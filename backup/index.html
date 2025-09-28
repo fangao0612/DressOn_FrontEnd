@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DressOn AI — Fashion Editing & Smart Wardrobe</title>
+  <meta name="description" content="DressOn AI: Consistent character editing and fashion re-styling with text prompts, model and garment references, and instant previews.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>👗</text></svg>">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner nb-header">
+      <div class="nb-left">
+        <div class="brand">
+          <img class="logo-img" src="./assets/dresson_logo.svg" alt="Dress On logo" />
+          <span class="name">Dress On</span>
+        </div>
+      </div>
+      <div class="nb-center">
+        <a class="nav-link" href="#editor">Image Editor</a>
+        <a class="nav-link" href="#showcase">Showcase</a>
+        <a class="nav-link" href="#pricing">Pricing</a>
+        <a class="nav-link" href="#api">API</a>
+      </div>
+      <div class="nb-right">
+        <button class="icon-btn theme-toggle" aria-label="Toggle theme">🌙</button>
+        <button class="pill locale" aria-haspopup="listbox">US <span class="chev" aria-hidden>▾</span></button>
+        <a class="btn btn-launch" href="#step1">Launch Now</a>
+        <div class="pill credits" role="status">
+          <span class="coin" aria-hidden>◎</span>
+          <span class="amount">19050</span>
+          <span class="unit">credits</span>
+        </div>
+        <div class="avatar" aria-label="Profile">F</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO: full viewport height -->
+    <section class="hero hero-centered" id="top">
+      <div class="container">
+        <div class="hero-copy">
+          <div class="badge">Fashion · Consistency · One‑click Dressing</div>
+          <h1 class="hero-title">Change Outfits, Instantly</h1>
+          <p class="hero-sub">DressOn AI delivers stable character identity, refined fabric detail, and natural scene blending. Re‑style any photo with simple text and references.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#step1">Start Editing</a>
+            <a class="btn ghost" href="#showcase">View Examples</a>
+          </div>
+          <ul class="hero-features">
+            <li>⚡ One‑shot dressing</li>
+            <li>🖼️ Multi‑image support</li>
+            <li>💬 Natural language</li>
+          </ul>
+          <div class="hero-cta">
+            <a class="hero-cta-text" href="#step1">Get Started</a>
+            <div class="scroll-indicator">
+              <div class="arrow-down">⌄</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 1 -->
+    <section class="editor" id="editor">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Step 1: Mix Character with Garment</h2>
+          <p class="section-subtitle">Experience the power of DressOn's natural language image editing. Transform any photo with simple text commands.</p>
+        </div>
+        <div class="editor-grid" id="step1">
+          <div class="left-wrap">
+          <div class="panel left">
+            <div class="panel-bar"><div class="bar-title">Prompt Engine</div></div>
+            <div class="panel-inner">
+
+            <div class="field two-col">
+              <label class="label">Character Reference</label>
+              <div class="uploader square" data-role="person">
+                <input class="file-input" type="file" accept="image/*" aria-label="Upload character reference">
+                <div class="drop-area">
+                  <div class="plus">+</div>
+                  <div class="hint">Add Image · Max 50MB</div>
+                </div>
+                <img class="preview" alt="Character preview" hidden>
+              </div>
+            </div>
+
+            <div class="field two-col">
+              <label class="label">Garment Reference</label>
+              <div class="uploader square" data-role="clothes">
+                <input class="file-input" type="file" accept="image/*" aria-label="Upload garment reference">
+                <div class="drop-area">
+                  <div class="plus">+</div>
+                  <div class="hint">Add Image · Max 50MB</div>
+                </div>
+                <img class="preview" alt="Garment preview" hidden>
+              </div>
+            </div>
+            </div>
+          </div>
+          <div class="step1-cta"><button class="btn primary full generate-btn" data-target="#canvas1">Generate Look</button></div>
+          </div>
+
+          <div class="panel right">
+            <div class="panel-bar"><div class="bar-title">Output Gallery</div></div>
+            <div class="panel-inner">
+              <div class="canvas" id="canvas1">
+                <div class="placeholder">
+                  <div class="icon">🪄</div>
+                  <div class="title">Ready for instant generation</div>
+                  <div class="desc">Upload references and hit Generate</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="refine" id="step2">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Step 2: Refine with Prompt</h2>
+          <p class="section-subtitle">Fine-tune your creations with precise prompts. Control background, lighting, pose and style with natural language.</p>
+        </div>
+        <div class="refine-grid">
+          <div class="left-wrap">
+          <div class="panel left">
+            <div class="panel-bar"><div class="bar-title">Refine with Prompts</div></div>
+            <div class="panel-inner">
+              <div class="refine-form">
+                <label class="label" for="prompt">Main Prompt</label>
+                <textarea id="prompt" class="prompt" rows="5" placeholder="Golden‑hour rooftop, editorial street style, shallow depth of field, soft backlight"></textarea>
+                <div class="prompt-actions">
+                  <button class="btn ghost" id="copy-prompt">Copy</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="step2-cta"><button class="btn primary full refine-btn" id="refine-generate" data-target="#canvas2">Apply & Generate</button></div>
+          </div>
+          <div class="panel right">
+            <div class="panel-bar"><div class="bar-title">Live Preview</div></div>
+            <div class="panel-inner">
+              <div class="canvas" id="canvas2">
+                <div class="placeholder">
+                  <div class="icon">🎨</div>
+                  <div class="title">Waiting for your prompt</div>
+                  <div class="desc">Describe style and scene, then generate</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHOWCASE & REVIEWS -->
+    <section class="showcase-reviews" id="showcase">
+      <div class="container">
+        <div class="showcase-section">
+          <h3 class="section-title">Lightning‑Fast Fashion Creations</h3>
+          <div class="cards">
+            <article class="shot">
+              <div class="thumb t1"></div>
+              <div class="meta">
+                <h4>Editorial Skyline</h4>
+                <p>Created in 0.8s with preserved identity and textile details.</p>
+              </div>
+            </article>
+            <article class="shot">
+              <div class="thumb t2"></div>
+              <div class="meta">
+                <h4>Garden Harmony</h4>
+                <p>Natural light and seamless blending between subject and scene.</p>
+              </div>
+            </article>
+            <article class="shot">
+              <div class="thumb t3"></div>
+              <div class="meta">
+                <h4>Island Breeze</h4>
+                <p>Realistic skin tones with crisp textures under bright sun.</p>
+              </div>
+            </article>
+            <article class="shot">
+              <div class="thumb t4"></div>
+              <div class="meta">
+                <h4>Arctic Aura</h4>
+                <p>Stable identity and fabric quality in complex lighting.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+        <div class="reviews-section">
+          <h3 class="section-title">What creators are saying</h3>
+          <div class="reviews-grid">
+            <div class="review">
+              <div class="avatar" aria-hidden="true"></div>
+              <div>
+                <div class="author">UGC Creator</div>
+                <p>"Consistent characters made series content much easier. Details stay intact."</p>
+              </div>
+            </div>
+            <div class="review">
+              <div class="avatar" aria-hidden="true"></div>
+              <div>
+                <div class="author">Fashion E‑commerce</div>
+                <p>"Batch dressing shortens launch cycles. Visual style stays unified."</p>
+              </div>
+            </div>
+            <div class="review">
+              <div class="avatar" aria-hidden="true"></div>
+              <div>
+                <div class="author">Retoucher</div>
+                <p>"One‑click base renders + fine touches doubled our throughput."</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq" id="faq">
+      <div class="container">
+        <h3 class="section-title">Frequently Asked Questions</h3>
+        <div class="accordion" role="tablist">
+          <div class="acc-item">
+            <button class="acc-head" aria-expanded="false">
+              <span>What is DressOn AI?</span>
+              <span class="chev" aria-hidden>▾</span>
+            </button>
+            <div class="acc-panel" hidden>
+              <p>An AI fashion editor for creators. It supports identity consistency, garment references and scene refinement.</p>
+            </div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-head" aria-expanded="false">
+              <span>How does it work?</span>
+              <span class="chev" aria-hidden>▾</span>
+            </button>
+            <div class="acc-panel" hidden>
+              <p>Upload one character and one garment, optionally add notes, then generate. Refine with prompts in Step 2.</p>
+            </div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-head" aria-expanded="false">
+              <span>Can I use it commercially?</span>
+              <span class="chev" aria-hidden>▾</span>
+            </button>
+            <div class="acc-panel" hidden>
+              <p>Yes, under applicable laws and platform policies. Please review your brand and portrait rights.</p>
+            </div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-head" aria-expanded="false">
+              <span>What types of edits are supported?</span>
+              <span class="chev" aria-hidden>▾</span>
+            </button>
+            <div class="acc-panel" hidden>
+              <p>Dressing, background replacement, camera and pose control, lighting and style adjustments.</p>
+            </div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-head" aria-expanded="false">
+              <span>Where can I try it?</span>
+              <span class="chev" aria-hidden>▾</span>
+            </button>
+            <div class="acc-panel" hidden>
+              <p>Use the “Start Editing” button on this page or contact us for enterprise access.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>© 2025 DressOn AI. All rights reserved.</div>
+      <div class="links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Refund</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>
+
+

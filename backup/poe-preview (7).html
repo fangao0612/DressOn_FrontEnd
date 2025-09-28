@@ -1,0 +1,252 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Remember everything. Organize nothing. — Night</title>
+<style>
+  :root{
+    /* Night canvas */
+    --bg: #0b0d10;
+    --bg-2:#0f1217;
+    --surface:#141923;
+    --overlay:#18202b;
+
+    /* Text */
+    --txt:#e9eef6;
+    --txt-soft:#c6d0df;
+    --muted:#96a3b9;
+
+    /* Lines */
+    --line:#283244;
+
+    /* Brand */
+    --primary:#FF5E66;
+    --primary-600:#ff4e58;
+    --primary-700:#e63d48;
+    --primary-950:#2d1417;
+
+    /* Accent dots */
+    --dot-yellow:#ffd166;
+    --dot-pink:#ff7b9c;
+    --dot-green:#80ffb2;
+
+    /* Tag pastel palette (night softened) */
+    --tag-notes:#ff8aa1;
+    --tag-bookmarks:#7fc8ff;
+    --tag-inspo:#8bd7ff;
+    --tag-articles:#ffa07a;
+    --tag-images:#ffe27a;
+
+    --focus:#8ab4ff;
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background: radial-gradient(60% 60% at 50% -10%, rgba(255,255,255,0.06), transparent 60%),
+                radial-gradient(80% 70% at -10% 0%, rgba(255,94,102,0.10), transparent 60%),
+                radial-gradient(80% 70% at 110% 0%, rgba(115,131,255,0.12), transparent 60%),
+                var(--bg);
+    color:var(--txt-soft);
+    font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  }
+
+  .wrap{max-width:1100px; margin:0 auto; padding:20px 16px 80px;}
+
+  /* Top nav */
+  .top{
+    display:flex; align-items:center; gap:12px; padding:10px 0;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px; font-weight:800; color:var(--txt);
+  }
+  .logo{ width:28px; height:28px; border-radius:50%;
+    background: radial-gradient(120% 120% at 20% 20%, var(--primary) 0%, #ff7a80 55%, var(--bg-2) 100%);
+    box-shadow: 0 0 0 1px rgba(255,255,255,.04), 0 8px 26px rgba(255,94,102,.25);
+  }
+  .nav{
+    margin-left:auto; display:flex; gap:18px; align-items:center; color:var(--muted);
+    font-weight:600;
+  }
+  .nav .dot{display:inline-flex; align-items:center; gap:8px; color:var(--txt-soft); text-decoration:none;}
+  .nav .dot::before{
+    content:""; width:8px; height:8px; border-radius:50%;
+    background:var(--dot-yellow);
+    box-shadow:0 0 0 2px rgba(255,209,102,.15);
+  }
+  .nav a:nth-child(2)::before{ background:var(--dot-pink); box-shadow:0 0 0 2px rgba(255,123,156,.15); }
+  .nav a:nth-child(3)::before{ background:var(--dot-green); box-shadow:0 0 0 2px rgba(128,255,178,.15); }
+
+  .auth{display:flex; gap:10px; margin-left:16px;}
+  .btn{
+    appearance:none; border:1px solid var(--line); background:rgba(255,255,255,.02);
+    color:var(--txt); padding:8px 14px; border-radius:999px; font-weight:700; cursor:pointer;
+  }
+  .btn.primary{
+    background:var(--primary); border-color:#ff6a71; color:#fff;
+    box-shadow:0 8px 24px rgba(255,94,102,.25);
+  }
+  .btn:hover{border-color:#344158}
+  .btn.primary:hover{background:var(--primary-600)}
+  .btn:focus-visible{outline:none; box-shadow:0 0 0 3px rgba(138,180,255,.35)}
+
+  /* Hero */
+  .hero{
+    position:relative;
+    margin: 34px auto 28px;
+    padding: clamp(28px, 8vw, 60px) 14px;
+    text-align:center;
+    background:
+      radial-gradient(60% 70% at 50% 0%, rgba(255,94,102,.18), transparent 60%),
+      radial-gradient(70% 80% at 100% 0%, rgba(120,140,255,.16), transparent 60%),
+      radial-gradient(70% 80% at 0% 0%, rgba(255,196,125,.14), transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,0));
+    border:1px solid var(--line);
+    border-radius: clamp(18px, 3vw, 28px);
+    backdrop-filter:saturate(1.1) blur(0px);
+  }
+  .title{
+    margin:0;
+    font-family: "Georgia", "Times New Roman", ui-serif, serif;
+    font-weight: 800;
+    letter-spacing: .2px;
+    line-height: .95;
+    color:#f4f7fb;
+    font-size: clamp(34px, 9vw, 84px);
+    text-shadow: 0 2px 0 rgba(255,255,255,.02);
+  }
+  .subtitle{
+    margin: 16px auto 22px; max-width: 740px; color: var(--txt-soft); font-size: clamp(15px, 2.4vw, 18px);
+  }
+
+  /* Tags row */
+  .tags{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin: 10px 0 18px;}
+  .tag{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:6px 10px; border-radius:999px; font-weight:700; font-size:13px;
+    background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); color:#0b0d10;
+  }
+  .tag span{ color:#0b0d10; }
+  .t-notes{ background: color-mix(in srgb, var(--tag-notes) 26%, white 0%); border-color: color-mix(in srgb, var(--tag-notes) 40%, transparent); }
+  .t-book{ background: color-mix(in srgb, var(--tag-bookmarks) 26%, white 0%); border-color: color-mix(in srgb, var(--tag-bookmarks) 40%, transparent); }
+  .t-inspo{ background: color-mix(in srgb, var(--tag-inspo) 26%, white 0%); border-color: color-mix(in srgb, var(--tag-inspo) 40%, transparent); }
+  .t-articles{ background: color-mix(in srgb, var(--tag-articles) 26%, white 0%); border-color: color-mix(in srgb, var(--tag-articles) 40%, transparent); }
+  .t-images{ background: color-mix(in srgb, var(--tag-images) 26%, white 0%); border-color: color-mix(in srgb, var(--tag-images) 40%, transparent); }
+
+  /* CTA buttons */
+  .ctas{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:10px;}
+  .btn.soft{
+    background: rgba(255,255,255,.06);
+    border-color: rgba(255,255,255,.10);
+    color: var(--txt);
+  }
+  .btn.soft:hover{ background: rgba(255,255,255,.10); }
+
+  /* Showcase board */
+  .board{
+    margin: 36px auto 0;
+    background: var(--surface);
+    border:1px solid var(--line);
+    border-radius:18px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    overflow:hidden;
+  }
+  .board-hd{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding: 12px 14px; background: linear-gradient(180deg, var(--bg-2), rgba(255,255,255,0));
+    border-bottom:1px solid var(--line);
+  }
+  .search{
+    display:flex; align-items:center; gap:10px; color:#cfd8e6; font-style:italic; font-size:22px;
+    font-family: ui-serif, Georgia, "Times New Roman", serif;
+  }
+  .tabs{ display:flex; gap:10px; flex-wrap:wrap; }
+  .pill{
+    padding:6px 12px; border-radius:999px; border:1px solid var(--line);
+    background: rgba(255,255,255,.03); color: var(--txt-soft); font-weight:700; cursor:pointer;
+  }
+  .pill.active{ background: rgba(255,255,255,.08); color: var(--txt); border-color:#334059; }
+
+  .board-bd{
+    display:grid; gap:12px; padding: 12px; grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 800px){ .board-bd{ grid-template-columns: repeat(4, 1fr);} }
+
+  .card{
+    background: var(--bg-2);
+    border:1px solid var(--line);
+    border-radius:12px; overflow:hidden;
+    aspect-ratio: 4 / 3;
+    display:flex; align-items:center; justify-content:center;
+    color:#aebad1;
+    box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  }
+  .thumb{
+    width:100%; height:100%; display:grid; place-items:center;
+    background:
+      radial-gradient(60% 60% at 30% 10%, rgba(255,94,102,.22), transparent 60%),
+      radial-gradient(60% 60% at 90% 20%, rgba(132,152,255,.20), transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,0));
+  }
+  .chip{
+    position:absolute; top:10px; left:10px;
+    padding:4px 8px; border-radius:999px; font-size:12px; font-weight:700; color:#0b0d10;
+    background: #ffd166; border:1px solid rgba(0,0,0,.08);
+  }
+
+  footer{color:var(--muted); text-align:center; padding:24px 0;}
+</style>
+<script src="https://puc.poecdn.net/authenticated_preview_page/syncedState.bd4eeeb8e8e02052ee92.js"></script></head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><div class="logo" aria-hidden="true"></div><span>mymind — night</span></div>
+      <nav class="nav" aria-label="Primary">
+        <a class="dot" href="#">What</a>
+        <a class="dot" href="#">Why</a>
+        <a class="dot" href="#">How</a>
+      </nav>
+      <div class="auth">
+        <button class="btn">Log in</button>
+        <button class="btn primary">Sign up</button>
+      </div>
+    </header>
+
+    <section class="hero" role="banner">
+      <h1 class="title">Remember everything.<br>Organize nothing.</h1>
+      <p class="subtitle">All your <span class="tag t-notes"><span>notes</span></span> <span class="tag t-book"><span>bookmarks</span></span> <span class="tag t-inspo"><span>inspiration</span></span> <span class="tag t-articles"><span>articles</span></span> and <span class="tag t-images"><span>images</span></span> in one single, private place.</p>
+
+      <div class="ctas">
+        <button class="btn soft">iPhone app</button>
+        <button class="btn soft">Browser Extension</button>
+        <button class="btn primary">Android app</button>
+      </div>
+    </section>
+
+    <section class="board" aria-label="Showcase">
+      <div class="board-hd">
+        <div class="search">Search my mind…</div>
+        <div class="tabs">
+          <button class="pill active">Everything</button>
+          <button class="pill">Spaces</button>
+          <button class="pill">Serendipity</button>
+        </div>
+      </div>
+      <div class="board-bd">
+        <div class="card"><div class="thumb"><span class="chip">$450</span>Cozy kitchen mood</div></div>
+        <div class="card"><div class="thumb">Quote — keep it simple.</div></div>
+        <div class="card"><div class="thumb">Sneakers color study</div></div>
+        <div class="card"><div class="thumb">Macro droplets shot</div></div>
+        <div class="card"><div class="thumb">Room palette</div></div>
+        <div class="card"><div class="thumb">UI tag idea</div></div>
+        <div class="card"><div class="thumb">Note — meeting</div></div>
+        <div class="card"><div class="thumb">Illustration ref</div></div>
+      </div>
+    </section>
+
+    <footer>Night-first landing mock • Primary #FF5E66 • soft pastel tags • radial glow background</footer>
+  </div>
+
+
+</body></html>
