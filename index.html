@@ -137,11 +137,23 @@
           <div class="panel left">
             <div class="panel-bar"><div class="bar-title">Refine with Prompts</div></div>
             <div class="panel-inner">
+              <div class="field two-col">
+                <label class="label">Refine Reference</label>
+                <div class="uploader square" data-role="refine">
+                  <input class="file-input" type="file" accept="image/*" aria-label="Upload refine reference">
+                  <div class="drop-area">
+                    <div class="plus">+</div>
+                    <div class="hint">Add Image · Max 50MB</div>
+                  </div>
+                  <img class="preview" alt="Refine preview" hidden>
+                </div>
+              </div>
               <div class="refine-form">
                 <label class="label" for="prompt">Main Prompt</label>
                 <textarea id="prompt" class="prompt" rows="5" placeholder="Golden‑hour rooftop, editorial street style, shallow depth of field, soft backlight"></textarea>
                 <div class="prompt-actions">
-                  <button class="btn ghost" id="copy-prompt">Copy</button>
+                  <button class="btn ghost btn-small" id="paste-prompt">Paste</button>
+                  <button class="btn ghost btn-small" id="copy-prompt">Copy</button>
                 </div>
               </div>
             </div>

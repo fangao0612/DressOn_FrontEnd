@@ -164,6 +164,7 @@ async function downscaleDataURL(dataUrl, maxW, maxH, mime = 'image/jpeg', qualit
 
 // keep last half image for manual resend and split canvases
 let lastHalfBlob = null;
+let lastFinalImageBase64 = null; // original full-res final image from step1
 
 async function sendToNano(finalSel, mainFile, refFile) {
   // persisted Nano prompt
@@ -195,7 +196,32 @@ async function sendToNano(finalSel, mainFile, refFile) {
     }
   }
   if (result?.imageBase64) {
-    stopTimer(finalSel, 'Done'); setCanvasImage(finalSel, result.imageBase64); logStatus(finalSel, 'Done');
+    stopTimer(finalSel, 'Done');
+    setCanvasImage(finalSel, result.imageBase64);
+    // ensure a working download button on Live Preview as well
+    try {
+      const panel2 = document.querySelector(finalSel);
+      const old = panel2?.querySelector('.dl-btn');
+      if (old) old.remove();
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'dl-btn';
+      btn.title = 'Download original';
+      const icon = document.createElement('img');
+      icon.src = './assets/download.svg';
+      icon.alt = 'download';
+      btn.appendChild(icon);
+      const dataUrl = result.imageBase64;
+      btn.onclick = () => {
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        const ts = new Date().toISOString().replace(/[:.]/g,'-');
+        a.download = `final-${ts}.png`;
+        document.body.appendChild(a); a.click(); a.remove();
+      };
+      panel2?.appendChild(btn);
+    } catch {}
+    logStatus(finalSel, 'Done');
   } else {
     stopTimer(finalSel, 'Failed'); setCanvasError(finalSel, `Generation failed: ${lastError?.message || 'No image from NanoBanana after 12 attempts'}`);
   }
@@ -311,11 +337,25 @@ async function handleGenerate() {
           result = r;
           stopTimer(targetSel, 'Done');
           const panel2 = document.querySelector(targetSel);
-          const cw = panel2?.clientWidth || 1024; const ch = panel2?.clientHeight || 768;
-          let previewUrl = r.imageBase64; try { previewUrl = await downscaleDataURL(r.imageBase64, cw, ch, 'image/jpeg', 0.9); } catch {}
+          const cw = Math.max(1, (panel2?.clientWidth || 1024));
+          const ch = Math.max(1, (panel2?.clientHeight || 768));
+          let previewUrl = r.imageBase64;
+          try { previewUrl = await downscaleDataURL(r.imageBase64, cw, ch, 'image/jpeg', 0.9); } catch {}
           setCanvasImage(targetSel, previewUrl);
+          // remember original full-res for refine
+          try { lastFinalImageBase64 = r.imageBase64; } catch {}
           // update download button
           try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src='./assets/download.svg'; icon.alt='download'; btn.appendChild(icon); btn.onclick=()=>{ const a=document.createElement('a'); a.href=r.imageBase64; const ts=new Date().toISOString().replace(/[:.]/g,'-'); a.download=`final-${ts}.png`; document.body.appendChild(a); a.click(); a.remove(); }; panel2.appendChild(btn);} catch {}
+          // auto-fill Refine Reference preview with the generated image (keep uploader behavior)
+          try {
+            const refine = document.querySelector('.uploader[data-role="refine"]');
+            const prev = refine?.querySelector('.preview');
+            if (prev) {
+              let small = r.imageBase64;
+              try { small = await downscaleDataURL(r.imageBase64, 270, 270, 'image/jpeg', 0.9); } catch {}
+              prev.src = small; prev.hidden = false;
+            }
+          } catch {}
           logStatus(targetSel, `nano: ${(nanoMs/1000).toFixed(2)} s · flux+nano: ${((fluxMs+nanoMs)/1000).toFixed(2)} s`);
           break;
         }
@@ -339,6 +379,19 @@ async function handleGenerate() {
     e.preventDefault();
     e.stopImmediatePropagation();
     handleGenerate();
+  });
+})();
+
+// copy/paste handlers for Main Prompt
+(() => {
+  const ta = document.getElementById('prompt');
+  const copyBtn = document.getElementById('copy-prompt');
+  const pasteBtn = document.getElementById('paste-prompt');
+  copyBtn?.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(ta?.value || ''); } catch (e) { console.warn('copy failed', e); }
+  });
+  pasteBtn?.addEventListener('click', async () => {
+    try { const text = await navigator.clipboard.readText(); if (ta) { ta.value = text || ''; ta.dispatchEvent(new Event('input', { bubbles:true })); } } catch (e) { console.warn('paste failed', e); }
   });
 })();
 
@@ -380,6 +433,96 @@ document.head.appendChild(style);
     btn.appendChild(icon);
     panel.appendChild(btn);
   }
+})();
+
+// dev: also place a disabled download button in Live Preview when idle
+(() => {
+  const panel = document.querySelector('#canvas2');
+  if (panel && !panel.querySelector('.dl-btn')) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'dl-btn';
+    btn.disabled = true;
+    btn.title = 'Download original';
+    const icon = document.createElement('img');
+    icon.src = './assets/download.svg';
+    icon.alt = 'download';
+    btn.appendChild(icon);
+    panel.appendChild(btn);
+  }
+})();
+
+// (removed) paste-from-output quick button — now using the standard uploader only
+
+// ---- refine flow: use previous Output Gallery image + prompt, send to Nano, render in Live Preview ----
+async function handleRefine(){
+  const targetSel = '#canvas2';
+  const promptEl = document.getElementById('prompt');
+  const promptText = (promptEl?.value || '').trim();
+  // half image: prefer original full-res from step1; fallback to the displayed image
+  let halfDataUrl = lastFinalImageBase64;
+  if (!halfDataUrl) {
+    const img = document.querySelector('#canvas1 img');
+    if (img && img.src) halfDataUrl = img.src;
+  }
+  if (!halfDataUrl) { setCanvasError(targetSel, 'No image in Output Gallery to refine.'); return; }
+
+  // optional refine reference image
+  const refineInput = document.querySelector('.uploader[data-role="refine"] .file-input');
+  const refFile = refineInput?.files?.[0];
+
+  try {
+    setCanvasLoading(targetSel, 'Refining with NanoBanana…');
+    startTimer(targetSel);
+    const panel = document.querySelector(targetSel);
+    const cancelBtn = panel?.querySelector('.btn-cancel');
+    let cancelReject; const cancelPromise = new Promise((_, reject)=>{ cancelReject = reject; });
+    currentCancel = () => { try { cancelReject?.(new Error('Cancelled by user')); } catch {} };
+    cancelBtn?.addEventListener('click', ()=>{ currentCancel?.(); logStatus(targetSel, 'Cancelled by user'); });
+
+    // convert dataURL to Blob
+    const halfBlob = await (await fetch(halfDataUrl)).blob();
+    const refs = refFile ? [refFile] : [];
+    if (promptText) { try { const pvw = promptText.replace(/\s+/g,' ').slice(0,120); logStatus(targetSel, `Refine prompt: "${pvw}${pvw.length===120?'…':''}"`, { withTime:false }); } catch {} }
+
+    const maxRetries = 6; let attempt = 0; let lastError = null; let result = null; const tStart = performance.now();
+    while (attempt < maxRetries && !result) {
+      attempt++; setAttempt(targetSel, attempt, maxRetries);
+      logStatus(targetSel, `Submitting to NanoBanana (attempt ${attempt}/${maxRetries})…`, { withTime:false });
+      try {
+        const { task_id } = await FluxKontext.startNanoProcess(halfBlob, refs, promptText || '');
+        logStatus(targetSel, `task_id: ${task_id}`, { withTime:false });
+        const r = await Promise.race([
+          FluxKontext.pollNanoResult(task_id, (j)=>{ if (j) { if (j.status) logStatus(targetSel, `status: ${j.status}`, { withTime:false }); if (j.error) logStatus(targetSel, `error: ${j.error}`, { withTime:false }); if (j.debug) { try { const dbg = typeof j.debug==='string'? j.debug : JSON.stringify(j.debug); logStatus(targetSel, `debug: ${String(dbg).slice(0,600)}${String(dbg).length>600?' …':''}`, { withTime:false }); } catch {} } } }),
+          cancelPromise,
+        ]);
+        if (r?.imageBase64) {
+          result = r; break;
+        }
+        if (r instanceof Error) throw r;
+        lastError = new Error(r?.error || 'No image from NanoBanana');
+      } catch (e) { lastError = e; logStatus(targetSel, `error: ${e?.message || e}`, { withTime:false }); if (String(e?.message||e).includes('Cancelled')) break; }
+    }
+    if (!result) throw new Error(lastError?.message || 'No image from NanoBanana after 6 attempts');
+
+    // success → render into Live Preview and enable download
+    const panel2 = document.querySelector(targetSel);
+    const cw = Math.max(1, (panel2?.clientWidth || 1024));
+    const ch = Math.max(1, (panel2?.clientHeight || 768));
+    let previewUrl = result.imageBase64; try { previewUrl = await downscaleDataURL(result.imageBase64, cw, ch, 'image/jpeg', 0.9); } catch {}
+    stopTimer(targetSel, 'Done');
+    setCanvasImage(targetSel, previewUrl);
+    try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src='./assets/download.svg'; icon.alt='download'; btn.appendChild(icon); btn.onclick=()=>{ const a=document.createElement('a'); a.href=result.imageBase64; const ts=new Date().toISOString().replace(/[:.]/g,'-'); a.download=`refined-${ts}.png`; document.body.appendChild(a); a.click(); a.remove(); }; panel2.appendChild(btn);} catch {}
+    const totalMs = performance.now() - tStart; logStatus(targetSel, `refine: ${(totalMs/1000).toFixed(2)} s`, { withTime:false });
+  } catch (e) { const msg = e?.message || String(e); stopTimer(targetSel, 'Failed'); setCanvasError(targetSel, `Refine failed: ${msg}`); }
+}
+
+// bind Step2 Apply & Generate button
+(() => {
+  const btn = document.getElementById('refine-generate');
+  if (!btn) return;
+  const clone = btn.cloneNode(true); btn.parentNode.replaceChild(clone, btn);
+  clone.addEventListener('click', (e)=>{ e.preventDefault(); e.stopImmediatePropagation(); handleRefine(); });
 })();
 
 

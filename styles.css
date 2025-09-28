@@ -69,6 +69,7 @@ body{
 .btn.primary{background:linear-gradient(180deg,#ff5e66,#ff5e66);color:#fff;border-color:rgba(255,94,102,.45);box-shadow:0 8px 24px rgba(255,94,102,.25),0 2px 10px rgba(0,0,0,.35)}
 .btn.ghost{background:transparent}
 .btn.full{width:100%}
+.btn-small{padding:.6rem 1rem;border-radius:9999px;font-size:.85rem;font-weight:400}
 
 /* hero */
 .hero{min-height:calc(100vh - var(--header-h));display:grid;place-items:center;padding:72px 0 56px;position:relative}
@@ -109,35 +110,41 @@ body{
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px 20px 22px;box-shadow:0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04)}
 .panel{height:952px;display:flex;flex-direction:column}
 /* ensure right panel never shows overflow */
-.panel.right{overflow:hidden}
-.left-wrap{display:flex;flex-direction:column;height:952px}
+.panel.right{overflow:hidden;height:937px}
+.left-wrap{display:flex;flex-direction:column;height:937px}
 .left-wrap .panel{height:auto;flex:1}
-.step1-cta{padding:16px 0 0;margin-top:var(--editor-gap,36px)}
+.step1-cta{padding:16px 0 0;margin-top:calc(var(--editor-gap,36px) - 15px)}
 .step1-cta .btn{border-radius:12px;width:100%;height:72px;background:linear-gradient(180deg,#ff5e66,#ff5e66);color:#fff;border:1px solid rgba(255,94,102,.35);box-shadow:0 8px 24px rgba(255,94,102,.25)}
 /* Step2 CTA 与 Step1 一致 */
-.step2-cta{padding:16px 0 0;margin-top:var(--editor-gap,36px)}
+.step2-cta{padding:16px 0 0;margin-top:calc(var(--editor-gap,36px) - 15px)}
 .step2-cta .btn{border-radius:12px;width:100%;height:72px;background:linear-gradient(180deg,#ff5e66,#ff5e66);color:#fff;border:1px solid rgba(255,94,102,.35);box-shadow:0 8px 24px rgba(255,94,102,.25)}
 .editor-grid{align-items:stretch}
 .refine-grid{align-items:stretch}
 .left-wrap,.panel.right{align-self:stretch}
 /* 对齐底部：让 CTA 的底边与右侧面板底边一致 */
 .editor-grid{grid-auto-rows:1fr}
-.panel .panel-inner{display:flex;flex-direction:column;gap:20px;flex:1;justify-content:center;align-items:center;overflow:hidden}
-/* 左侧面板：让两块输入区域整体在面板中居中 */
-.panel.left .panel-inner{align-items:center}
-/* Step2 左侧表单宽度与 Step1 左列一致并居中 */
-.refine .panel.left .panel-inner{align-items:center}
+.panel .panel-inner{display:flex;flex-direction:column;gap:20px;flex:1;justify-content:flex-start;align-items:flex-start;overflow:hidden}
+/* 左侧面板：让两块输入区域整体在面板中靠上且左对齐 */
+.panel.left .panel-inner{align-items:flex-start}
+/* Step2 左侧表单宽度与 Step1 左列一致并靠上显示 */
+.refine .panel.left .panel-inner{align-items:flex-start}
 .refine .refine-form{width:270px;display:flex;flex-direction:column;gap:12px}
 /* 右侧面板内元素拉伸，避免画布被挤瘦 */
 .panel.right .panel-inner{align-items:stretch}
 .panel .panel-bar{height:64px;display:flex;align-items:center;margin:-20px -20px 12px;padding:0 20px;background:linear-gradient(135deg,rgba(159,176,203,.08),rgba(255,255,255,.03));border-bottom:1px solid rgba(159,176,203,.22);border-top-left-radius:16px;border-top-right-radius:16px}
+/* extra spacing below titles for left panels */
+.editor .panel.left .panel-bar,
+.refine .panel.left .panel-bar{ margin-bottom: 38px; }
+/* add 7px spacing above Output Gallery canvas */
+.editor .panel.right .panel-bar{ margin-bottom: 22px; }
+.refine .panel.right .panel-bar{ margin-bottom: 22px; }
 .panel .bar-title{font-weight:900;color:#ffcc99}
 .panel-head h2{margin:.1rem 0 .35rem;font-size:30px}
 .panel-head h3{margin:.1rem 0 .2rem;font-size:22px}
 .panel-head p{margin:0;color:var(--muted)}
 
 .field{display:flex;flex-direction:column;gap:10px;margin:18px 0}
-.field.two-col{display:flex;flex-direction:column;align-items:flex-start;gap:6px;width:270px}
+.field.two-col{display:flex;flex-direction:column;align-items:flex-start;gap:14px;width:270px}
 .field.two-col .label{text-align:left;margin:0}
 .field.two-col .uploader{justify-self:center}
 .label{font-weight:800}
@@ -146,13 +153,25 @@ body{
 .panel.right .canvas{height:100%;width:100%;flex:1;position:relative;overflow:hidden}
 .file-input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .drop-area{display:grid;place-items:center;text-align:center;color:var(--muted)}
-.plus{font-size:42px;color:#ff5e66;margin-bottom:6px}
+/* Restore: ensure default drop-area layout untouched */
+/* Refine uploader resets: match default uploader layout */
+.uploader[data-role="refine"] .drop-area{position:static;display:grid;place-items:center;text-align:center;color:var(--muted)}
+.uploader[data-role="refine"] .plus{position:static;transform:none;margin-bottom:6px}
+.uploader[data-role="refine"] .hint{position:static;margin-top:0}
+/* keep plus style intact; hint remains below via default flow */
 .preview{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
 .note,.prompt{width:100%;background:#0e1320;border:1px solid var(--border);border-radius:12px;color:var(--text);padding:1rem}
 /* 约束提示词文本框的宽度，禁止水平拉伸，仅允许垂直方向调整 */
 .prompt{min-width:100%;max-width:100%;min-height:100px;max-height:560px;overflow:auto;resize:vertical}
+/* Main Prompt: default height 201px; resize range 100–258px */
+.prompt{height:201px;min-height:100px;max-height:258px}
+
+/* Fix: prompt focus ring clipped by overflow — draw inside */
+.prompt:focus,.prompt:focus-visible{outline:0;border-color:rgba(255,255,255,.9);box-shadow:0 0 0 2px rgba(255,255,255,.9) inset}
 
 .canvas{min-height:480px;border:1px dashed rgba(255,255,255,.18);border-radius:14px;background:linear-gradient(180deg,#111827,#0e141f);display:grid;place-items:center;position:relative;overflow:hidden}
+/* add inner padding on right panels to create 7px spacing around canvas without clipping */
+.editor .panel.right .panel-inner,.refine .panel.right .panel-inner{padding:7px}
 .canvas img{position:relative;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;object-position:center;display:block;margin:auto}
 /* hover download button in bottom-right */
 .canvas .dl-btn{position:absolute;right:14px;bottom:14px;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:linear-gradient(180deg,#ff5e66,#ff5e66);color:#fff;display:grid;place-items:center;font-weight:900;box-shadow:0 8px 24px rgba(255,94,102,.25),0 2px 10px rgba(0,0,0,.35);cursor:pointer;opacity:1;transform:none;transition:opacity .15s ease, transform .15s ease;z-index:3}
@@ -216,5 +235,17 @@ body{
   .cards{grid-template-columns:1fr}
   .reviews-grid{grid-template-columns:1fr}
 }
+
+/* Reduce spacing between Character Reference and Garment Reference in Prompt Engine */
+.editor .panel.left .panel-inner .field.two-col:nth-of-type(2){
+  margin-top: -1px;
+}
+
+/* Restore original alignment for left panels */
+.panel.left .panel-inner{align-items:flex-start}
+.refine .panel.left .panel-inner{align-items:flex-start}
+
+/* Restore classic plus sign style for all uploaders */
+.uploader .drop-area .plus{font-size:42px;color:var(--primary);margin-bottom:6px;font-weight:400}
 
 
