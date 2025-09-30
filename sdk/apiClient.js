@@ -34,7 +34,7 @@ function buildForm(data) {
 
 async function httpPost(path, form) {
   const url = `${DEFAULTS.baseUrl}${path}`;
-  const resp = await fetch(url, { method: 'POST', body: form });
+  const resp = await fetch(url, { method: 'POST', body: form, credentials: 'include' });
   if (!resp.ok) {
     const text = await resp.text().catch(() => '');
     throw new Error(`POST ${path} failed: ${resp.status} ${text}`);
@@ -46,7 +46,7 @@ async function httpPost(path, form) {
 
 async function httpGet(path) {
   const url = `${DEFAULTS.baseUrl}${path}`;
-  const resp = await fetch(url);
+  const resp = await fetch(url, { credentials: 'include' });
   if (!resp.ok) {
     const text = await resp.text().catch(() => '');
     throw new Error(`GET ${path} failed: ${resp.status} ${text}`);
@@ -58,6 +58,129 @@ export const FluxKontext = {
   setBaseUrl(url) {
     assert(typeof url === 'string' && url.length > 0, 'Invalid baseUrl');
     DEFAULTS.baseUrl = url.replace(/\/$/, '');
+  },
+
+  async getMe() {
+    return await httpGet('/me');
+  },
+
+  async logout() {
+    const url = `${DEFAULTS.baseUrl}/auth/logout`;
+    const resp = await fetch(url, { method: 'POST', credentials: 'include' });
+    if (!resp.ok) throw new Error(`POST /auth/logout failed: ${resp.status}`);
+    return await resp.json().catch(()=>({ ok:true }));
+  },
+
+  login() {
+    window.location.href = `${DEFAULTS.baseUrl}/auth/login`;
+  },
+
+  // Stytch 认证方法
+  async stytchGoogleLogin() {
+    try {
+      const response = await httpGet('/stytch/google/url');
+      if (response.url) {
+        window.location.href = response.url;
+      } else {
+        throw new Error('Failed to get Google OAuth URL');
+      }
+    } catch (error) {
+      console.error('Stytch Google login failed:', error);
+      throw error;
+    }
+  },
+
+  async stytchEmailSend(email) {
+    try {
+      const response = await fetch(`${DEFAULTS.baseUrl}/stytch/email/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email })
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || `Failed to send email: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Stytch email send failed:', error);
+      throw error;
+    }
+  },
+
+  async stytchEmailVerify(email, code) {
+    try {
+      const response = await fetch(`${DEFAULTS.baseUrl}/stytch/email/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, code })
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || `Failed to verify code: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Stytch email verify failed:', error);
+      throw error;
+    }
+  },
+
+  // 独立邮箱验证码系统
+  async emailSend(email) {
+    try {
+      const response = await fetch(`${DEFAULTS.baseUrl}/email/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email })
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || `Failed to send email: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Email send failed:', error);
+      throw error;
+    }
+  },
+
+  async emailVerify(email, code) {
+    try {
+      const response = await fetch(`${DEFAULTS.baseUrl}/email/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, code })
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || `Failed to verify code: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Email verify failed:', error);
+      throw error;
+    }
+  },
+
+  async stytchLogout() {
+    try {
+      const response = await fetch(`${DEFAULTS.baseUrl}/stytch/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error(`Stytch logout failed: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Stytch logout failed:', error);
+      throw error;
+    }
   },
 
   async runFlux(mainImageFile, fluxPrompt, options = {}) {

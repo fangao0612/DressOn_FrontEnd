@@ -2,7 +2,7 @@
 import { FluxKontext } from './sdk/apiClient.js';
 
 // Configure backend base URL
-FluxKontext.setBaseUrl('http://127.0.0.1:9090');
+FluxKontext.setBaseUrl('http://127.0.0.1:9091');
 
 const $ = (s, ctx = document) => ctx.querySelector(s);
 
@@ -291,10 +291,17 @@ async function handleGenerate() {
       const tFluxStart = performance.now();
       const fluxRes = await FluxKontext.runFlux(mainFile, 'remove clothes', { steps: 8 });
       logStatus(targetSel, 'Flux submitted. Waiting for half image…');
-      const halfUrl = fluxRes?.halfImageUrl;
-      if (!halfUrl) throw new Error('Flux did not return half image URL');
-      logStatus(targetSel, 'Half image URL received. Fetching…');
-      halfBlob = await fetchBlob(halfUrl);
+      // 后端代理返回的 base64 优先
+      const halfB64 = fluxRes?.halfImageBase64;
+      if (halfB64) {
+        logStatus(targetSel, 'Half image received via backend proxy');
+        halfBlob = await (await fetch(halfB64)).blob();
+      } else {
+        const halfUrl = fluxRes?.halfImageUrl;
+        if (!halfUrl) throw new Error('Flux did not return half image');
+        logStatus(targetSel, 'Half image URL received. Fetching…');
+        halfBlob = await fetchBlob(halfUrl);
+      }
       fluxMs = performance.now() - tFluxStart;
       logStatus(targetSel, `Flux time: ${(fluxMs/1000).toFixed(2)} s`);
       __lastHalfBlob = halfBlob; __lastMainSig = currSig;
@@ -357,6 +364,8 @@ async function handleGenerate() {
             }
           } catch {}
           logStatus(targetSel, `nano: ${(nanoMs/1000).toFixed(2)} s · flux+nano: ${((fluxMs+nanoMs)/1000).toFixed(2)} s`);
+          // refresh credits after success
+          refreshCreditsBadge();
           break;
         }
         if (r instanceof Error) throw r;
@@ -366,7 +375,7 @@ async function handleGenerate() {
       }
     }
     if (!result) throw new Error(lastError?.message || 'No image from NanoBanana after 6 attempts');
-  } catch (e) { const msg = e?.message || String(e); stopTimer(targetSel, 'Failed'); setCanvasError(targetSel, `Generation failed: ${msg}`); logStatus(targetSel, 'Final status: failed after maximum retries', { withTime:false }); if (/Failed to fetch|CORS/i.test(msg)) { console.warn('Hint: ensure backend allows 127.0.0.1:5174 and ComfyUI is up'); } }
+  } catch (e) { const msg = e?.message || String(e); stopTimer(targetSel, 'Failed'); setCanvasError(targetSel, `Generation failed: ${msg}`); logStatus(targetSel, 'Final status: failed after maximum retries', { withTime:false }); if (/Failed to fetch|CORS/i.test(msg)) { console.warn('Hint: ensure backend allows 127.0.0.1:5174 and ComfyUI is up'); } if (/402/.test(String(e))) { alert('余额不足，请购买或等候发放'); } }
 }
 
 // Bind button exclusively (remove any existing listeners like mockGenerate)
@@ -418,6 +427,18 @@ const style = document.createElement('style');
 style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
 document.head.appendChild(style);
 
+// helper: refresh credits badge from /me
+async function refreshCreditsBadge(){
+  try{
+    const me = await FluxKontext.getMe();
+    const amount = (me.credits && me.credits.balance != null) ? String(me.credits.balance) : null;
+    if (amount) {
+      const el = document.querySelector('.pill.credits .amount');
+      if (el) el.textContent = amount;
+    }
+  }catch{}
+}
+
 // dev: show a disabled download button even in idle state
 (() => {
   const panel = document.querySelector('#canvas1');
@@ -450,6 +471,281 @@ document.head.appendChild(style);
     btn.appendChild(icon);
     panel.appendChild(btn);
   }
+})();
+
+// ---- profile/login wiring (5174 用户端) ----
+(() => {
+  const btn = document.querySelector('.profile-btn');
+  const pop = document.querySelector('.profile-popover');
+  const loginBtn = document.querySelector('.login-btn');
+  const logoutBtn = document.querySelector('.logout-btn');
+  const line = document.querySelector('.profile-popover .me-line');
+  const signInBtn = document.querySelector('.sign-in-btn');
+  const authModal = document.getElementById('auth-modal');
+  const authTabs = document.querySelectorAll('.auth-tab');
+  const authGoogleBtn = document.getElementById('auth-google-btn');
+  const authEmailInput = document.getElementById('auth-email');
+  const authEmailSendBtn = document.getElementById('auth-email-send-btn');
+  const authEmailVerify = document.getElementById('auth-email-verify');
+  const authEmailCode = document.getElementById('auth-email-code');
+  const authEmailVerifyBtn = document.getElementById('auth-email-verify-btn');
+  const authEmailResendBtn = document.getElementById('auth-email-resend-btn');
+  const authEmailStatus = document.getElementById('auth-email-status');
+  const authCloseBtn = document.getElementById('auth-close') || document.querySelector('.auth-close');
+  const authBackdrop = document.getElementById('auth-backdrop') || document.querySelector('.auth-backdrop');
+  // 头像菜单仅在已登录且元素存在时绑定，避免阻断后续登录弹窗绑定
+  btn?.addEventListener('click', ()=>{ if (pop) pop.hidden = !pop.hidden; });
+  document.addEventListener('click', (e)=>{
+    if (pop && !pop.hidden && !pop.contains(e.target) && e.target !== btn) pop.hidden = true;
+  });
+  const refreshMe = async () => {
+    try {
+      const me = await FluxKontext.getMe();
+      if (me && me.user) {
+        line.textContent = me.user.email || me.user.name || 'Signed in';
+        logoutBtn.hidden = false; loginBtn.hidden = true;
+        // avatar initial
+        const letter = (me.user.email||me.user.name||'')[0] || 'F';
+        btn.textContent = letter.toUpperCase();
+        document.documentElement.setAttribute('data-auth', 'on');
+        btn.hidden = false;
+        if (signInBtn) { signInBtn.hidden = true; signInBtn.style.display = 'none'; }
+        // update credits badge if present
+        try {
+          const amount = (me.credits && me.credits.balance != null) ? String(me.credits.balance) : null;
+          if (amount) {
+            const el = document.querySelector('.pill.credits .amount');
+            if (el) el.textContent = amount;
+          }
+        } catch {}
+      } else {
+        throw new Error('no me');
+      }
+    } catch {
+      line.textContent = 'Not signed in';
+      logoutBtn.hidden = true; loginBtn.hidden = false;
+      btn.textContent = 'F';
+      document.documentElement.removeAttribute('data-auth');
+      btn.hidden = true;
+      if (signInBtn) {
+        signInBtn.hidden = false;
+        signInBtn.style.display = '';
+        // 未登录时：进入前端路由 /auth/signin，锁定滚动，仅打开弹窗
+        signInBtn.onclick = () => openAuth();
+      }
+    }
+  };
+  const openAuth = () => {
+    try { history.pushState({auth:true}, '', '#/auth/signin'); } catch {}
+    document.body.classList.add('no-scroll');
+    try { document.documentElement.setAttribute('data-authpage','1'); } catch {}
+    if (authModal) authModal.hidden = false;
+  };
+  const closeAuth = () => { if (authModal) authModal.hidden = true; };
+  const exitAuth = () => {
+    closeAuth();
+    document.body.classList.remove('no-scroll');
+    try { document.documentElement.removeAttribute('data-authpage'); } catch {}
+    try { if (location.hash === '#/auth/signin') history.back(); } catch {}
+  };
+  // 委托绑定，确保无论何时加载都能生效
+  document.addEventListener('click', (e) => {
+    const t = e.target;
+    if (!t) return;
+    if (t.id === 'auth-backdrop' || (t.classList && t.classList.contains('auth-backdrop'))) {
+      e.preventDefault();
+      e.stopPropagation();
+      exitAuth();
+      return;
+    }
+    const closeBtn = t.closest ? t.closest('.auth-close') : null;
+    if (closeBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      exitAuth();
+      return;
+    }
+  });
+  // 直接绑定一次，避免委托被拦截
+  authCloseBtn?.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); exitAuth(); });
+  authBackdrop?.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); exitAuth(); });
+  document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') exitAuth(); });
+  authTabs.forEach(tab => tab.addEventListener('click', () => {
+    authTabs.forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    const key = tab.getAttribute('data-tab');
+    document.querySelectorAll('.auth-pane').forEach(p=>{
+      const match = p.getAttribute('data-pane') === key;
+      p.classList.toggle('active', match);
+    });
+  }));
+  authGoogleBtn?.addEventListener('click', async ()=>{
+    try {
+      await FluxKontext.stytchGoogleLogin();
+    } catch (error) {
+      console.error('Google login failed:', error);
+      alert('登录失败: ' + error.message);
+    }
+  });
+
+  // 邮箱验证码登录功能
+  let currentEmail = '';
+  let resendTimer = null;
+  
+  const startResendCountdown = () => {
+    let seconds = 60;
+    authEmailResendBtn.disabled = true;
+    authEmailResendBtn.textContent = `Resend in ${seconds}s`;
+    
+    resendTimer = setInterval(() => {
+      seconds--;
+      if (seconds > 0) {
+        authEmailResendBtn.textContent = `Resend in ${seconds}s`;
+      } else {
+        clearInterval(resendTimer);
+        authEmailResendBtn.disabled = false;
+        authEmailResendBtn.textContent = 'Resend Code';
+      }
+    }, 1000);
+  };
+  
+  authEmailSendBtn?.addEventListener('click', async ()=>{
+    const email = authEmailInput?.value?.trim();
+    if (!email) {
+      authEmailStatus.textContent = '请输入邮箱地址';
+      return;
+    }
+    
+    try {
+      authEmailSendBtn.disabled = true;
+      authEmailSendBtn.innerHTML = '<span class="spinner"></span>Sending...';
+      authEmailStatus.textContent = '正在发送验证码...';
+      
+      await FluxKontext.emailSend(email);
+      currentEmail = email;
+      
+      // 显示验证码输入界面
+      document.getElementById('auth-email-input-step').style.display = 'none';
+      authEmailVerify.style.display = 'block';
+      document.getElementById('sent-email').textContent = email;
+      
+      // 启动倒计时
+      startResendCountdown();
+      
+      authEmailCode.focus();
+    } catch (error) {
+      console.error('Email send failed:', error);
+      authEmailStatus.textContent = '发送失败: ' + error.message;
+    } finally {
+      authEmailSendBtn.disabled = false;
+      authEmailSendBtn.textContent = 'Send Verification Code';
+    }
+  });
+
+  // Back 按钮功能
+  const authEmailBackBtn = document.getElementById('auth-email-back-btn');
+  authEmailBackBtn?.addEventListener('click', () => {
+    // 清除倒计时
+    if (resendTimer) {
+      clearInterval(resendTimer);
+      resendTimer = null;
+    }
+    
+    // 重置界面
+    document.getElementById('auth-email-input-step').style.display = 'block';
+    authEmailVerify.style.display = 'none';
+    authEmailCode.value = '';
+    authEmailStatus.textContent = 'Enter your email to receive a verification code.';
+  });
+
+  authEmailVerifyBtn?.addEventListener('click', async ()=>{
+    const code = authEmailCode?.value?.trim();
+    if (!code || !currentEmail) {
+      alert('请输入验证码');
+      return;
+    }
+    
+    try {
+      authEmailVerifyBtn.disabled = true;
+      authEmailVerifyBtn.innerHTML = '<span class="spinner"></span>Verifying...';
+      
+      await FluxKontext.emailVerify(currentEmail, code);
+      
+      // 清除倒计时
+      if (resendTimer) {
+        clearInterval(resendTimer);
+        resendTimer = null;
+      }
+      
+      exitAuth();
+      refreshMe();
+    } catch (error) {
+      console.error('Email verify failed:', error);
+      alert('验证失败: ' + error.message);
+    } finally {
+      authEmailVerifyBtn.disabled = false;
+      authEmailVerifyBtn.textContent = 'Verify & Sign In';
+    }
+  });
+
+  authEmailResendBtn?.addEventListener('click', async ()=>{
+    if (!currentEmail) return;
+    
+    // 清除旧的倒计时
+    if (resendTimer) {
+      clearInterval(resendTimer);
+      resendTimer = null;
+    }
+    
+    try {
+      authEmailResendBtn.disabled = true;
+      authEmailResendBtn.innerHTML = '<span class="spinner"></span>Sending...';
+      
+      await FluxKontext.emailSend(currentEmail);
+      
+      // 重新启动倒计时
+      startResendCountdown();
+      
+      // 显示成功提示（可选）
+      const banner = document.querySelector('.auth-success-banner .success-text');
+      if (banner) {
+        const originalText = banner.innerHTML;
+        banner.innerHTML = `Verification code resent to <span id="sent-email">${currentEmail}</span>`;
+        setTimeout(() => {
+          banner.innerHTML = originalText;
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Email resend failed:', error);
+      alert('重发失败: ' + error.message);
+      authEmailResendBtn.disabled = false;
+      authEmailResendBtn.textContent = 'Resend Code';
+    }
+  });
+
+  loginBtn?.addEventListener('click', openAuth);
+  logoutBtn?.addEventListener('click', async ()=>{ try { await FluxKontext.logout(); } catch {} refreshMe(); });
+  signInBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openAuth(); });
+  refreshMe();
+})();
+
+// 当直接访问 #/auth/signin 时自动打开登录弹窗；离开时关闭
+(() => {
+  const modal = document.getElementById('auth-modal');
+  function syncAuthRoute(){
+    const isAuth = location.hash === '#/auth/signin';
+    if (isAuth) {
+      document.body.classList.add('no-scroll');
+      document.documentElement.setAttribute('data-authpage','1');
+      if (modal) modal.hidden = false;
+    } else {
+      if (modal) modal.hidden = true;
+      document.body.classList.remove('no-scroll');
+      document.documentElement.removeAttribute('data-authpage');
+    }
+  }
+  window.addEventListener('hashchange', syncAuthRoute);
+  syncAuthRoute();
 })();
 
 // (removed) paste-from-output quick button — now using the standard uploader only

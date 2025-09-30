@@ -27,7 +27,7 @@
         <a class="nav-link" href="#pricing">Pricing</a>
         <a class="nav-link" href="#api">API</a>
       </div>
-      <div class="nb-right">
+        <div class="nb-right">
         <button class="icon-btn theme-toggle" aria-label="Toggle theme">🌙</button>
         <button class="pill locale" aria-haspopup="listbox">US <span class="chev" aria-hidden>▾</span></button>
         <a class="btn btn-launch" href="#step1">Launch Now</a>
@@ -36,12 +36,63 @@
           <span class="amount">19050</span>
           <span class="unit">credits</span>
         </div>
-        <div class="avatar" aria-label="Profile">F</div>
+        <button class="avatar profile-btn" aria-label="Profile" hidden>F</button>
+        <button class="btn primary sign-in-btn" type="button">Sign In</button>
+        <div class="profile-popover" hidden>
+          <div class="me-line">Not signed in</div>
+          <div class="me-actions">
+            <button class="btn ghost btn-small login-btn">Sign in with Google</button>
+            <button class="btn ghost btn-small logout-btn" hidden>Logout</button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
 
   <main>
+    <!-- Auth Modal (hidden by default) -->
+    <div class="auth-modal" id="auth-modal" hidden>
+      <div class="auth-backdrop" id="auth-backdrop" onclick="document.getElementById('auth-modal').hidden=true"></div>
+      <div class="auth-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+        <div class="auth-logo">🍌</div>
+        <h2 class="auth-title" id="auth-title">Welcome to Dress On</h2>
+        <p class="auth-sub">Sign in to continue to AI image editor</p>
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-tab="google">Google Sign In</button>
+          <button class="auth-tab" data-tab="email">Email Sign In</button>
+        </div>
+        <div class="auth-pane auth-google active" data-pane="google">
+          <button class="btn primary auth-google-btn" id="auth-google-btn">
+            <img id="google-logo" src="./assets/Google_Logo.svg" alt="Google logo" style="width:18px;height:18px;margin-right:8px;" />
+            Continue with Google
+          </button>
+        </div>
+        <div class="auth-pane auth-email" data-pane="email">
+          <div id="auth-email-input-step">
+            <label class="auth-label">Email Address</label>
+            <input class="auth-input" id="auth-email" type="email" placeholder="your@email.com">
+            <button class="btn primary full" id="auth-email-send-btn">Send Verification Code</button>
+            <p class="auth-tip" id="auth-email-status">Enter your email to receive a verification code.</p>
+          </div>
+          <div id="auth-email-verify" style="display: none;">
+            <button class="auth-back-btn" id="auth-email-back-btn">
+              <span class="back-arrow">←</span> Back
+            </button>
+            <div class="auth-success-banner">
+              <span class="success-icon">✓</span>
+              <p class="success-text">Verification code sent to <span id="sent-email"></span></p>
+            </div>
+            <label class="auth-label">Verification Code</label>
+            <input class="auth-input" id="auth-email-code" type="text" placeholder="Enter 6-digit code" maxlength="6">
+            <p class="auth-tip auth-expire-tip">Code expires in 10 minutes</p>
+            <button class="btn primary full" id="auth-email-verify-btn">Verify & Sign In</button>
+            <button class="btn ghost full" id="auth-email-resend-btn" style="margin-top: 8px;" disabled>Resend in 60s</button>
+          </div>
+        </div>
+        <p class="auth-consent">By signing in, you agree to our <a href="#" target="_blank" rel="noopener">Terms of Service</a> and <a href="#" target="_blank" rel="noopener">Privacy Policy</a></p>
+        <button class="auth-close" id="auth-close" type="button" aria-label="Close" onclick="document.getElementById('auth-modal').hidden=true">✕</button>
+      </div>
+    </div>
     <!-- HERO: full viewport height -->
     <section class="hero hero-centered" id="top">
       <div class="container">
