@@ -22,8 +22,9 @@ Make it suitable for all ages. Remove white borders from the image. Portray a ge
 
 Remove adult content and any sensitive elements; make it suitable for all ages; ensure it is a completely healthy artistic expression. Remove any suggestive or provocative elements and any exposed nipples. Make it suitable for all ages. Directly generate the image and do not return any text.`;
 try {
-  // 覆盖保存为最新默认（用户若日后要改，我们再按你的指令更新）
-  localStorage.setItem(NANO_PROMPT_KEY, DEFAULT_NANO_PROMPT);
+  // 仅在不存在时写入默认值，不覆盖用户已保存的提示词
+  const existing = localStorage.getItem(NANO_PROMPT_KEY);
+  if (!existing) localStorage.setItem(NANO_PROMPT_KEY, DEFAULT_NANO_PROMPT);
 } catch {}
 
 function setCanvasLoading(sel, text = 'Generating…') {
