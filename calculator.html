@@ -25,7 +25,7 @@
     const OUTPUT_IMAGE_PRICE = 0.039;    // 输出图片：$0.039/image (固定)
 
     async function fetchTotals(){
-      const r = await fetch('http://127.0.0.1:9091/usage/totals', { credentials:'include' });
+      const r = await fetch('https://dresson-backend.onrender.com/usage/totals', { credentials:'include' });
       if(!r.ok) throw new Error(await r.text());
       return r.json();
     }

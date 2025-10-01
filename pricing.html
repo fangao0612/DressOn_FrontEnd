@@ -577,18 +577,18 @@
     
     if (signInBtn) {
       signInBtn.addEventListener('click', () => {
-        window.location.href = 'http://127.0.0.1:9091/auth/login';
+        window.location.href = 'https://dresson-backend.onrender.com/auth/login';
       });
     }
     
     if (loginBtn) {
       loginBtn.addEventListener('click', () => {
-        window.location.href = 'http://127.0.0.1:9091/auth/login';
+        window.location.href = 'https://dresson-backend.onrender.com/auth/login';
       });
     }
     
     // Check auth status
-    fetch('http://127.0.0.1:9091/me', { credentials: 'include' })
+    fetch('https://dresson-backend.onrender.com/me', { credentials: 'include' })
       .then(r => r.ok ? r.json() : null)
       .then(user => {
         if (user) {

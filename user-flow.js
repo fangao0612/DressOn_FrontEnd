@@ -2,7 +2,7 @@
 import { FluxKontext } from './sdk/apiClient.js';
 
 // Configure backend base URL
-FluxKontext.setBaseUrl('http://127.0.0.1:9091');
+FluxKontext.setBaseUrl('https://dresson-backend.onrender.com');
 
 const $ = (s, ctx = document) => ctx.querySelector(s);
 
@@ -582,7 +582,7 @@ async function refreshCreditsBadge(){
   authGoogleBtn?.addEventListener('click', async ()=>{
     try {
       // 使用原有的 Google OAuth（已验证可用）
-      window.location.href = 'http://127.0.0.1:9091/auth/login';
+      window.location.href = 'https://dresson-backend.onrender.com/auth/login';
     } catch (error) {
       console.error('Google login failed:', error);
       alert('登录失败: ' + error.message);
