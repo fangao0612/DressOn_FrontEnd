@@ -1,8 +1,15 @@
 // User-facing flow: after Generate, automatically run Flux then NanoBanana
 import { FluxKontext } from './sdk/apiClient.js';
 
-// Configure backend base URL
-FluxKontext.setBaseUrl('https://dresson-backend.onrender.com');
+// Configure backend base URL (local dev: 9091; production: Render)
+try {
+  const host = (typeof window !== 'undefined' && window.location && window.location.hostname) || '';
+  const isLocal = host === '127.0.0.1' || host === 'localhost';
+  const base = isLocal ? 'http://127.0.0.1:9091' : 'https://dresson-backend.onrender.com';
+  FluxKontext.setBaseUrl(base);
+} catch {
+  FluxKontext.setBaseUrl('https://dresson-backend.onrender.com');
+}
 
 const $ = (s, ctx = document) => ctx.querySelector(s);
 

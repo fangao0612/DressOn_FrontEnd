@@ -6,7 +6,7 @@
 // const result = await FluxKontext.pollNanoResult(task_id);
 
 const DEFAULTS = {
-  baseUrl: typeof window !== 'undefined' ? (window.FLUX_KONTEXT_BASE_URL || 'http://127.0.0.1:9090') : 'http://127.0.0.1:9090',
+  baseUrl: typeof window !== 'undefined' ? (window.FLUX_KONTEXT_BASE_URL || 'http://127.0.0.1:9091') : 'http://127.0.0.1:9091',
 };
 
 function assert(condition, message) {
