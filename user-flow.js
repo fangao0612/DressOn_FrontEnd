@@ -581,7 +581,8 @@ async function refreshCreditsBadge(){
   }));
   authGoogleBtn?.addEventListener('click', async ()=>{
     try {
-      await FluxKontext.stytchGoogleLogin();
+      // 使用原有的 Google OAuth（已验证可用）
+      window.location.href = 'http://127.0.0.1:9091/auth/login';
     } catch (error) {
       console.error('Google login failed:', error);
       alert('登录失败: ' + error.message);

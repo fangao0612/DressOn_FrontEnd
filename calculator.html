@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Usage Cost Calculator · DressOn AI</title>
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    .calc-wrap{max-width:880px;margin:48px auto;background:#18202b;border:1px solid var(--border);border-radius:16px;padding:20px}
+    .row{display:flex;gap:12px;align-items:center;margin:8px 0}
+    .row label{width:200px;color:#a3aec2}
+    .row input{flex:1;height:42px;border-radius:10px;border:1px solid var(--border);background:#0e1320;color:var(--text);padding:0 10px}
+    .btn-line{display:flex;gap:10px;margin-top:12px}
+    .note{color:#8ea0b8;font-size:12px}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
+    .result{margin-top:16px;padding:12px;border:1px solid var(--border);border-radius:12px;background:#121a2a}
+  </style>
+  <script type="module">
+    const $ = (s)=>document.querySelector(s);
+    const fmt = (n)=>Number(n||0).toLocaleString();
+    const USD = (n)=>`$${(Number(n||0)).toFixed(6)}`;
+
+    // Pricing (USD)
+    const INPUT_TOKEN_PRICE = 0.00003;   // 输入 tokens：$0.00003/token
+    const OUTPUT_IMAGE_PRICE = 0.039;    // 输出图片：$0.039/image (固定)
+
+    async function fetchTotals(){
+      const r = await fetch('http://127.0.0.1:9091/usage/totals', { credentials:'include' });
+      if(!r.ok) throw new Error(await r.text());
+      return r.json();
+    }
+
+    function compute(tot){
+      const totalImages = Number(tot.total_images||0);
+      const inTok = Number(tot.total_input_tokens||0);
+      const outTok = Number(tot.total_output_tokens||0);
+      
+      // 总成本 = 输入 tokens 费用 + 输出图片费用
+      const inputCost = inTok * INPUT_TOKEN_PRICE;
+      const outputCost = totalImages * OUTPUT_IMAGE_PRICE;
+      const totalCost = inputCost + outputCost;
+      
+      // 平均每张图的 token 消耗
+      const avgInTok = totalImages>0 ? inTok/totalImages : 0;
+      
+      // 平均每张图的美元成本
+      const avgCost = totalImages>0 ? totalCost/totalImages : 0;
+      
+      return { totalImages, inTok, outTok, totalCost, inputCost, outputCost, avgInTok, avgCost };
+    }
+
+    async function refresh(){
+      try{
+        const tot = await fetchTotals();
+        const r = compute(tot);
+        $('#total-images').textContent = fmt(r.totalImages);
+        $('#total-in').textContent = fmt(r.inTok);
+        $('#total-out').textContent = fmt(r.outTok);
+        $('#input-cost').textContent = USD(r.inputCost);
+        $('#output-cost').textContent = USD(r.outputCost);
+        $('#total-cost').textContent = USD(r.totalCost);
+        $('#avg-in-tok').textContent = fmt(Math.round(r.avgInTok));
+        $('#avg-cost').textContent = USD(r.avgCost);
+      }catch(e){ alert('Fetch totals failed: '+e); }
+    }
+
+    window.addEventListener('DOMContentLoaded', ()=>{
+      refresh();
+      // 每 5 秒自动刷新一次（可选）
+      setInterval(refresh, 5000);
+    });
+  </script>
+</head>
+<body>
+  <div class="calc-wrap">
+    <h2>Usage Cost Calculator</h2>
+    <h3 style="color:var(--muted);font-size:18px;margin-top:8px">累计统计</h3>
+    <div class="row"><label>总生图数量</label><div class="mono" id="total-images">0</div></div>
+    <div class="row"><label>总输入 tokens</label><div class="mono" id="total-in">0</div></div>
+    <div class="row"><label>总输出 tokens</label><div class="mono" id="total-out" style="color:var(--muted);opacity:0.6">0 (仅供参考)</div></div>
+    <div class="row"><label>输入 tokens 费用</label><div class="mono" id="input-cost">$0.000000</div></div>
+    <div class="row"><label>输出图片费用</label><div class="mono" id="output-cost">$0.000000</div></div>
+    <div class="row"><label>总花费</label><div class="mono" id="total-cost" style="font-weight:700">$0.000000</div></div>
+    
+    <hr style="border-color:var(--border);margin:20px 0">
+    <h3 style="color:var(--muted);font-size:18px">平均每张图</h3>
+    <div class="row"><label>平均输入 tokens</label><div class="mono" id="avg-in-tok">0</div></div>
+    <div class="row"><label>平均花费</label><div class="mono" id="avg-cost" style="color:var(--primary);font-weight:700">$0.000000</div></div>
+    
+    <div class="note" style="margin-top:20px;padding:12px;background:rgba(255,255,255,0.05);border-radius:8px">
+      💡 <strong>计算公式：</strong><br>
+      总成本 = (输入 tokens × $0.00003) + (输出图片数 × <strong>$0.039</strong>)<br>
+      平均每张图花费 = 总成本 / 总图数<br>
+      <br>
+      📌 输入价格：$0.00003/token（文本/图片输入）<br>
+      📌 输出价格：<strong>$0.039/张</strong>（固定，≤1024×1024px）<br>
+      <br>
+      数据每次 NanoBanana 生图成功后自动更新（每 5 秒刷新）
+    </div>
+  </div>
+</body>
+</html>
+
+
