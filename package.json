@@ -6,7 +6,7 @@
   "main": "app.js",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 5175",
-    "build": "vite build",
+    "build": "echo 'No build needed - static files'",
     "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
