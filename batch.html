@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>本地批处理 (5174)</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 24px; }
+    label { display:block; margin: 12px 0 4px; }
+    input[type=text] { width: 520px; padding: 6px 8px; }
+    button { padding: 8px 14px; margin-top: 12px; }
+    .row { margin: 6px 0; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  </style>
+</head>
+<body>
+  <h2>本地批处理（仅调用本地 ComfyUI，不影响 5173/5175）</h2>
+  <div class="row">
+    <label>后端地址（默认本地 9091）</label>
+    <input id="apiHost" type="text" value="http://127.0.0.1:9091" />
+  </div>
+  <div class="row">
+    <label>输入文件夹（不递归）</label>
+    <input id="inDir" type="text" placeholder="例如: C:\\data\\input" />
+  </div>
+  <div class="row">
+    <label>输出文件夹</label>
+    <input id="outDir" type="text" placeholder="例如: C:\\data\\output" />
+  </div>
+  <div class="row">
+    <label>并发</label>
+    <select id="concurrency">
+      <option value="1" selected>1</option>
+      <option value="2">2</option>
+    </select>
+  </div>
+  <button id="startBtn">开始批处理</button>
+
+  <h3>进度</h3>
+  <pre id="log" class="mono"></pre>
+
+  <script>
+    const $ = (sel) => document.querySelector(sel);
+    const logEl = $('#log');
+    let pollTimer = null;
+    function log(msg){ logEl.textContent += msg + "\n"; }
+
+    async function startBatch(){
+      const api = $('#apiHost').value.trim();
+      const inDir = $('#inDir').value.trim();
+      const outDir = $('#outDir').value.trim();
+      const cc = $('#concurrency').value;
+      if(!api || !inDir || !outDir){ alert('请填写后端地址 / 输入 / 输出目录'); return; }
+      try{
+        const form = new FormData();
+        form.append('input_dir', inDir);
+        form.append('output_dir', outDir);
+        form.append('concurrency', cc);
+        const res = await fetch(`${api}/batch/start`, { method: 'POST', body: form });
+        if(!res.ok){ throw new Error(await res.text()); }
+        const data = await res.json();
+        log(`[start] job_id=${data.job_id}`);
+        pollStatus(api, data.job_id);
+      }catch(e){
+        log(`[error] ${e}`);
+      }
+    }
+
+    async function pollStatus(api, jobId){
+      if(pollTimer) clearInterval(pollTimer);
+      pollTimer = setInterval(async ()=>{
+        try{
+          const r = await fetch(`${api}/batch/status?job_id=${encodeURIComponent(jobId)}`);
+          if(!r.ok){ throw new Error(await r.text()); }
+          const s = await r.json();
+          const { status, total, done, failed, eta_seconds } = s;
+          logEl.textContent = `status=${status} total=${total} done=${done} failed=${failed} eta=${eta_seconds}s`;
+          if(status === 'done'){
+            clearInterval(pollTimer); pollTimer=null;
+          }
+        }catch(e){ log(`[poll error] ${e}`); }
+      }, 1500);
+    }
+
+    $('#startBtn').addEventListener('click', startBatch);
+  </script>
+</body>
+</html>
+
+
+

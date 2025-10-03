@@ -247,6 +247,7 @@ let __garmentOriginal = null;           // File or Blob (original garment as upl
 let __garmentOriginalName = null;       // original filename
 let __garmentPaddedCache = null;        // Blob padded to current main size
 let __garmentPaddedSig = null;          // signature of main used to produce padded
+let __garmentOriginalSig = null;        // signature of garment original
 
 async function computePaddedGarment(mainFile, garmentOriginal){
   if (!mainFile || !garmentOriginal) return null;
@@ -254,6 +255,7 @@ async function computePaddedGarment(mainFile, garmentOriginal){
   const padded = await FluxKontext.resizeImageWithPadding(garmentOriginal, mainSize.width, mainSize.height, '#ffffff');
   __garmentPaddedCache = padded;
   __garmentPaddedSig = __sigOf(mainFile);
+  __garmentOriginalSig = __sigOf(garmentOriginal);
   return padded;
 }
 
@@ -315,11 +317,18 @@ async function handleGenerate() {
       __lastHalfBlob = halfBlob; __lastMainSig = currSig;
     }
 
-    // 计算/复用 padded garment：
+    // 计算/复用 padded garment：检查主图和garment是否都没变
+    const currentGarmentSig = __sigOf(__garmentOriginal || garmentFile);
     let paddedGarment = __garmentPaddedCache;
-    if (!paddedGarment || __garmentPaddedSig !== currSig) {
+    const needRecompute = !paddedGarment || 
+                          __garmentPaddedSig !== currSig ||  // 主图变了
+                          __garmentOriginalSig !== currentGarmentSig; // garment变了
+    if (needRecompute) {
       logStatus(targetSel, 'Recomputing garment padding to match character size…', { withTime:false });
       paddedGarment = await computePaddedGarment(mainFile, __garmentOriginal || garmentFile);
+      console.log('[garment cache] Padded garment recomputed');
+    } else {
+      console.log('[garment cache] Reusing cached padded garment');
     }
 
     // 发送到 Nano
