@@ -1,14 +1,34 @@
 // User-facing flow: after Generate, automatically run Flux then NanoBanana
 import { FluxKontext } from './sdk/apiClient.js';
 
-// Configure backend base URL (local dev: 9091; production: Render)
+// Configure backend base URL：优先 localStorage / window 全局变量，其次环境变量，最后回退本地 9091
 try {
-  const host = (typeof window !== 'undefined' && window.location && window.location.hostname) || '';
-  const isLocal = host === '127.0.0.1' || host === 'localhost';
-  const base = isLocal ? 'http://127.0.0.1:9091' : 'https://dresson-backend.onrender.com';
-  FluxKontext.setBaseUrl(base);
+  let candidate;
+  if (typeof window !== 'undefined') {
+    candidate = (typeof window.localStorage !== 'undefined' && window.localStorage.getItem('API_HOST'))
+      || window.FLUX_KONTEXT_BASE_URL;
+  }
+  if (!candidate && typeof process !== 'undefined' && process.env) {
+    candidate = process.env.NEXT_PUBLIC_API_HOST
+      || process.env.NEXT_PUBLIC_BACKEND_BASE_URL
+      || process.env.NEXT_PUBLIC_BASE_URL
+      || process.env.API_HOST;
+  }
+  if (!candidate && typeof import !== 'undefined') {
+    try {
+      const env = typeof import.meta !== 'undefined' ? import.meta.env : undefined;
+      if (env) {
+        candidate = env.VITE_API_HOST || env.VITE_BACKEND_BASE_URL || env.VITE_BASE_URL || candidate;
+      }
+    } catch (_) {
+      // 忽略 import.meta 在某些打包环境不存在的情况
+    }
+  }
+  if (candidate) {
+    FluxKontext.setBaseUrl(candidate);
+  }
 } catch {
-  FluxKontext.setBaseUrl('https://dresson-backend.onrender.com');
+  // 保留 apiClient.js 中的默认值逻辑
 }
 
 const $ = (s, ctx = document) => ctx.querySelector(s);
@@ -190,6 +210,7 @@ async function sendToNano(finalSel, mainFile, refFile) {
   let attempt = 0; let lastError = null; let result = null;
   while (attempt < maxRetries && !result) {
     attempt++;
+    setAttempt(finalSel, attempt, maxRetries);
     logStatus(finalSel, `Submitting to NanoBanana (attempt ${attempt}/${maxRetries})…`);
     try {
       const { task_id } = await FluxKontext.startNanoProcess(lastHalfBlob, [resizedRef], nanoPrompt || '');

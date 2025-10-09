@@ -5,8 +5,49 @@
 // const { task_id } = await FluxKontext.startNanoProcess(imageBlob, refFiles, prompt);
 // const result = await FluxKontext.pollNanoResult(task_id);
 
+function resolveEnvBaseUrl() {
+  // Support both Next.js (process.env.NEXT_PUBLIC_*) and Vite (import.meta.env.VITE_*) styles
+  let envUrl;
+  if (typeof process !== 'undefined' && process.env) {
+    envUrl = process.env.NEXT_PUBLIC_API_HOST
+      || process.env.NEXT_PUBLIC_BACKEND_BASE_URL
+      || process.env.NEXT_PUBLIC_BASE_URL
+      || process.env.API_HOST; // generic fallback
+  }
+  if (!envUrl && typeof import !== 'undefined') {
+    try {
+      envUrl = (typeof import.meta !== 'undefined' && import.meta.env && (
+        import.meta.env.VITE_API_HOST
+        || import.meta.env.VITE_BACKEND_BASE_URL
+        || import.meta.env.VITE_BASE_URL
+      )) || envUrl;
+    } catch (_) {
+      // ignore – import.meta might not be defined in all bundlers
+    }
+  }
+  return envUrl;
+}
+
+function resolveDefaultBaseUrl() {
+  const envUrl = resolveEnvBaseUrl();
+
+  if (typeof window !== 'undefined') {
+    const stored = typeof window.localStorage !== 'undefined'
+      ? window.localStorage.getItem('API_HOST')
+      : undefined;
+    const winDefined = window.FLUX_KONTEXT_BASE_URL;
+
+    const candidate = stored || winDefined || envUrl;
+    if (candidate) return candidate.replace(/\/$/, '');
+  }
+
+  if (envUrl) return envUrl.replace(/\/$/, '');
+
+  return 'http://127.0.0.1:9091';
+}
+
 const DEFAULTS = {
-  baseUrl: typeof window !== 'undefined' ? (window.FLUX_KONTEXT_BASE_URL || 'http://127.0.0.1:9091') : 'http://127.0.0.1:9091',
+  baseUrl: resolveDefaultBaseUrl(),
 };
 
 function assert(condition, message) {
