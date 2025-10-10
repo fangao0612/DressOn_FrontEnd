@@ -14,7 +14,7 @@ function resolveEnvBaseUrl() {
       || process.env.NEXT_PUBLIC_BASE_URL
       || process.env.API_HOST; // generic fallback
   }
-  if (!envUrl && typeof import !== 'undefined') {
+  if (!envUrl) {
     try {
       envUrl = (typeof import.meta !== 'undefined' && import.meta.env && (
         import.meta.env.VITE_API_HOST

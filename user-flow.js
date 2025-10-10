@@ -14,7 +14,7 @@ try {
       || process.env.NEXT_PUBLIC_BASE_URL
       || process.env.API_HOST;
   }
-  if (!candidate && typeof import !== 'undefined') {
+  if (!candidate) {
     try {
       const env = typeof import.meta !== 'undefined' ? import.meta.env : undefined;
       if (env) {
