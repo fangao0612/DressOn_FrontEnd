@@ -7,6 +7,12 @@ export default defineConfig({
     strictPort: true,
     open: false,
   },
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+  },
+  // 定义环境变量前缀，允许 VITE_ 开头的变量被注入
+  envPrefix: 'VITE_',
 });
 
 
