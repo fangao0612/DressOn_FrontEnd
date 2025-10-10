@@ -15,11 +15,27 @@
 
 ### 步骤 2: 添加后端 API 地址
 
-添加以下环境变量：
+**推荐方式（使用同源代理）**：
 
 | 变量名 | 值 | 环境 |
 |--------|-----|------|
-| `VITE_API_HOST` | `https://your-backend-url.com` | Production, Preview, Development |
+| `VITE_API_HOST` | `/api` | Production, Preview |
+
+**说明**：
+- 使用 `/api` 作为相对路径，利用 Vercel Rewrites 自动转发到后端
+- 无需 CORS 配置，更安全
+- 切换后端只需修改 `vercel.json`，无需重新构建
+- `vercel.json` 已配置将 `/api/*` 转发到 RunPod 后端
+
+**传统方式（直连后端）**：
+
+如果你不想使用同源代理，可以直接配置后端完整 URL：
+
+| 变量名 | 值 | 环境 |
+|--------|-----|------|
+| `VITE_API_HOST` | `https://rshmx6rz8b91s3-9091.proxy.runpod.net` | Production, Preview |
+
+⚠️ **注意**：使用直连方式需要确保后端配置了正确的 CORS 允许来源。
 
 #### 🔗 后端 URL 选项
 

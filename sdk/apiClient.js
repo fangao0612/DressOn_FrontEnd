@@ -43,6 +43,12 @@ function resolveDefaultBaseUrl() {
 
   if (envUrl) return envUrl.replace(/\/$/, '');
 
+  // 生产环境防呆：禁止回退到 localhost
+  if (import.meta.env.PROD) {
+    console.error('[API_HOST] Not configured in production! Set VITE_API_HOST in Vercel.');
+    throw new Error('API_HOST not configured. Please set VITE_API_HOST environment variable.');
+  }
+
   return 'http://127.0.0.1:9091';
 }
 
