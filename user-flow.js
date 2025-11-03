@@ -73,10 +73,70 @@ function setCanvasError(sel, message) {
 
 function setCanvasImage(sel, src) {
   const panel = $(sel);
-  if (!panel) return;
+  if (!panel) {
+    console.error('[DEBUG] Panel not found:', sel);
+    return;
+  }
+
+  // Add debug border to canvas
+  panel.style.border = '3px solid red';
+
+  console.log('[DEBUG] Canvas dimensions:', {
+    selector: sel,
+    width: panel.clientWidth,
+    height: panel.clientHeight,
+    offsetWidth: panel.offsetWidth,
+    offsetHeight: panel.offsetHeight,
+    scrollWidth: panel.scrollWidth,
+    scrollHeight: panel.scrollHeight,
+    computedStyles: {
+      width: window.getComputedStyle(panel).width,
+      height: window.getComputedStyle(panel).height,
+      flex: window.getComputedStyle(panel).flex,
+      display: window.getComputedStyle(panel).display,
+      overflow: window.getComputedStyle(panel).overflow
+    }
+  });
+
   panel.innerHTML = '';
   const img = document.createElement('img');
   img.src = src;
+
+  // Add debug border to image
+  img.style.border = '3px solid blue';
+
+  // Log image dimensions after load
+  img.onload = () => {
+    console.log('[DEBUG] Image loaded:', {
+      src: src.substring(0, 100) + '...',
+      naturalWidth: img.naturalWidth,
+      naturalHeight: img.naturalHeight,
+      aspectRatio: (img.naturalWidth / img.naturalHeight).toFixed(3),
+      clientWidth: img.clientWidth,
+      clientHeight: img.clientHeight,
+      renderedAspectRatio: (img.clientWidth / img.clientHeight).toFixed(3),
+      offsetWidth: img.offsetWidth,
+      offsetHeight: img.offsetHeight,
+      computedStyles: {
+        width: window.getComputedStyle(img).width,
+        height: window.getComputedStyle(img).height,
+        maxWidth: window.getComputedStyle(img).maxWidth,
+        maxHeight: window.getComputedStyle(img).maxHeight,
+        objectFit: window.getComputedStyle(img).objectFit,
+        objectPosition: window.getComputedStyle(img).objectPosition
+      }
+    });
+
+    // Check if image appears cropped
+    const aspectDiff = Math.abs((img.naturalWidth / img.naturalHeight) - (img.clientWidth / img.clientHeight));
+    if (aspectDiff > 0.01) {
+      console.warn('[DEBUG] ⚠️ Aspect ratio mismatch detected! Original:',
+        (img.naturalWidth / img.naturalHeight).toFixed(3),
+        'Rendered:',
+        (img.clientWidth / img.clientHeight).toFixed(3));
+    }
+  };
+
   // keep aspect ratio inside canvas without overflow
   img.style.maxWidth = '100%';
   img.style.maxHeight = '100%';
@@ -84,6 +144,8 @@ function setCanvasImage(sel, src) {
   img.style.height = 'auto';
   img.style.objectFit = 'contain';
   panel.appendChild(img);
+
+  console.log('[DEBUG] Image element added to canvas');
 }
 
 // ---- timer helpers ----

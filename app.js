@@ -105,10 +105,67 @@
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result;
+      
+      // Add debug border to canvas
+      canvas.style.border = '3px solid red';
+      
+      console.log('[DEBUG] [Upload Handler] Canvas dimensions:', {
+        width: canvas.clientWidth,
+        height: canvas.clientHeight,
+        offsetWidth: canvas.offsetWidth,
+        offsetHeight: canvas.offsetHeight,
+        scrollWidth: canvas.scrollWidth,
+        scrollHeight: canvas.scrollHeight,
+        computedStyles: {
+          width: window.getComputedStyle(canvas).width,
+          height: window.getComputedStyle(canvas).height,
+          flex: window.getComputedStyle(canvas).flex,
+          display: window.getComputedStyle(canvas).display,
+          overflow: window.getComputedStyle(canvas).overflow
+        }
+      });
+      
       // Clear placeholder and show image
       canvas.innerHTML = '';
       const img = document.createElement('img');
       img.src = dataUrl;
+      
+      // Add debug border to image
+      img.style.border = '3px solid blue';
+      
+      // Log image dimensions after load
+      img.onload = () => {
+        console.log('[DEBUG] [Upload Handler] Image loaded:', {
+          file: file.name,
+          fileSize: file.size,
+          naturalWidth: img.naturalWidth,
+          naturalHeight: img.naturalHeight,
+          aspectRatio: (img.naturalWidth / img.naturalHeight).toFixed(3),
+          clientWidth: img.clientWidth,
+          clientHeight: img.clientHeight,
+          renderedAspectRatio: (img.clientWidth / img.clientHeight).toFixed(3),
+          offsetWidth: img.offsetWidth,
+          offsetHeight: img.offsetHeight,
+          computedStyles: {
+            width: window.getComputedStyle(img).width,
+            height: window.getComputedStyle(img).height,
+            maxWidth: window.getComputedStyle(img).maxWidth,
+            maxHeight: window.getComputedStyle(img).maxHeight,
+            objectFit: window.getComputedStyle(img).objectFit,
+            objectPosition: window.getComputedStyle(img).objectPosition
+          }
+        });
+        
+        // Check if image appears cropped
+        const aspectDiff = Math.abs((img.naturalWidth / img.naturalHeight) - (img.clientWidth / img.clientHeight));
+        if (aspectDiff > 0.01) {
+          console.warn('[DEBUG] [Upload Handler] ⚠️ Aspect ratio mismatch! Original:',
+            (img.naturalWidth / img.naturalHeight).toFixed(3),
+            'Rendered:',
+            (img.clientWidth / img.clientHeight).toFixed(3));
+        }
+      };
+      
       img.style.maxWidth = '100%';
       img.style.maxHeight = '100%';
       img.style.width = 'auto';
@@ -118,6 +175,8 @@
       img.style.display = 'block';
       img.style.margin = 'auto';
       canvas.appendChild(img);
+      
+      console.log('[DEBUG] [Upload Handler] Image element added to canvas');
       
       // Add download button
       const btn = document.createElement('button');
