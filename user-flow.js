@@ -206,7 +206,7 @@ async function sendToNano(finalSel, mainFile, refFile) {
   const mainSize = await getImageSizeFromFile(mainFile);
   const resizedRef = await FluxKontext.resizeImageWithPadding(refFile, mainSize.width, mainSize.height, '#ffffff');
   try { const preview = (nanoPrompt||'').replace(/\s+/g,' ').slice(0,120); logStatus(finalSel, `Nano prompt: "${preview}${preview.length===120?'…':''}"`); } catch {}
-  const maxRetries = 12;
+  const maxRetries = 1;
   let attempt = 0; let lastError = null; let result = null;
   while (attempt < maxRetries && !result) {
     attempt++;
@@ -357,7 +357,7 @@ async function handleGenerate() {
     const mainSize = await getImageSizeFromFile(mainFile); // 仅用于日志
     try { const preview = (nanoPrompt||'').replace(/\s+/g,' ').slice(0,120); logStatus(targetSel, `Nano prompt: "${preview}${preview.length===120?'…':''}"`, { withTime:false }); } catch {}
 
-    const maxRetries = 6;
+    const maxRetries = 1;
     let attempt = 0; let lastError = null; let result = null;
     while (attempt < maxRetries && !result) {
       attempt++;
@@ -820,7 +820,7 @@ async function handleRefine(){
     const refs = refFile ? [refFile] : [];
     if (promptText) { try { const pvw = promptText.replace(/\s+/g,' ').slice(0,120); logStatus(targetSel, `Refine prompt: "${pvw}${pvw.length===120?'…':''}"`, { withTime:false }); } catch {} }
 
-    const maxRetries = 6; let attempt = 0; let lastError = null; let result = null; const tStart = performance.now();
+    const maxRetries = 1; let attempt = 0; let lastError = null; let result = null; const tStart = performance.now();
     while (attempt < maxRetries && !result) {
       attempt++; setAttempt(targetSel, attempt, maxRetries);
       logStatus(targetSel, `Submitting to NanoBanana (attempt ${attempt}/${maxRetries})…`, { withTime:false });
