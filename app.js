@@ -134,7 +134,9 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
       // Add debug border to image
       img.style.border = '3px solid blue';
 
-      // 默认约束，防止溢出
+      // 默认约束，防止溢出且保持比例
+      img.style.width = '100%';
+      img.style.height = '100%';
       img.style.maxWidth = '100%';
       img.style.maxHeight = '100%';
       img.style.objectFit = 'contain';
@@ -162,10 +164,8 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
             objectPosition: window.getComputedStyle(img).objectPosition
           }
         });
-        
-        // Check if image appears cropped
-        const aspectDiff = Math.abs((img.naturalWidth / img.naturalHeight) - (img.clientWidth / img.clientHeight));
-        if (aspectDiff > 0.01) {
+
+        if (Math.abs((img.naturalWidth / img.naturalHeight) - (img.clientWidth / img.clientHeight)) > 0.01) {
           console.warn('[DEBUG] [Upload Handler] ⚠️ Aspect ratio mismatch! Original:',
             (img.naturalWidth / img.naturalHeight).toFixed(3),
             'Rendered:',
@@ -173,23 +173,6 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
         }
       };
 
-      const panelWidth = canvas.clientWidth || canvas.offsetWidth;
-      const panelHeight = canvas.clientHeight || canvas.offsetHeight;
-      if (panelWidth && panelHeight) {
-        const panelAspect = panelWidth / panelHeight;
-        const imageAspect = img.naturalWidth / img.naturalHeight;
-
-        if (imageAspect >= panelAspect) {
-          img.style.width = '100%';
-          img.style.height = 'auto';
-        } else {
-          img.style.width = 'auto';
-          img.style.height = '100%';
-        }
-      } else {
-        img.style.width = '100%';
-        img.style.height = 'auto';
-      }
       canvas.appendChild(img);
       
       console.log('[DEBUG] [Upload Handler] Image element added to canvas');

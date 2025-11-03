@@ -107,7 +107,9 @@ function setCanvasImage(sel, src) {
   // Add debug border to image
   img.style.border = '3px solid blue';
 
-  // 默认约束，防止溢出
+  // 默认约束，确保自适应不裁剪
+  img.style.width = '100%';
+  img.style.height = '100%';
   img.style.maxWidth = '100%';
   img.style.maxHeight = '100%';
   img.style.objectFit = 'contain';
@@ -135,34 +137,12 @@ function setCanvasImage(sel, src) {
       }
     });
 
-    // Check if image appears cropped
     const aspectDiff = Math.abs((img.naturalWidth / img.naturalHeight) - (img.clientWidth / img.clientHeight));
     if (aspectDiff > 0.01) {
       console.warn('[DEBUG] ⚠️ Aspect ratio mismatch detected! Original:',
         (img.naturalWidth / img.naturalHeight).toFixed(3),
         'Rendered:',
         (img.clientWidth / img.clientHeight).toFixed(3));
-    }
-
-    const panelWidth = panel.clientWidth || panel.offsetWidth;
-    const panelHeight = panel.clientHeight || panel.offsetHeight;
-    if (panelWidth && panelHeight) {
-      const panelAspect = panelWidth / panelHeight;
-      const imageAspect = img.naturalWidth / img.naturalHeight;
-
-      if (imageAspect >= panelAspect) {
-        // 图片更宽：以宽为准
-        img.style.width = '100%';
-        img.style.height = 'auto';
-      } else {
-        // 图片更高：以高为准
-        img.style.width = 'auto';
-        img.style.height = '100%';
-      }
-    } else {
-      // 无法确定尺寸时退化为宽度优先
-      img.style.width = '100%';
-      img.style.height = 'auto';
     }
   };
 
