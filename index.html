@@ -164,11 +164,12 @@
           <div class="panel right">
             <div class="panel-bar"><div class="bar-title">Output Gallery</div></div>
             <div class="panel-inner">
-              <div class="canvas" id="canvas1">
+              <div class="canvas" id="canvas1" data-role="output">
+                <input class="canvas-file-input" type="file" accept="image/*" aria-label="Upload test image" style="position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2">
                 <div class="placeholder">
                   <div class="icon">🪄</div>
                   <div class="title">Ready for instant generation</div>
-                  <div class="desc">Upload references and hit Generate</div>
+                  <div class="desc">Upload references and hit Generate (or click to test)</div>
                 </div>
               </div>
             </div>

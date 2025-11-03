@@ -90,3 +90,69 @@
 
 
 
+
+// Temporary feature: upload test image to output gallery
+(() => {
+  const canvas = document.querySelector('#canvas1[data-role="output"]');
+  const fileInput = canvas?.querySelector('.canvas-file-input');
+  
+  if (!canvas || !fileInput) return;
+  
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      // Clear placeholder and show image
+      canvas.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = dataUrl;
+      img.style.maxWidth = '100%';
+      img.style.maxHeight = '100%';
+      img.style.width = 'auto';
+      img.style.height = 'auto';
+      img.style.objectFit = 'contain';
+      img.style.objectPosition = 'center';
+      img.style.display = 'block';
+      img.style.margin = 'auto';
+      canvas.appendChild(img);
+      
+      // Add download button
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'dl-btn';
+      btn.title = 'Download test image';
+      const icon = document.createElement('img');
+      icon.src = './assets/download.svg';
+      icon.alt = 'download';
+      btn.appendChild(icon);
+      btn.onclick = () => {
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        const ts = new Date().toISOString().replace(/[:.]/g,'-');
+        a.download = `test-${ts}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      };
+      canvas.appendChild(btn);
+      
+      // Re-add file input for next upload
+      const newInput = document.createElement('input');
+      newInput.className = 'canvas-file-input';
+      newInput.type = 'file';
+      newInput.accept = 'image/*';
+      newInput.setAttribute('aria-label', 'Upload test image');
+      newInput.style.position = 'absolute';
+      newInput.style.inset = '0';
+      newInput.style.opacity = '0';
+      newInput.style.cursor = 'pointer';
+      newInput.style.zIndex = '2';
+      newInput.addEventListener('change', fileInput.onchange);
+      canvas.appendChild(newInput);
+    };
+    reader.readAsDataURL(file);
+  });
+})();
