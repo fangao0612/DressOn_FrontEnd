@@ -142,6 +142,8 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
       img.style.objectFit = 'contain';
       img.style.objectPosition = 'center';
       img.style.display = 'block';
+      img.style.width = 'auto';
+      img.style.height = 'auto';
 
       img.onload = () => {
         console.log('[DEBUG] [Upload Handler] Image loaded:', {
@@ -165,11 +167,15 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
           }
         });
 
-        if (Math.abs((img.naturalWidth / img.naturalHeight) - (img.clientWidth / img.clientHeight)) > 0.01) {
-          console.warn('[DEBUG] [Upload Handler] ⚠️ Aspect ratio mismatch! Original:',
-            (img.naturalWidth / img.naturalHeight).toFixed(3),
-            'Rendered:',
-            (img.clientWidth / img.clientHeight).toFixed(3));
+        const panelWidth = canvas.clientWidth || canvas.offsetWidth;
+        const panelHeight = canvas.clientHeight || canvas.offsetHeight;
+        if (panelWidth && panelHeight && img.naturalWidth && img.naturalHeight) {
+          const scale = Math.min(panelWidth / img.naturalWidth, panelHeight / img.naturalHeight, 1);
+          img.style.width = `${Math.round(img.naturalWidth * scale)}px`;
+          img.style.height = `${Math.round(img.naturalHeight * scale)}px`;
+        } else {
+          img.style.width = 'auto';
+          img.style.height = 'auto';
         }
       };
 

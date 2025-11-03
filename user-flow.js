@@ -137,12 +137,15 @@ function setCanvasImage(sel, src) {
       }
     });
 
-    const aspectDiff = Math.abs((img.naturalWidth / img.naturalHeight) - (img.clientWidth / img.clientHeight));
-    if (aspectDiff > 0.01) {
-      console.warn('[DEBUG] ⚠️ Aspect ratio mismatch detected! Original:',
-        (img.naturalWidth / img.naturalHeight).toFixed(3),
-        'Rendered:',
-        (img.clientWidth / img.clientHeight).toFixed(3));
+    const panelWidth = panel.clientWidth || panel.offsetWidth;
+    const panelHeight = panel.clientHeight || panel.offsetHeight;
+    if (panelWidth && panelHeight && img.naturalWidth && img.naturalHeight) {
+      const scale = Math.min(panelWidth / img.naturalWidth, panelHeight / img.naturalHeight, 1);
+      img.style.width = `${Math.round(img.naturalWidth * scale)}px`;
+      img.style.height = `${Math.round(img.naturalHeight * scale)}px`;
+    } else {
+      img.style.width = 'auto';
+      img.style.height = 'auto';
     }
   };
 
