@@ -137,12 +137,9 @@ function setCanvasImage(sel, src) {
     }
   };
 
-  // keep aspect ratio inside canvas without overflow
-  // 只使用 max-width/max-height，让图片按自然尺寸等比缩放适应容器
-  img.style.maxWidth = '100%';
-  img.style.maxHeight = '100%';
-  img.style.width = 'auto';
-  img.style.height = 'auto';
+  // 图片自适应缩放适应容器：填满容器但保持比例，完整显示不被裁剪
+  img.style.width = '100%';
+  img.style.height = '100%';
   img.style.objectFit = 'contain';
   img.style.objectPosition = 'center';
   panel.appendChild(img);
