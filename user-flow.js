@@ -138,11 +138,12 @@ function setCanvasImage(sel, src) {
   };
 
   // keep aspect ratio inside canvas without overflow
-  img.style.maxWidth = '98%';
-  img.style.maxHeight = '98%';
-  img.style.width = 'auto';
-  img.style.height = 'auto';
+  img.style.maxWidth = '100%';
+  img.style.maxHeight = '100%';
+  img.style.width = '100%';
+  img.style.height = '100%';
   img.style.objectFit = 'contain';
+  img.style.objectPosition = 'center';
   panel.appendChild(img);
 
   console.log('[DEBUG] Image element added to canvas');

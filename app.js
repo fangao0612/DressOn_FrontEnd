@@ -166,14 +166,13 @@
         }
       };
       
-      img.style.maxWidth = '98%';
-      img.style.maxHeight = '98%';
-      img.style.width = 'auto';
-      img.style.height = 'auto';
+      img.style.maxWidth = '100%';
+      img.style.maxHeight = '100%';
+      img.style.width = '100%';
+      img.style.height = '100%';
       img.style.objectFit = 'contain';
       img.style.objectPosition = 'center';
       img.style.display = 'block';
-      img.style.margin = 'auto';
       canvas.appendChild(img);
       
       console.log('[DEBUG] [Upload Handler] Image element added to canvas');
