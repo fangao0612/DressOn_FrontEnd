@@ -1,8 +1,8 @@
 // Minimal interactivity: upload previews, mock generation, FAQ accordion
+const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
 (function(){
   const $ = (s,ctx=document)=>ctx.querySelector(s);
   const $$ = (s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
-  const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
 
   // NB nav interactions
   (function initNav(){
