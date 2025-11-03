@@ -166,8 +166,8 @@
         }
       };
       
-      img.style.maxWidth = '100%';
-      img.style.maxHeight = '100%';
+      img.style.maxWidth = '98%';
+      img.style.maxHeight = '98%';
       img.style.width = 'auto';
       img.style.height = 'auto';
       img.style.objectFit = 'contain';
