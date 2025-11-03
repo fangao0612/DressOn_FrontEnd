@@ -132,8 +132,14 @@
       
       // Add debug border to image
       img.style.border = '3px solid blue';
-      
-      // Log image dimensions after load
+
+      // 默认约束，防止溢出
+      img.style.maxWidth = '100%';
+      img.style.maxHeight = '100%';
+      img.style.objectFit = 'contain';
+      img.style.objectPosition = 'center';
+      img.style.display = 'block';
+
       img.onload = () => {
         console.log('[DEBUG] [Upload Handler] Image loaded:', {
           file: file.name,
@@ -165,13 +171,24 @@
             (img.clientWidth / img.clientHeight).toFixed(3));
         }
       };
-      
-      // 图片自适应缩放适应容器：填满容器但保持比例，完整显示不被裁剪
-      img.style.width = '100%';
-      img.style.height = '100%';
-      img.style.objectFit = 'contain';
-      img.style.objectPosition = 'center';
-      img.style.display = 'block';
+
+      const panelWidth = canvas.clientWidth || canvas.offsetWidth;
+      const panelHeight = canvas.clientHeight || canvas.offsetHeight;
+      if (panelWidth && panelHeight) {
+        const panelAspect = panelWidth / panelHeight;
+        const imageAspect = img.naturalWidth / img.naturalHeight;
+
+        if (imageAspect >= panelAspect) {
+          img.style.width = '100%';
+          img.style.height = 'auto';
+        } else {
+          img.style.width = 'auto';
+          img.style.height = '100%';
+        }
+      } else {
+        img.style.width = '100%';
+        img.style.height = 'auto';
+      }
       canvas.appendChild(img);
       
       console.log('[DEBUG] [Upload Handler] Image element added to canvas');

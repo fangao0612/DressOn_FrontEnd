@@ -105,6 +105,12 @@ function setCanvasImage(sel, src) {
   // Add debug border to image
   img.style.border = '3px solid blue';
 
+  // 默认约束，防止溢出
+  img.style.maxWidth = '100%';
+  img.style.maxHeight = '100%';
+  img.style.objectFit = 'contain';
+  img.style.objectPosition = 'center';
+
   // Log image dimensions after load
   img.onload = () => {
     console.log('[DEBUG] Image loaded:', {
@@ -135,13 +141,29 @@ function setCanvasImage(sel, src) {
         'Rendered:',
         (img.clientWidth / img.clientHeight).toFixed(3));
     }
+
+    const panelWidth = panel.clientWidth || panel.offsetWidth;
+    const panelHeight = panel.clientHeight || panel.offsetHeight;
+    if (panelWidth && panelHeight) {
+      const panelAspect = panelWidth / panelHeight;
+      const imageAspect = img.naturalWidth / img.naturalHeight;
+
+      if (imageAspect >= panelAspect) {
+        // 图片更宽：以宽为准
+        img.style.width = '100%';
+        img.style.height = 'auto';
+      } else {
+        // 图片更高：以高为准
+        img.style.width = 'auto';
+        img.style.height = '100%';
+      }
+    } else {
+      // 无法确定尺寸时退化为宽度优先
+      img.style.width = '100%';
+      img.style.height = 'auto';
+    }
   };
 
-  // 图片自适应缩放适应容器：填满容器但保持比例，完整显示不被裁剪
-  img.style.width = '100%';
-  img.style.height = '100%';
-  img.style.objectFit = 'contain';
-  img.style.objectPosition = 'center';
   panel.appendChild(img);
 
   console.log('[DEBUG] Image element added to canvas');
