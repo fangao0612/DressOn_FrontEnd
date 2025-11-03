@@ -107,8 +107,6 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
     reader.onload = () => {
       const dataUrl = reader.result;
       
-      // Add debug border to canvas
-      canvas.style.border = '3px solid red';
       
       console.log('[DEBUG] [Upload Handler] Canvas dimensions:', {
         width: canvas.clientWidth,
@@ -131,8 +129,6 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
       const img = document.createElement('img');
       img.src = dataUrl;
       
-      // Add debug border to image
-      img.style.border = '3px solid blue';
 
       // 默认约束，防止溢出且保持比例
       img.style.width = '100%';

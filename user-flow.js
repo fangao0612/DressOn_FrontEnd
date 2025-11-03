@@ -104,8 +104,6 @@ function setCanvasImage(sel, src) {
   const img = document.createElement('img');
   img.src = src;
 
-  // Add debug border to image
-  img.style.border = '3px solid blue';
 
   // 默认约束，确保自适应不裁剪
   img.style.width = '100%';
