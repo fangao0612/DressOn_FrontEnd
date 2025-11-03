@@ -276,7 +276,7 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 .label{font-weight:800}
 .uploader{position:relative;border:1px dashed rgba(255,255,255,.22);border-radius:14px;background:linear-gradient(180deg,#0f1522,#0e1420);height:240px;display:grid;place-items:center;cursor:pointer;overflow:hidden}
 .uploader.square{height:auto;aspect-ratio:1/1;width:270px}
-.panel.right .canvas{height:100%;width:100%;flex:1;position:relative;overflow:hidden}
+.panel.right .canvas{width:100%;flex:1;position:relative;overflow:hidden}
 .file-input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .drop-area{display:grid;place-items:center;text-align:center;color:var(--muted)}
 /* Restore: ensure default drop-area layout untouched */
