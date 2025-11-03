@@ -374,8 +374,8 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 /* Restore classic plus sign style for all uploaders */
 .uploader .drop-area .plus{font-size:42px;color:var(--primary);margin-bottom:6px;font-weight:400}
 
-.panel.left .panel-inner{align-items:stretch}
-.panel.left .panel-inner .field,.panel.left .panel-inner .field.two-col{width:100%;display:flex;flex-direction:column;align-items:center}
-.panel.left .panel-inner .uploader{margin:0 auto}
+.panel.left .panel-inner{align-items:flex-start}
+.panel.left .panel-inner .field,.panel.left .panel-inner .field.two-col{align-items:flex-start}
+.panel.left .panel-inner .uploader{align-self:center}
 
 
