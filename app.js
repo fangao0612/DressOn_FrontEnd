@@ -2,6 +2,7 @@
 (function(){
   const $ = (s,ctx=document)=>ctx.querySelector(s);
   const $$ = (s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
+  const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
 
   // NB nav interactions
   (function initNav(){
@@ -197,9 +198,9 @@
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'dl-btn';
-      btn.title = 'Download test image';
+      btn.title = 'Download original';
       const icon = document.createElement('img');
-      icon.src = './assets/download.svg';
+      icon.src = DOWNLOAD_ICON;
       icon.alt = 'download';
       btn.appendChild(icon);
       btn.onclick = () => {

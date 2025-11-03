@@ -1,6 +1,8 @@
 // User-facing flow: after Generate, automatically run Flux then NanoBanana
 import { FluxKontext } from './sdk/apiClient.js';
 
+const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
+
 // Configure backend base URL：优先 localStorage / window 全局变量，其次环境变量，最后回退本地 9091
 try {
   let candidate;
@@ -62,7 +64,7 @@ function setCanvasLoading(sel, text = 'Generating…') {
     <button class="btn-cancel" style="background:#2a3346;color:#e6eefb;border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:4px 10px;cursor:pointer">Stop</button>
   </div>
   <div class="status-log" style="margin-top:12px;max-height:180px;overflow:auto;border-top:1px dashed rgba(255,255,255,.18);padding-top:8px;color:#a3aec2;font-size:12px;text-align:left"></div>
-  <button class="dl-btn" disabled title="Download original"><img src="./assets/download.svg" alt="download" /></button>`;
+  <button class="dl-btn" disabled title="Download original"><img src="${DOWNLOAD_ICON}" alt="download" /></button>`;
 }
 
 function setCanvasError(sel, message) {
@@ -320,7 +322,7 @@ async function sendToNano(finalSel, mainFile, refFile) {
       btn.className = 'dl-btn';
       btn.title = 'Download original';
       const icon = document.createElement('img');
-      icon.src = './assets/download.svg';
+      icon.src = DOWNLOAD_ICON;
       icon.alt = 'download';
       btn.appendChild(icon);
       const dataUrl = result.imageBase64;
@@ -473,7 +475,7 @@ async function handleGenerate() {
           // remember original full-res for refine
           try { lastFinalImageBase64 = r.imageBase64; } catch {}
           // update download button
-          try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src='./assets/download.svg'; icon.alt='download'; btn.appendChild(icon); btn.onclick=()=>{ const a=document.createElement('a'); a.href=r.imageBase64; const ts=new Date().toISOString().replace(/[:.]/g,'-'); a.download=`final-${ts}.png`; document.body.appendChild(a); a.click(); a.remove(); }; panel2.appendChild(btn);} catch {}
+          try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src=DOWNLOAD_ICON; icon.alt='download'; btn.appendChild(icon); btn.onclick=()=>{ const a=document.createElement('a'); a.href=r.imageBase64; const ts=new Date().toISOString().replace(/[:.]/g,'-'); a.download=`final-${ts}.png`; document.body.appendChild(a); a.click(); a.remove(); }; panel2.appendChild(btn);} catch {}
           // auto-fill Refine Reference preview with the generated image (keep uploader behavior)
           try {
             const refine = document.querySelector('.uploader[data-role="refine"]');
@@ -570,7 +572,7 @@ async function refreshCreditsBadge(){
     btn.disabled = true;
     btn.title = 'Download original';
     const icon = document.createElement('img');
-    icon.src = './assets/download.svg';
+    icon.src = DOWNLOAD_ICON;
     icon.alt = 'download';
     btn.appendChild(icon);
     panel.appendChild(btn);
@@ -587,7 +589,7 @@ async function refreshCreditsBadge(){
     btn.disabled = true;
     btn.title = 'Download original';
     const icon = document.createElement('img');
-    icon.src = './assets/download.svg';
+    icon.src = DOWNLOAD_ICON;
     icon.alt = 'download';
     btn.appendChild(icon);
     panel.appendChild(btn);
@@ -930,7 +932,7 @@ async function handleRefine(){
     let previewUrl = result.imageBase64; try { previewUrl = await downscaleDataURL(result.imageBase64, cw, ch, 'image/jpeg', 0.9); } catch {}
     stopTimer(targetSel, 'Done');
     setCanvasImage(targetSel, previewUrl);
-    try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src='./assets/download.svg'; icon.alt='download'; btn.appendChild(icon); btn.onclick=()=>{ const a=document.createElement('a'); a.href=result.imageBase64; const ts=new Date().toISOString().replace(/[:.]/g,'-'); a.download=`refined-${ts}.png`; document.body.appendChild(a); a.click(); a.remove(); }; panel2.appendChild(btn);} catch {}
+    try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src=DOWNLOAD_ICON; icon.alt='download'; btn.appendChild(icon); btn.onclick=()=>{ const a=document.createElement('a'); a.href=result.imageBase64; const ts=new Date().toISOString().replace(/[:.]/g,'-'); a.download=`refined-${ts}.png`; document.body.appendChild(a); a.click(); a.remove(); }; panel2.appendChild(btn);} catch {}
     const totalMs = performance.now() - tStart; logStatus(targetSel, `refine: ${(totalMs/1000).toFixed(2)} s`, { withTime:false });
   } catch (e) { const msg = e?.message || String(e); stopTimer(targetSel, 'Failed'); setCanvasError(targetSel, `Refine failed: ${msg}`); }
 }
