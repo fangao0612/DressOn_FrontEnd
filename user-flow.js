@@ -905,18 +905,27 @@ async function handleRefine(){
     currentCancel = () => { try { cancelReject?.(new Error('Cancelled by user')); } catch {} };
     cancelBtn?.addEventListener('click', ()=>{ currentCancel?.(); logStatus(targetSel, 'Cancelled by user'); });
 
-    // Convert halfSource to Blob
+    // Determine how to handle halfSource
+    // If it's a URL (not data:), pass it directly to backend
+    // Backend will fetch it (much faster for internal URLs)
+    // If it's a File/Blob, pass as-is
+    // If it's a data: URL, it will be converted by startNanoProcess
+    let halfToSend;
     if (halfSource instanceof File || halfSource instanceof Blob) {
       // Direct file upload - use as-is
-      halfBlob = halfSource;
+      halfToSend = halfSource;
+      // Validate blob size (thumbnails are typically < 5KB, full images should be much larger)
+      if (halfToSend.size < 5000) {
+        throw new Error(`Invalid image size (${halfToSend.size} bytes). Image too small - please use a full-resolution image.`);
+      }
+    } else if (typeof halfSource === 'string' && !halfSource.startsWith('data:')) {
+      // It's a URL (from step1 result) - pass directly to backend
+      // Backend will fetch it server-side (avoids 110s browser fetch delay)
+      halfToSend = halfSource;
+      logStatus(targetSel, `Using step1 output URL (fast server-side fetch)`, { withTime:false });
     } else {
-      // DataURL from Step 1 - convert to Blob
-      halfBlob = await (await fetch(halfSource)).blob();
-    }
-
-    // Validate blob size (thumbnails are typically < 5KB, full images should be much larger)
-    if (halfBlob.size < 5000) {
-      throw new Error(`Invalid image size (${halfBlob.size} bytes). Image too small - please use a full-resolution image.`);
+      // It's a data: URL - pass to startNanoProcess which will convert it
+      halfToSend = halfSource;
     }
 
     // No additional ref images needed since we're using the uploaded image as half_image
@@ -928,7 +937,7 @@ async function handleRefine(){
       attempt++; setAttempt(targetSel, attempt, maxRetries);
       logStatus(targetSel, `Submitting to NanoBanana (attempt ${attempt}/${maxRetries})…`, { withTime:false });
       try {
-        const { task_id } = await FluxKontext.startNanoProcess(halfBlob, refs, promptText || '');
+        const { task_id } = await FluxKontext.startNanoProcess(halfToSend, refs, promptText || '');
         logStatus(targetSel, `task_id: ${task_id}`, { withTime:false });
         const r = await Promise.race([
           FluxKontext.pollNanoResult(task_id, (j)=>{ if (j) { if (j.status) logStatus(targetSel, `status: ${j.status}`, { withTime:false }); if (j.error) logStatus(targetSel, `error: ${j.error}`, { withTime:false }); if (j.debug) { try { const dbg = typeof j.debug==='string'? j.debug : JSON.stringify(j.debug); logStatus(targetSel, `debug: ${String(dbg).slice(0,600)}${String(dbg).length>600?' …':''}`, { withTime:false }); } catch {} } } }),

@@ -263,9 +263,19 @@ export const FluxKontext = {
   async startNanoProcess(halfImageBlob, refFilesOrBlobs = [], nanoPrompt = '') {
     assert(halfImageBlob, 'halfImageBlob is required');
     const form = new FormData();
-    const half = await blobFromFile(halfImageBlob);
-    // align with legacy: explicit filename for half, keep original names for refs
-    form.append('half_image', half, 'half.png');
+
+    // Support both URL (string) and Blob/File
+    // If it's a URL string (not a data: URL), pass it as half_image_url
+    if (typeof halfImageBlob === 'string' && !halfImageBlob.startsWith('data:')) {
+      // It's a URL - pass it as half_image_url parameter
+      // Backend will fetch it directly (much faster for internal URLs)
+      form.append('half_image_url', halfImageBlob);
+    } else {
+      // It's a Blob/File or data: URL - convert and upload as before
+      const half = await blobFromFile(halfImageBlob);
+      form.append('half_image', half, 'half.png');
+    }
+
     (refFilesOrBlobs || []).forEach((f, i) => {
       const file = f;
       const name = (file && file.name) ? file.name : `ref_${i + 1}.png`;
