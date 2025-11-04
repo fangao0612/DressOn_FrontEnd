@@ -392,7 +392,10 @@ async function handleGenerate() {
       const halfB64 = fluxRes?.halfImageBase64;
       if (halfB64) {
         logStatus(targetSel, 'Half image received via backend proxy');
+        const tBlobStart = performance.now();
         halfBlob = await (await fetch(halfB64)).blob();
+        const blobMs = performance.now() - tBlobStart;
+        logStatus(targetSel, `Half image blob conversion: ${(blobMs/1000).toFixed(2)} s`);
       } else {
         const halfUrl = fluxRes?.halfImageUrl;
         if (!halfUrl) throw new Error('Flux did not return half image');
@@ -400,7 +403,7 @@ async function handleGenerate() {
         halfBlob = await fetchBlob(halfUrl);
       }
       fluxMs = performance.now() - tFluxStart;
-      logStatus(targetSel, `Flux time: ${(fluxMs/1000).toFixed(2)} s`);
+      logStatus(targetSel, `Flux total time: ${(fluxMs/1000).toFixed(2)} s`);
       __lastHalfBlob = halfBlob; __lastMainSig = currSig;
     }
 
@@ -412,9 +415,13 @@ async function handleGenerate() {
                           __garmentOriginalSig !== currentGarmentSig; // garment变了
     if (needRecompute) {
       logStatus(targetSel, 'Recomputing garment padding to match character size…', { withTime:false });
+      const tPaddingStart = performance.now();
       paddedGarment = await computePaddedGarment(mainFile, __garmentOriginal || garmentFile);
+      const paddingMs = performance.now() - tPaddingStart;
+      logStatus(targetSel, `Garment padding complete: ${(paddingMs/1000).toFixed(2)} s`);
       console.log('[garment cache] Padded garment recomputed');
     } else {
+      logStatus(targetSel, 'Reusing cached padded garment');
       console.log('[garment cache] Reusing cached padded garment');
     }
 
