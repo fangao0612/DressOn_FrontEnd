@@ -860,13 +860,12 @@ async function handleRefine(){
   const targetSel = '#canvas2';
   const promptEl = document.getElementById('prompt');
   const promptText = (promptEl?.value || '').trim();
-  // half image: prefer original full-res from step1; fallback to the displayed image
+  // half image: must use original full-res from step1 (never use thumbnail!)
   let halfDataUrl = lastFinalImageBase64;
   if (!halfDataUrl) {
-    const img = document.querySelector('#canvas1 img');
-    if (img && img.src) halfDataUrl = img.src;
+    setCanvasError(targetSel, 'No full-resolution image available. Please run Step 1 first.');
+    return;
   }
-  if (!halfDataUrl) { setCanvasError(targetSel, 'No image in Output Gallery to refine.'); return; }
 
   // optional refine reference image
   const refineInput = document.querySelector('.uploader[data-role="refine"] .file-input');
@@ -883,6 +882,10 @@ async function handleRefine(){
 
     // convert dataURL to Blob
     const halfBlob = await (await fetch(halfDataUrl)).blob();
+    // Validate blob size (thumbnails are typically < 5KB, full images should be much larger)
+    if (halfBlob.size < 5000) {
+      throw new Error(`Invalid image size (${halfBlob.size} bytes). Please run Step 1 again to generate a full-resolution image.`);
+    }
     const refs = refFile ? [refFile] : [];
     if (promptText) { try { const pvw = promptText.replace(/\s+/g,' ').slice(0,120); logStatus(targetSel, `Refine prompt: "${pvw}${pvw.length===120?'…':''}"`, { withTime:false }); } catch {} }
 
