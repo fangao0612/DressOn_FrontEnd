@@ -934,7 +934,16 @@ async function handleRefine(){
     const panel2 = document.querySelector(targetSel);
     const cw = Math.max(1, (panel2?.clientWidth || 1024));
     const ch = Math.max(1, (panel2?.clientHeight || 768));
-    let previewUrl = result.imageBase64; try { previewUrl = await downscaleDataURL(result.imageBase64, cw, ch, 'image/jpeg', 0.9); } catch {}
+    // If result is a URL (not data:), use it directly for fast display
+    // Browser will handle async download, avoiding the 80s delay from downscaleDataURL
+    let previewUrl = result.imageBase64;
+    if (!result.imageBase64.startsWith('data:')) {
+      // It's a URL - use it directly
+      previewUrl = result.imageBase64;
+    } else {
+      // It's base64 data - downscale it
+      try { previewUrl = await downscaleDataURL(result.imageBase64, cw, ch, 'image/jpeg', 0.9); } catch {}
+    }
     stopTimer(targetSel, 'Done');
     setCanvasImage(targetSel, previewUrl);
     try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src=DOWNLOAD_ICON; icon.alt='download'; btn.appendChild(icon); btn.onclick=()=>{ const a=document.createElement('a'); a.href=result.imageBase64; const ts=new Date().toISOString().replace(/[:.]/g,'-'); a.download=`refined-${ts}.png`; document.body.appendChild(a); a.click(); a.remove(); }; panel2.appendChild(btn);} catch {}
