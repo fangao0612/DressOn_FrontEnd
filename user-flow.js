@@ -450,8 +450,16 @@ async function handleGenerate() {
           const panel2 = document.querySelector(targetSel);
           const cw = Math.max(1, (panel2?.clientWidth || 1024));
           const ch = Math.max(1, (panel2?.clientHeight || 768));
+          // If result is a URL (not data:), use it directly for fast display
+          // Browser will handle async download, avoiding the 80s delay from downscaleDataURL
           let previewUrl = r.imageBase64;
-          try { previewUrl = await downscaleDataURL(r.imageBase64, cw, ch, 'image/jpeg', 0.9); } catch {}
+          if (!r.imageBase64.startsWith('data:')) {
+            // It's a URL - use it directly
+            previewUrl = r.imageBase64;
+          } else {
+            // It's base64 data - downscale it
+            try { previewUrl = await downscaleDataURL(r.imageBase64, cw, ch, 'image/jpeg', 0.9); } catch {}
+          }
           setCanvasImage(targetSel, previewUrl);
           // remember original full-res for refine
           try { lastFinalImageBase64 = r.imageBase64; } catch {}
@@ -463,7 +471,12 @@ async function handleGenerate() {
             const prev = refine?.querySelector('.preview');
             if (prev) {
               let small = r.imageBase64;
-              try { small = await downscaleDataURL(r.imageBase64, 270, 270, 'image/jpeg', 0.9); } catch {}
+              // If it's a URL, use it directly; if base64, downscale it
+              if (!r.imageBase64.startsWith('data:')) {
+                small = r.imageBase64;
+              } else {
+                try { small = await downscaleDataURL(r.imageBase64, 270, 270, 'image/jpeg', 0.9); } catch {}
+              }
               prev.src = small; prev.hidden = false;
             }
           } catch {}
