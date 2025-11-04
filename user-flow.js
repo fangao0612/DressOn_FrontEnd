@@ -388,19 +388,26 @@ async function handleGenerate() {
       const tFluxStart = performance.now();
       const fluxRes = await FluxKontext.runFlux(mainFile, 'remove clothes', { steps: 8 });
       logStatus(targetSel, 'Flux submitted. Waiting for half image…');
-      // 后端代理返回的 base64 优先
+      // Prefer URL over base64 for better performance
+      const halfUrl = fluxRes?.halfImageUrl;
       const halfB64 = fluxRes?.halfImageBase64;
-      if (halfB64) {
-        logStatus(targetSel, 'Half image received via backend proxy');
+
+      if (halfUrl) {
+        // URL is fastest - backend already saved the image
+        logStatus(targetSel, 'Half image URL received. Fetching…');
+        const tFetchStart = performance.now();
+        halfBlob = await fetchBlob(halfUrl);
+        const fetchMs = performance.now() - tFetchStart;
+        logStatus(targetSel, `Half image URL fetch: ${(fetchMs/1000).toFixed(2)} s`);
+      } else if (halfB64) {
+        // Fallback to base64 if no URL provided
+        logStatus(targetSel, 'Half image received via backend proxy (base64)');
         const tBlobStart = performance.now();
         halfBlob = await (await fetch(halfB64)).blob();
         const blobMs = performance.now() - tBlobStart;
         logStatus(targetSel, `Half image blob conversion: ${(blobMs/1000).toFixed(2)} s`);
       } else {
-        const halfUrl = fluxRes?.halfImageUrl;
-        if (!halfUrl) throw new Error('Flux did not return half image');
-        logStatus(targetSel, 'Half image URL received. Fetching…');
-        halfBlob = await fetchBlob(halfUrl);
+        throw new Error('Flux did not return half image');
       }
       fluxMs = performance.now() - tFluxStart;
       logStatus(targetSel, `Flux total time: ${(fluxMs/1000).toFixed(2)} s`);
