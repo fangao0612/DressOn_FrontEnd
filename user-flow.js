@@ -860,16 +860,28 @@ async function handleRefine(){
   const targetSel = '#canvas2';
   const promptEl = document.getElementById('prompt');
   const promptText = (promptEl?.value || '').trim();
-  // half image: must use original full-res from step1 (never use thumbnail!)
-  let halfDataUrl = lastFinalImageBase64;
-  if (!halfDataUrl) {
-    setCanvasError(targetSel, 'No full-resolution image available. Please run Step 1 first.');
-    return;
-  }
-
-  // optional refine reference image
+  // Check if user uploaded a local image in "Refine Reference" uploader
   const refineInput = document.querySelector('.uploader[data-role="refine"] .file-input');
   const refFile = refineInput?.files?.[0];
+
+  // Determine the half image source:
+  // Priority 1: Use uploaded file from Refine Reference uploader (if available)
+  // Priority 2: Use Step 1 output (lastFinalImageBase64)
+  let halfSource = null;  // Will be either File or DataURL string
+  let halfBlob = null;
+
+  if (refFile) {
+    // User uploaded a local image - use it as the image to refine
+    halfSource = refFile;
+    logStatus(targetSel, 'Using uploaded image from Refine Reference', { withTime:false });
+  } else if (lastFinalImageBase64) {
+    // Use Step 1 output (must be full-res, never thumbnail!)
+    halfSource = lastFinalImageBase64;
+    logStatus(targetSel, 'Using Step 1 output image', { withTime:false });
+  } else {
+    setCanvasError(targetSel, 'No image to refine. Please upload an image in "Refine Reference" or run Step 1 first.');
+    return;
+  }
 
   try {
     setCanvasLoading(targetSel, 'Refining with NanoBanana…');
@@ -880,13 +892,22 @@ async function handleRefine(){
     currentCancel = () => { try { cancelReject?.(new Error('Cancelled by user')); } catch {} };
     cancelBtn?.addEventListener('click', ()=>{ currentCancel?.(); logStatus(targetSel, 'Cancelled by user'); });
 
-    // convert dataURL to Blob
-    const halfBlob = await (await fetch(halfDataUrl)).blob();
+    // Convert halfSource to Blob
+    if (halfSource instanceof File || halfSource instanceof Blob) {
+      // Direct file upload - use as-is
+      halfBlob = halfSource;
+    } else {
+      // DataURL from Step 1 - convert to Blob
+      halfBlob = await (await fetch(halfSource)).blob();
+    }
+
     // Validate blob size (thumbnails are typically < 5KB, full images should be much larger)
     if (halfBlob.size < 5000) {
-      throw new Error(`Invalid image size (${halfBlob.size} bytes). Please run Step 1 again to generate a full-resolution image.`);
+      throw new Error(`Invalid image size (${halfBlob.size} bytes). Image too small - please use a full-resolution image.`);
     }
-    const refs = refFile ? [refFile] : [];
+
+    // No additional ref images needed since we're using the uploaded image as half_image
+    const refs = [];
     if (promptText) { try { const pvw = promptText.replace(/\s+/g,' ').slice(0,120); logStatus(targetSel, `Refine prompt: "${pvw}${pvw.length===120?'…':''}"`, { withTime:false }); } catch {} }
 
     const maxRetries = 1; let attempt = 0; let lastError = null; let result = null; const tStart = performance.now();
