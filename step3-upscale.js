@@ -26,8 +26,28 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
   // 获取API基础URL
   function getApiBase() {
     try {
-      return FluxKontext.getBaseUrl?.() || 'http://127.0.0.1:9090';
-    } catch {
+      // 优先使用 FluxKontext 的配置
+      const baseUrl = FluxKontext.getBaseUrl?.();
+      if (baseUrl) return baseUrl;
+
+      // 否则尝试从 localStorage 获取
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const stored = window.localStorage.getItem('API_HOST');
+        if (stored) return stored;
+      }
+
+      // 最后检查环境变量
+      if (typeof import.meta !== 'undefined' && import.meta.env) {
+        const envUrl = import.meta.env.VITE_API_HOST ||
+                      import.meta.env.VITE_BACKEND_BASE_URL ||
+                      import.meta.env.VITE_BASE_URL;
+        if (envUrl) return envUrl;
+      }
+
+      // 默认值
+      return 'http://127.0.0.1:9090';
+    } catch (e) {
+      console.error('[step3] Error getting API base:', e);
       return 'http://127.0.0.1:9090';
     }
   }
