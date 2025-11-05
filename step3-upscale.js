@@ -74,16 +74,60 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
     `;
   }
 
-  // 显示结果图片
+  // 显示结果图片 (复刻 step2 的居中和自适应逻辑)
   function showResult(imageUrl) {
-    canvas3.innerHTML = `
-      <div class="result-card">
-        <img src="${imageUrl}" alt="Upscaled result" />
-        <a href="${imageUrl}" download class="download-btn" title="Download">
-          <img src="${DOWNLOAD_ICON}" alt="Download" />
-        </a>
-      </div>
-    `;
+    console.log('[step3] Showing result image:', imageUrl.substring(0, 100));
+
+    canvas3.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.alt = 'Upscaled result';
+
+    // 设置图片样式：居中、自适应、不裁剪 (与 step2 一致)
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.maxWidth = '100%';
+    img.style.maxHeight = '100%';
+    img.style.objectFit = 'contain';
+    img.style.objectPosition = 'center';
+
+    // 图片加载后调整尺寸以保持完整显示
+    img.onload = () => {
+      console.log('[step3] Image loaded:', {
+        naturalWidth: img.naturalWidth,
+        naturalHeight: img.naturalHeight,
+        aspectRatio: (img.naturalWidth / img.naturalHeight).toFixed(3)
+      });
+
+      const panelWidth = canvas3.clientWidth || canvas3.offsetWidth;
+      const panelHeight = canvas3.clientHeight || canvas3.offsetHeight;
+
+      if (panelWidth && panelHeight && img.naturalWidth && img.naturalHeight) {
+        const scale = Math.min(panelWidth / img.naturalWidth, panelHeight / img.naturalHeight, 1);
+        img.style.width = `${Math.round(img.naturalWidth * scale)}px`;
+        img.style.height = `${Math.round(img.naturalHeight * scale)}px`;
+      } else {
+        img.style.width = 'auto';
+        img.style.height = 'auto';
+      }
+    };
+
+    canvas3.appendChild(img);
+
+    // 添加下载按钮
+    const downloadBtn = document.createElement('a');
+    downloadBtn.href = imageUrl;
+    downloadBtn.download = `upscaled-${Date.now()}.png`;
+    downloadBtn.className = 'download-btn';
+    downloadBtn.title = 'Download';
+    downloadBtn.style.cssText = 'position:absolute;bottom:12px;right:12px;';
+
+    const icon = document.createElement('img');
+    icon.src = DOWNLOAD_ICON;
+    icon.alt = 'Download';
+    downloadBtn.appendChild(icon);
+
+    canvas3.appendChild(downloadBtn);
   }
 
   // 显示错误
