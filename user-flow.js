@@ -306,12 +306,26 @@ async function sendToNano(finalSel, mainFile, refFile) {
       icon.alt = 'download';
       btn.appendChild(icon);
       const dataUrl = result.imageBase64;
-      btn.onclick = () => {
-        const a = document.createElement('a');
-        a.href = dataUrl;
-        const ts = new Date().toISOString().replace(/[:.]/g,'-');
-        a.download = `final-${ts}.png`;
-        document.body.appendChild(a); a.click(); a.remove();
+      btn.onclick = async () => {
+        try {
+          let blobUrl = dataUrl;
+          if (!dataUrl.startsWith('data:')) {
+            const response = await fetch(dataUrl);
+            const blob = await response.blob();
+            blobUrl = URL.createObjectURL(blob);
+          }
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          const ts = new Date().toISOString().replace(/[:.]/g,'-');
+          a.download = `final-${ts}.png`;
+          document.body.appendChild(a); a.click(); a.remove();
+          if (!dataUrl.startsWith('data:')) {
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+          }
+        } catch (error) {
+          console.error('[download] Failed:', error);
+          alert('Download failed. Please try again.');
+        }
       };
       panel2?.appendChild(btn);
     } catch {}
@@ -476,7 +490,7 @@ async function handleGenerate() {
           // remember original full-res for refine
           try { lastFinalImageBase64 = r.imageBase64; } catch {}
           // update download button
-          try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src=DOWNLOAD_ICON; icon.alt='download'; btn.appendChild(icon); btn.onclick=()=>{ const a=document.createElement('a'); a.href=r.imageBase64; const ts=new Date().toISOString().replace(/[:.]/g,'-'); a.download=`final-${ts}.png`; document.body.appendChild(a); a.click(); a.remove(); }; panel2.appendChild(btn);} catch {}
+          try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src=DOWNLOAD_ICON; icon.alt='download'; btn.appendChild(icon); btn.onclick=async()=>{try{let blobUrl=r.imageBase64;if(!r.imageBase64.startsWith('data:')){const response=await fetch(r.imageBase64);const blob=await response.blob();blobUrl=URL.createObjectURL(blob);}const a=document.createElement('a');a.href=blobUrl;const ts=new Date().toISOString().replace(/[:.]/g,'-');a.download=`final-${ts}.png`;document.body.appendChild(a);a.click();a.remove();if(!r.imageBase64.startsWith('data:')){setTimeout(()=>URL.revokeObjectURL(blobUrl),100);}}catch(error){console.error('[download] Failed:',error);alert('Download failed. Please try again.');}}; panel2.appendChild(btn);} catch {}
           // auto-fill Refine Reference preview with the generated image (keep uploader behavior)
           try {
             const refine = document.querySelector('.uploader[data-role="refine"]');

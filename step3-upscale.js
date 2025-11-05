@@ -114,10 +114,9 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
 
     canvas3.appendChild(img);
 
-    // 添加下载按钮
-    const downloadBtn = document.createElement('a');
-    downloadBtn.href = imageUrl;
-    downloadBtn.download = `upscaled-${Date.now()}.png`;
+    // 添加下载按钮 - 使用fetch确保真正下载而不是打开新窗口
+    const downloadBtn = document.createElement('button');
+    downloadBtn.type = 'button';
     downloadBtn.className = 'download-btn';
     downloadBtn.title = 'Download';
     downloadBtn.style.cssText = 'position:absolute;bottom:12px;right:12px;';
@@ -126,6 +125,29 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
     icon.src = DOWNLOAD_ICON;
     icon.alt = 'Download';
     downloadBtn.appendChild(icon);
+
+    downloadBtn.onclick = async () => {
+      try {
+        // Fetch image as blob to bypass CORS download restrictions
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Trigger download
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `upscaled-${Date.now()}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        // Cleanup blob URL
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+      } catch (error) {
+        console.error('[step3] Download failed:', error);
+        alert('Download failed. Please try again.');
+      }
+    };
 
     canvas3.appendChild(downloadBtn);
   }
