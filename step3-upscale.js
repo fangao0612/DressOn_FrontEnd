@@ -193,7 +193,8 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
 
       const formData = new FormData();
       formData.append('image', uploadedFile);
-      formData.append('prompt', 'Upscale this image to high resolution while preserving all details and quality.');
+      // Don't send prompt - let backend use UPSCALE_PROMPT environment variable
+      // formData.append('prompt', 'Upscale this image to high resolution while preserving all details and quality.');
 
       const apiBase = getApiBase();
       console.log('[step3] Sending request to:', `${apiBase}/upscale/process_async`);
