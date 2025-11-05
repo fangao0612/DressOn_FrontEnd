@@ -245,8 +245,8 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 .step1-cta{padding:16px 0 0;margin-top:calc(var(--editor-gap,36px) - 15px)}
 .step1-cta .btn{border-radius:12px;width:100%;height:72px;background:linear-gradient(180deg,#ff5e66,#ff5e66);color:#fff;border:1px solid rgba(255,94,102,.35);box-shadow:0 8px 24px rgba(255,94,102,.25)}
 /* Step2 CTA 与 Step1 一致 */
-.step2-cta{padding:16px 0 0;margin-top:calc(var(--editor-gap,36px) - 15px)}
-.step2-cta .btn{border-radius:12px;width:100%;height:72px;background:linear-gradient(180deg,#ff5e66,#ff5e66);color:#fff;border:1px solid rgba(255,94,102,.35);box-shadow:0 8px 24px rgba(255,94,102,.25)}
+.step2-cta,.step3-cta{padding:16px 0 0;margin-top:calc(var(--editor-gap,36px) - 15px)}
+.step2-cta .btn,.step3-cta .btn{border-radius:12px;width:100%;height:72px;background:linear-gradient(180deg,#ff5e66,#ff5e66);color:#fff;border:1px solid rgba(255,94,102,.35);box-shadow:0 8px 24px rgba(255,94,102,.25)}
 .editor-grid{align-items:stretch}
 .refine-grid{align-items:stretch}
 .left-wrap,.panel.right{align-self:stretch}
