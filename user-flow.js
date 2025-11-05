@@ -81,7 +81,6 @@ function setCanvasImage(sel, src) {
   }
 
   // Add debug border to canvas
-  panel.style.border = '3px solid red';
 
   console.log('[DEBUG] Canvas dimensions:', {
     selector: sel,
@@ -379,10 +378,9 @@ async function handleGenerate() {
     let halfBlob;
     let fluxMs = 0;
 
-    // reuse half image if main not changed
-    if (__lastHalfBlob && __lastMainSig === currSig) {
-      logStatus(targetSel, 'Reuse cached half image (skip Flux)');
-      halfBlob = __lastHalfBlob;
+    // TEMPORARILY DISABLED: reuse half image if main not changed
+    // To re-enable caching: change the condition below from "false" to the original check
+    if (false && __lastHalfBlob && __lastMainSig === currSig) { // CACHE DISABLED
     } else {
       logStatus(targetSel, 'Uploading Character Reference…');
       const tFluxStart = performance.now();
