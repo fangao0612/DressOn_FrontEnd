@@ -511,3 +511,12 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
   background:rgba(228,192,122,.10);
   border-color:rgba(228,192,122,.30);
 }
+
+/* Credits display in light mode */
+[data-theme="light"] .credits .amount{
+  color:#1a202c;  /* dark color for numbers */
+}
+
+[data-theme="light"] .credits .unit{
+  color:#64748b;  /* muted dark color for "credits" text */
+}
