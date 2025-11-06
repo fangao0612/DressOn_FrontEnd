@@ -871,7 +871,7 @@ async function handleRefine(){
 
   // Validate prompt is not empty
   if (!promptText) {
-    alert('Please enter a prompt first');
+    setCanvasError(targetSel, 'Please enter a prompt first');
     return;
   }
 
