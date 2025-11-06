@@ -967,8 +967,7 @@ async function handleRefine(){
         const { task_id } = await FluxKontext.startNanoProcess(halfToSend, refs, promptText || '');
         logStatus(targetSel, `task_id: ${task_id}`, { withTime:false });
         const r = await
-          FluxKontext.pollNanoResult(task_id, (j)=>{ if (j) { if (j.status) logStatus(targetSel, `status: ${j.status}`, { withTime:false }); if (j.error) logStatus(targetSel, `error: ${j.error}`, { withTime:false }); if (j.debug) { try { const dbg = typeof j.debug==='string'? j.debug : JSON.stringify(j.debug); logStatus(targetSel, `debug: ${String(dbg).slice(0,600)}${String(dbg).length>600?' …':''}`, { withTime:false }); } catch {} } } }),
-        ;
+          FluxKontext.pollNanoResult(task_id, (j)=>{ if (j) { if (j.status) logStatus(targetSel, `status: ${j.status}`, { withTime:false }); if (j.error) logStatus(targetSel, `error: ${j.error}`, { withTime:false }); if (j.debug) { try { const dbg = typeof j.debug==='string'? j.debug : JSON.stringify(j.debug); logStatus(targetSel, `debug: ${String(dbg).slice(0,600)}${String(dbg).length>600?' …':''}`, { withTime:false }); } catch {} } } });
         if (r?.imageBase64) {
           result = r; break;
         }
