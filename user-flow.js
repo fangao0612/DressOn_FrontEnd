@@ -932,7 +932,6 @@ async function handleRefine(){
     setCanvasLoading(targetSel, 'Refining with NanoBanana…');
     startTimer(targetSel, 'total');
     // Cancel functionality removed - UI elements moved to F12 console
-    cancelBtn?.addEventListener('click', ()=>{ currentCancel?.(); logStatus(targetSel, 'Cancelled by user'); });
 
     // Determine how to handle halfSource
     // If it's a URL (not data:), pass it directly to backend
