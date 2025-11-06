@@ -117,9 +117,9 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
     // 添加下载按钮 - 使用fetch确保真正下载而不是打开新窗口
     const downloadBtn = document.createElement('button');
     downloadBtn.type = 'button';
-    downloadBtn.className = 'download-btn';
+    downloadBtn.className = 'dl-btn';
     downloadBtn.title = 'Download';
-    downloadBtn.style.cssText = 'position:absolute;bottom:12px;right:12px;';
+    downloadBtn.style.cssText = '';
 
     const icon = document.createElement('img');
     icon.src = DOWNLOAD_ICON;
