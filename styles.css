@@ -493,3 +493,16 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
   box-shadow:0 1px 0 rgba(255,255,255,.35) inset,
              0 2px 4px rgba(0,0,0,.1);
 }
+
+/* Badge text color in light mode */
+[data-theme="light"] .badge{
+  color:#1a202c;
+  background:rgba(255,94,102,.08);
+  border-color:rgba(255,94,102,.25);
+}
+
+[data-theme="light"] .section-header .badge{
+  color:#1a202c;
+  background:rgba(228,192,122,.10);
+  border-color:rgba(228,192,122,.30);
+}
