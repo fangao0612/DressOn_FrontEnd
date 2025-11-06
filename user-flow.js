@@ -95,13 +95,9 @@ function setCanvasImage(sel, src) {
   img.src = src;
 
 
-  // 默认约束，确保自适应不裁剪
-  img.style.width = '100%';
-  img.style.height = '100%';
-  img.style.maxWidth = '100%';
-  img.style.maxHeight = '100%';
-  img.style.objectFit = 'contain';
-  img.style.objectPosition = 'center';
+  // Let CSS handle default sizing - don't override with inline styles
+  // The CSS already defines: .canvas img { max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; }
+  // Only set explicit dimensions after image loads to prevent container distortion
 
   // Log image dimensions after load
   img.onload = () => {
