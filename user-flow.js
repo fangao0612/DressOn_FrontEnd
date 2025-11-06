@@ -464,16 +464,15 @@ async function handleGenerate() {
         const tNanoStart = performance.now();
         const { task_id } = await FluxKontext.startNanoProcess(halfBlob, [paddedGarment], nanoPrompt || '');
         logStatus(targetSel, `task_id: ${task_id}`, { withTime: false });
-        const r = await Promise.race([
+        const r = await
           FluxKontext.pollNanoResult(task_id, (j) => {
             if (j) {
               if (j.status) logStatus(targetSel, `status: ${j.status}`, { withTime: false });
               if (j.error) logStatus(targetSel, `error: ${j.error}`, { withTime: false });
               if (j.debug) { try { const dbg = typeof j.debug==='string'? j.debug : JSON.stringify(j.debug); logStatus(targetSel, `debug: ${String(dbg).slice(0,600)}${String(dbg).length>600?' …':''}`, { withTime: false }); } catch {} }
             }
-          }),
-          cancelPromise,
-        ]);
+          })
+        ;
         if (r?.imageBase64) {
           const nanoMs = performance.now() - tNanoStart;
           result = r;
@@ -967,10 +966,9 @@ async function handleRefine(){
       try {
         const { task_id } = await FluxKontext.startNanoProcess(halfToSend, refs, promptText || '');
         logStatus(targetSel, `task_id: ${task_id}`, { withTime:false });
-        const r = await Promise.race([
+        const r = await
           FluxKontext.pollNanoResult(task_id, (j)=>{ if (j) { if (j.status) logStatus(targetSel, `status: ${j.status}`, { withTime:false }); if (j.error) logStatus(targetSel, `error: ${j.error}`, { withTime:false }); if (j.debug) { try { const dbg = typeof j.debug==='string'? j.debug : JSON.stringify(j.debug); logStatus(targetSel, `debug: ${String(dbg).slice(0,600)}${String(dbg).length>600?' …':''}`, { withTime:false }); } catch {} } } }),
-          cancelPromise,
-        ]);
+        ;
         if (r?.imageBase64) {
           result = r; break;
         }
