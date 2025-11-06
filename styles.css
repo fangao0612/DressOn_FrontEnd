@@ -485,11 +485,11 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
   color:var(--text);
 }
 
-/* Section backgrounds */
+/* Section backgrounds - solid color for editor sections, hero keeps gradient */
 [data-theme="light"] .editor,
 [data-theme="light"] .refine,
 [data-theme="light"] .upscale{
-  background:transparent;
+  background:var(--bg);  /* solid background color, no gradient */
 }
 
 /* Shadow adjustments for light mode */
