@@ -279,8 +279,8 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 /* Step2 左侧表单宽度与 Step1 左列一致并靠上显示 */
 .refine .panel.left .panel-inner{align-items:flex-start}
 .refine .refine-form{width:270px;display:flex;flex-direction:column;gap:12px}
-/* 右侧面板内元素拉伸，避免画布被挤瘦 */
-.panel.right .panel-inner{align-items:stretch}
+/* 右侧面板内元素拉伸，避免画布被挤瘦；overflow:hidden防止canvas内容撑大边框 */
+.panel.right .panel-inner{align-items:stretch;overflow:hidden}
 .panel .panel-bar{height:64px;display:flex;align-items:center;margin:-20px -20px 12px;padding:0 20px;background:linear-gradient(135deg,rgba(159,176,203,.08),rgba(255,255,255,.03));border-bottom:1px solid rgba(159,176,203,.22);border-top-left-radius:16px;border-top-right-radius:16px}
 /* extra spacing below titles for left panels */
 .editor .panel.left .panel-bar,
