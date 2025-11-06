@@ -151,47 +151,67 @@ function setCanvasImage(sel, src) {
   console.log('[DEBUG] Image element added to canvas');
 }
 
-// ---- timer helpers ----
-const startTimes = new WeakMap();
+// ---- timer helpers (multi-timer system) ----
+const timerData = new WeakMap(); // stores { total, flux, nano } for each panel
 let currentCancel = null; // function to cancel current flow
-function startTimer(sel) {
+
+function startTimer(sel, type = 'total') {
   const panel = $(sel);
   if (!panel) return;
 
-  // Clear old timer if exists
-  if (panel._timer) {
-    clearInterval(panel._timer);
-    panel._timer = null;
+  let timers = timerData.get(panel);
+  if (!timers) {
+    timers = { total: null, flux: null, nano: null };
+    timerData.set(panel, timers);
   }
 
-  const start = Date.now();
-  startTimes.set(panel, start);
+  const timerKey = type.toLowerCase();
+  if (!timers[timerKey]) {
+    timers[timerKey] = {};
+  }
 
-  // Log to console instead of DOM
+  const timer = timers[timerKey];
+
+  // Clear old interval if exists
+  if (timer.interval) {
+    clearInterval(timer.interval);
+  }
+
+  timer.startTime = Date.now();
   const stepName = sel.includes('canvas1') ? 'Step1' : 'Step2';
-  console.log(`[${stepName}] Timer started`);
+  const timerLabel = type.charAt(0).toUpperCase() + type.slice(1);
 
-  // Periodic console updates (every 5 seconds to avoid spam)
-  panel._timer = setInterval(() => {
-    const elapsed = (Date.now() - start) / 1000;
-    console.log(`[${stepName}] Elapsed: ${elapsed.toFixed(1)}s`);
+  console.log(`[${stepName}] ${timerLabel} timer started`);
+
+  // Periodic updates every 5 seconds
+  timer.interval = setInterval(() => {
+    const elapsed = (Date.now() - timer.startTime) / 1000;
+    console.log(`[${stepName}] ${timerLabel}: ${elapsed.toFixed(1)}s`);
   }, 5000);
 }
-function stopTimer(sel, label) {
+
+function stopTimer(sel, type = 'total', label) {
   const panel = $(sel);
   if (!panel) return;
 
-  // Clear timer
-  if (panel._timer) {
-    clearInterval(panel._timer);
-    panel._timer = null;
+  const timers = timerData.get(panel);
+  if (!timers) return;
+
+  const timerKey = type.toLowerCase();
+  const timer = timers[timerKey];
+  if (!timer) return;
+
+  // Clear interval
+  if (timer.interval) {
+    clearInterval(timer.interval);
+    timer.interval = null;
   }
 
-  const start = startTimes.get(panel);
-  if (start) {
-    const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+  if (timer.startTime) {
+    const elapsed = ((Date.now() - timer.startTime) / 1000).toFixed(1);
     const stepName = sel.includes('canvas1') ? 'Step1' : 'Step2';
-    const message = label ? `${label} (${elapsed}s)` : `Elapsed: ${elapsed}s`;
+    const timerLabel = type.charAt(0).toUpperCase() + type.slice(1);
+    const message = label ? `${timerLabel} ${label} (${elapsed}s)` : `${timerLabel}: ${elapsed}s`;
     console.log(`[${stepName}] ${message}`);
   }
 }
@@ -266,7 +286,7 @@ async function sendToNano(finalSel, mainFile, refFile) {
 
   if (!lastHalfBlob) { setCanvasError(finalSel, 'Half image not ready'); return; }
   setCanvasLoading(finalSel, 'Sending to NanoBanana…');
-  startTimer(finalSel);
+  startTimer(targetSel, 'nano');
   logStatus(finalSel, 'Preparing garment: matching character size with white padding…');
   const mainSize = await getImageSizeFromFile(mainFile);
   const resizedRef = await FluxKontext.resizeImageWithPadding(refFile, mainSize.width, mainSize.height, '#ffffff');
@@ -290,7 +310,8 @@ async function sendToNano(finalSel, mainFile, refFile) {
     }
   }
   if (result?.imageBase64) {
-    stopTimer(finalSel, 'Done');
+    stopTimer(targetSel, 'nano', 'completed');
+    stopTimer(targetSel, 'total', 'completed');
     setCanvasImage(finalSel, result.imageBase64);
     // ensure a working download button on Live Preview as well
     try {
@@ -331,7 +352,7 @@ async function sendToNano(finalSel, mainFile, refFile) {
     } catch {}
     logStatus(finalSel, 'Done');
   } else {
-    stopTimer(finalSel, 'Failed'); setCanvasError(finalSel, `Generation failed: ${lastError?.message || 'No image from NanoBanana after 12 attempts'}`);
+    stopTimer(targetSel, 'nano', 'failed'); stopTimer(targetSel, 'total', 'failed'); setCanvasError(finalSel, `Generation failed: ${lastError?.message || 'No image from NanoBanana after 12 attempts'}`);
   }
 }
 
@@ -380,7 +401,8 @@ async function handleGenerate() {
 
   try {
     setCanvasLoading(targetSel, 'Running Flux (half image)…');
-    startTimer(targetSel);
+    startTimer(targetSel, 'total');  // Total timer for entire workflow
+    startTimer(targetSel, 'flux');   // Flux-specific timer
     const panel = document.querySelector(targetSel);
     const cancelBtn = panel?.querySelector('.btn-cancel');
     let cancelReject;
@@ -472,7 +494,8 @@ async function handleGenerate() {
         if (r?.imageBase64) {
           const nanoMs = performance.now() - tNanoStart;
           result = r;
-          stopTimer(targetSel, 'Done');
+          stopTimer(targetSel, 'nano', 'completed');
+          stopTimer(targetSel, 'total', 'completed');
           const panel2 = document.querySelector(targetSel);
           const cw = Math.max(1, (panel2?.clientWidth || 1024));
           const ch = Math.max(1, (panel2?.clientHeight || 768));
@@ -518,7 +541,7 @@ async function handleGenerate() {
       }
     }
     if (!result) throw new Error(lastError?.message || 'No image from NanoBanana after 6 attempts');
-  } catch (e) { const msg = e?.message || String(e); stopTimer(targetSel, 'Failed'); setCanvasError(targetSel, `Generation failed: ${msg}`); logStatus(targetSel, 'Final status: failed after maximum retries', { withTime:false }); if (/Failed to fetch|CORS/i.test(msg)) { console.warn('Hint: ensure backend allows 127.0.0.1:5174 and ComfyUI is up'); } if (/402/.test(String(e))) { alert('余额不足，请购买或等候发放'); } }
+  } catch (e) { const msg = e?.message || String(e); stopTimer(targetSel, 'flux', 'failed'); stopTimer(targetSel, 'total', 'failed'); setCanvasError(targetSel, `Generation failed: ${msg}`); logStatus(targetSel, 'Final status: failed after maximum retries', { withTime:false }); if (/Failed to fetch|CORS/i.test(msg)) { console.warn('Hint: ensure backend allows 127.0.0.1:5174 and ComfyUI is up'); } if (/402/.test(String(e))) { alert('余额不足，请购买或等候发放'); } }
 }
 
 // Bind button exclusively (remove any existing listeners like mockGenerate)
@@ -924,7 +947,7 @@ async function handleRefine(){
 
   try {
     setCanvasLoading(targetSel, 'Refining with NanoBanana…');
-    startTimer(targetSel);
+    startTimer(targetSel, 'total');
     const panel = document.querySelector(targetSel);
     const cancelBtn = panel?.querySelector('.btn-cancel');
     let cancelReject; const cancelPromise = new Promise((_, reject)=>{ cancelReject = reject; });
@@ -992,11 +1015,11 @@ async function handleRefine(){
       // It's base64 data - downscale it
       try { previewUrl = await downscaleDataURL(result.imageBase64, cw, ch, 'image/jpeg', 0.9); } catch {}
     }
-    stopTimer(targetSel, 'Done');
+    stopTimer(targetSel, 'total', 'completed');
     setCanvasImage(targetSel, previewUrl);
     try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src=DOWNLOAD_ICON; icon.alt='download'; btn.appendChild(icon); btn.onclick=async()=>{try{let blobUrl=result.imageBase64;if(!result.imageBase64.startsWith('data:')){const response=await fetch(result.imageBase64);const blob=await response.blob();blobUrl=URL.createObjectURL(blob);}const a=document.createElement('a');a.href=blobUrl;const ts=new Date().toISOString().replace(/[:.]/g,'-');a.download=`refined-${ts}.png`;document.body.appendChild(a);a.click();a.remove();if(!result.imageBase64.startsWith('data:')){setTimeout(()=>URL.revokeObjectURL(blobUrl),100);}}catch(error){console.error('[download] Failed:',error);alert('Download failed. Please try again.');}}; panel2.appendChild(btn);} catch {}
     const totalMs = performance.now() - tStart; logStatus(targetSel, `refine: ${(totalMs/1000).toFixed(2)} s`, { withTime:false });
-  } catch (e) { const msg = e?.message || String(e); stopTimer(targetSel, 'Failed'); setCanvasError(targetSel, `Refine failed: ${msg}`); }
+  } catch (e) { const msg = e?.message || String(e); stopTimer(targetSel, 'flux', 'failed'); stopTimer(targetSel, 'total', 'failed'); setCanvasError(targetSel, `Refine failed: ${msg}`); }
 }
 
 // bind Step2 Apply & Generate button
