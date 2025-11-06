@@ -273,7 +273,7 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 .left-wrap,.panel.right{align-self:stretch}
 /* 对齐底部：让 CTA 的底边与右侧面板底边一致 */
 .editor-grid{grid-auto-rows:1fr}
-.panel .panel-inner{display:flex;flex-direction:column;gap:20px;flex:1;justify-content:flex-start;align-items:flex-start;overflow:hidden}
+.panel .panel-inner{display:flex;flex-direction:column;gap:20px;flex:1;justify-content:flex-start;align-items:flex-start;overflow:visible}
 /* 左侧面板：让两块输入区域整体在面板中靠上且左对齐 */
 .panel.left .panel-inner{align-items:flex-start}
 /* Step2 左侧表单宽度与 Step1 左列一致并靠上显示 */
@@ -519,4 +519,10 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 
 [data-theme="light"] .credits .unit{
   color:#64748b;  /* muted dark color for "credits" text */
+}
+
+/* Fix button shadow clipping in prompt-actions */
+.prompt-actions{
+  overflow: visible;
+  padding-bottom: 8px;  /* Extra space to ensure shadow isn't clipped */
 }
