@@ -332,6 +332,7 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 .placeholder .title{font-weight:800}
 .placeholder .desc{max-width:40ch}
 .prompt-actions{display:flex;gap:.7rem;margin-top:.8rem}
+.get-image-actions{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1rem;width:270px}
 
 /* showcase & reviews combined */
 .showcase-reviews{padding:72px 0;background:var(--bg);min-height:90vh;display:flex;align-items:center}

@@ -13,6 +13,8 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
   const preview = uploader?.querySelector('.preview');
   const upscaleBtn = $('#upscale-generate');
   const canvas3 = $('#canvas3');
+  const getStep1Btn = $('#get-step1-image');
+  const getStep2Btn = $('#get-step2-image');
 
   // 状态
   let uploadedFile = null;
@@ -314,6 +316,79 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
     upscaleBtn.textContent = 'Upscale Image';
   }
 
+  // 更新按钮状态
+  function updateGetImageButtons() {
+    if (getStep1Btn) {
+      const hasStep1 = window.lastFinalImageBase64;
+      getStep1Btn.disabled = !hasStep1;
+      console.log('[step3] Step1 button:', hasStep1 ? 'enabled' : 'disabled');
+    }
+    if (getStep2Btn) {
+      const hasStep2 = window.lastStep2ImageBase64;
+      getStep2Btn.disabled = !hasStep2;
+      console.log('[step3] Step2 button:', hasStep2 ? 'enabled' : 'disabled');
+    }
+  }
+
+  // 从base64或URL加载图片到uploader
+  async function loadImageToUploader(imageSource, sourceName) {
+    try {
+      console.log('[step3] Loading image from', sourceName);
+
+      // 如果已有上传的文件URL，先释放
+      if (uploadedFileUrl) {
+        URL.revokeObjectURL(uploadedFileUrl);
+        uploadedFileUrl = null;
+      }
+
+      // 将图片转换为File对象
+      let blob;
+      if (imageSource.startsWith('data:')) {
+        // data URL
+        const response = await fetch(imageSource);
+        blob = await response.blob();
+      } else if (imageSource.startsWith('http')) {
+        // HTTP URL
+        const response = await fetch(imageSource);
+        blob = await response.blob();
+      } else {
+        throw new Error('Invalid image source');
+      }
+
+      // 创建File对象
+      const file = new File([blob], `${sourceName}-image.png`, { type: 'image/png' });
+      uploadedFile = file;
+
+      // 显示预览
+      uploadedFileUrl = URL.createObjectURL(file);
+      preview.src = uploadedFileUrl;
+      preview.hidden = false;
+      dropArea.style.display = 'none';
+
+      // 启用按钮
+      upscaleBtn.disabled = false;
+
+      console.log('[step3] Image loaded from', sourceName);
+    } catch (error) {
+      console.error('[step3] Error loading image:', error);
+      alert(`Failed to load image from ${sourceName}`);
+    }
+  }
+
+  // 自动加载最新的图片（优先step2，其次step1）
+  function autoLoadLatestImage() {
+    // 优先加载step2的图片
+    if (window.lastStep2ImageBase64) {
+      console.log('[step3] Auto-loading image from step2');
+      loadImageToUploader(window.lastStep2ImageBase64, 'step2');
+    } else if (window.lastFinalImageBase64) {
+      console.log('[step3] Auto-loading image from step1');
+      loadImageToUploader(window.lastFinalImageBase64, 'step1');
+    } else {
+      console.log('[step3] No images available for auto-load');
+    }
+  }
+
   // 绑定事件
   console.log('[step3] Binding events...');
 
@@ -358,9 +433,35 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
     console.log('[step3] Drag & drop listeners attached');
   }
 
+  // Get image from step1 button
+  if (getStep1Btn) {
+    getStep1Btn.addEventListener('click', () => {
+      if (window.lastFinalImageBase64) {
+        loadImageToUploader(window.lastFinalImageBase64, 'step1');
+      }
+    });
+    console.log('[step3] Get Step1 button listener attached');
+  }
+
+  // Get image from step2 button
+  if (getStep2Btn) {
+    getStep2Btn.addEventListener('click', () => {
+      if (window.lastStep2ImageBase64) {
+        loadImageToUploader(window.lastStep2ImageBase64, 'step2');
+      }
+    });
+    console.log('[step3] Get Step2 button listener attached');
+  }
+
   // 初始化
   upscaleBtn.disabled = true;
   showPlaceholder();
+
+  // 更新按钮状态
+  updateGetImageButtons();
+
+  // 自动加载最新图片
+  autoLoadLatestImage();
 
   console.log('[step3] Upscale module initialized successfully');
   console.log('[step3] Elements:', {
@@ -369,6 +470,11 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
     upscaleBtn: !!upscaleBtn,
     canvas3: !!canvas3,
     dropArea: !!dropArea,
-    preview: !!preview
+    preview: !!preview,
+    getStep1Btn: !!getStep1Btn,
+    getStep2Btn: !!getStep2Btn
   });
+
+  // 将更新函数暴露到全局，以便在step1/step2完成时调用
+  window.updateStep3Buttons = updateGetImageButtons;
 })();

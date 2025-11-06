@@ -266,6 +266,10 @@ let lastHalfBlob = null;
 let lastFinalImageBase64 = null; // original full-res final image from step1
 let lastStep2ImageBase64 = null; // original full-res refined image from step2
 
+// Expose to window for step3-upscale.js access
+window.lastFinalImageBase64 = lastFinalImageBase64;
+window.lastStep2ImageBase64 = lastStep2ImageBase64;
+
 async function sendToNano(finalSel, mainFile, refFile) {
   // persisted Nano prompt
   let nanoPrompt = DEFAULT_NANO_PROMPT;
@@ -492,7 +496,9 @@ async function handleGenerate() {
           }
           setCanvasImage(targetSel, previewUrl);
           // remember original full-res for refine
-          try { lastFinalImageBase64 = r.imageBase64; } catch {}
+          try { lastFinalImageBase64 = r.imageBase64; window.lastFinalImageBase64 = r.imageBase64; } catch {}
+          // update step3 buttons
+          try { if (window.updateStep3Buttons) window.updateStep3Buttons(); } catch {}
           // update download button
           try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src=DOWNLOAD_ICON; icon.alt='download'; btn.appendChild(icon); btn.onclick=async()=>{try{let blobUrl=r.imageBase64;if(!r.imageBase64.startsWith('data:')){const response=await fetch(r.imageBase64);const blob=await response.blob();blobUrl=URL.createObjectURL(blob);}const a=document.createElement('a');a.href=blobUrl;const ts=new Date().toISOString().replace(/[:.]/g,'-');a.download=`final-${ts}.png`;document.body.appendChild(a);a.click();a.remove();if(!r.imageBase64.startsWith('data:')){setTimeout(()=>URL.revokeObjectURL(blobUrl),100);}}catch(error){console.error('[download] Failed:',error);alert('Download failed. Please try again.');}}; panel2.appendChild(btn);} catch {}
           // auto-fill Refine Reference preview with the generated image (keep uploader behavior)
@@ -966,7 +972,9 @@ async function handleRefine(){
     stopTimer(targetSel, 'total', 'completed');
     setCanvasImage(targetSel, previewUrl);
     // remember original full-res for step3
-    try { lastStep2ImageBase64 = result.imageBase64; } catch {}
+    try { lastStep2ImageBase64 = result.imageBase64; window.lastStep2ImageBase64 = result.imageBase64; } catch {}
+    // update step3 buttons
+    try { if (window.updateStep3Buttons) window.updateStep3Buttons(); } catch {}
     try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src=DOWNLOAD_ICON; icon.alt='download'; btn.appendChild(icon); btn.onclick=async()=>{try{let blobUrl=result.imageBase64;if(!result.imageBase64.startsWith('data:')){const response=await fetch(result.imageBase64);const blob=await response.blob();blobUrl=URL.createObjectURL(blob);}const a=document.createElement('a');a.href=blobUrl;const ts=new Date().toISOString().replace(/[:.]/g,'-');a.download=`refined-${ts}.png`;document.body.appendChild(a);a.click();a.remove();if(!result.imageBase64.startsWith('data:')){setTimeout(()=>URL.revokeObjectURL(blobUrl),100);}}catch(error){console.error('[download] Failed:',error);alert('Download failed. Please try again.');}}; panel2.appendChild(btn);} catch {}
     const totalMs = performance.now() - tStart; logStatus(targetSel, `refine: ${(totalMs/1000).toFixed(2)} s`, { withTime:false });
   } catch (e) { const msg = e?.message || String(e); stopTimer(targetSel, 'flux', 'failed'); stopTimer(targetSel, 'total', 'failed'); setCanvasError(targetSel, `Refine failed: ${msg}`); }
