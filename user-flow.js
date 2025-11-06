@@ -56,14 +56,7 @@ function setCanvasLoading(sel, text = 'Generating…') {
     <div style="width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,255,255,.18);border-top-color:#E4C07A;animation:spin 1s linear infinite;margin-bottom:10px"></div>
     ${text}
   </div>
-  <div class="status-meta" style="margin-top:8px;display:flex;justify-content:center;gap:12px;color:#E4C07A;font-size:12px;text-align:center">
-    <div class="status-timer">Elapsed: 0.0 s</div>
-    <div class="status-attempt">Attempt: -</div>
-  </div>
-  <div class="status-actions" style="margin-top:6px;text-align:center">
-    <button class="btn-cancel" style="background:#2a3346;color:#e6eefb;border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:4px 10px;cursor:pointer">Stop</button>
-  </div>
-  <div class="status-log" style="margin-top:12px;max-height:180px;overflow:auto;border-top:1px dashed rgba(255,255,255,.18);padding-top:8px;color:#a3aec2;font-size:12px;text-align:left"></div>
+
   <button class="dl-btn" disabled title="Download original"><img src="${DOWNLOAD_ICON}" alt="download" /></button>`;
 }
 
@@ -399,12 +392,7 @@ async function handleGenerate() {
     setCanvasLoading(targetSel, 'Running Flux (half image)…');
     startTimer(targetSel, 'total');  // Total timer for entire workflow
     startTimer(targetSel, 'flux');   // Flux-specific timer
-    const panel = document.querySelector(targetSel);
-    const cancelBtn = panel?.querySelector('.btn-cancel');
-    let cancelReject;
-    const cancelPromise = new Promise((_, reject)=>{ cancelReject = reject; });
-    currentCancel = () => { try { cancelReject?.(new Error('Cancelled by user')); } catch {} };
-    cancelBtn?.addEventListener('click', ()=>{ currentCancel?.(); logStatus(targetSel, 'Cancelled by user'); });
+    // Cancel functionality removed - UI elements moved to F12 console
 
     const currSig = __sigOf(mainFile);
     let halfBlob;
@@ -944,10 +932,7 @@ async function handleRefine(){
   try {
     setCanvasLoading(targetSel, 'Refining with NanoBanana…');
     startTimer(targetSel, 'total');
-    const panel = document.querySelector(targetSel);
-    const cancelBtn = panel?.querySelector('.btn-cancel');
-    let cancelReject; const cancelPromise = new Promise((_, reject)=>{ cancelReject = reject; });
-    currentCancel = () => { try { cancelReject?.(new Error('Cancelled by user')); } catch {} };
+    // Cancel functionality removed - UI elements moved to F12 console
     cancelBtn?.addEventListener('click', ()=>{ currentCancel?.(); logStatus(targetSel, 'Cancelled by user'); });
 
     // Determine how to handle halfSource
