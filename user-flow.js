@@ -868,6 +868,13 @@ async function handleRefine(){
   const targetSel = '#canvas2';
   const promptEl = document.getElementById('prompt');
   const promptText = (promptEl?.value || '').trim();
+
+  // Validate prompt is not empty
+  if (!promptText) {
+    alert('Please enter a prompt first');
+    return;
+  }
+
   // Check if user uploaded a local image in "Refine Reference" uploader
   const refineInput = document.querySelector('.uploader[data-role="refine"] .file-input');
   const refFile = refineInput?.files?.[0];
