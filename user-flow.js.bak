@@ -1,8 +1,6 @@
 // User-facing flow: after Generate, automatically run Flux then NanoBanana
 import { FluxKontext } from './sdk/apiClient.js';
 
-const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
-
 // Configure backend base URL：优先 localStorage / window 全局变量，其次环境变量，最后回退本地 9091
 try {
   let candidate;
@@ -55,7 +53,16 @@ function setCanvasLoading(sel, text = 'Generating…') {
   panel.innerHTML = `<div style="display:grid;place-items:center;text-align:center;color:#a3aec2">
     <div style="width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,255,255,.18);border-top-color:#E4C07A;animation:spin 1s linear infinite;margin-bottom:10px"></div>
     ${text}
-  </div>`;
+  </div>
+  <div class="status-meta" style="margin-top:8px;display:flex;justify-content:center;gap:12px;color:#E4C07A;font-size:12px;text-align:center">
+    <div class="status-timer">Elapsed: 0.0 s</div>
+    <div class="status-attempt">Attempt: -</div>
+  </div>
+  <div class="status-actions" style="margin-top:6px;text-align:center">
+    <button class="btn-cancel" style="background:#2a3346;color:#e6eefb;border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:4px 10px;cursor:pointer">Stop</button>
+  </div>
+  <div class="status-log" style="margin-top:12px;max-height:180px;overflow:auto;border-top:1px dashed rgba(255,255,255,.18);padding-top:8px;color:#a3aec2;font-size:12px;text-align:left"></div>
+  <button class="dl-btn" disabled title="Download original"><img src="./assets/download.svg" alt="download" /></button>`;
 }
 
 function setCanvasError(sel, message) {
@@ -66,160 +73,82 @@ function setCanvasError(sel, message) {
 
 function setCanvasImage(sel, src) {
   const panel = $(sel);
-  if (!panel) {
-    console.error('[DEBUG] Panel not found:', sel);
-    return;
-  }
-
-  // Add debug border to canvas
-
-  console.log('[DEBUG] Canvas dimensions:', {
-    selector: sel,
-    width: panel.clientWidth,
-    height: panel.clientHeight,
-    offsetWidth: panel.offsetWidth,
-    offsetHeight: panel.offsetHeight,
-    scrollWidth: panel.scrollWidth,
-    scrollHeight: panel.scrollHeight,
-    computedStyles: {
-      width: window.getComputedStyle(panel).width,
-      height: window.getComputedStyle(panel).height,
-      flex: window.getComputedStyle(panel).flex,
-      display: window.getComputedStyle(panel).display,
-      overflow: window.getComputedStyle(panel).overflow
-    }
-  });
-
+  if (!panel) return;
   panel.innerHTML = '';
   const img = document.createElement('img');
   img.src = src;
-
-
-  // 默认约束，确保自适应不裁剪
-  img.style.width = '100%';
-  img.style.height = '100%';
+  // keep aspect ratio inside canvas without overflow
   img.style.maxWidth = '100%';
   img.style.maxHeight = '100%';
+  img.style.width = 'auto';
+  img.style.height = 'auto';
   img.style.objectFit = 'contain';
-  img.style.objectPosition = 'center';
-
-  // Log image dimensions after load
-  img.onload = () => {
-    console.log('[DEBUG] Image loaded:', {
-      src: src.substring(0, 100) + '...',
-      naturalWidth: img.naturalWidth,
-      naturalHeight: img.naturalHeight,
-      aspectRatio: (img.naturalWidth / img.naturalHeight).toFixed(3),
-      clientWidth: img.clientWidth,
-      clientHeight: img.clientHeight,
-      renderedAspectRatio: (img.clientWidth / img.clientHeight).toFixed(3),
-      offsetWidth: img.offsetWidth,
-      offsetHeight: img.offsetHeight,
-      computedStyles: {
-        width: window.getComputedStyle(img).width,
-        height: window.getComputedStyle(img).height,
-        maxWidth: window.getComputedStyle(img).maxWidth,
-        maxHeight: window.getComputedStyle(img).maxHeight,
-        objectFit: window.getComputedStyle(img).objectFit,
-        objectPosition: window.getComputedStyle(img).objectPosition
-      }
-    });
-
-    const panelWidth = panel.clientWidth || panel.offsetWidth;
-    const panelHeight = panel.clientHeight || panel.offsetHeight;
-    if (panelWidth && panelHeight && img.naturalWidth && img.naturalHeight) {
-      const scale = Math.min(panelWidth / img.naturalWidth, panelHeight / img.naturalHeight, 1);
-      img.style.width = `${Math.round(img.naturalWidth * scale)}px`;
-      img.style.height = `${Math.round(img.naturalHeight * scale)}px`;
-    } else {
-      img.style.width = 'auto';
-      img.style.height = 'auto';
-    }
-  };
-
   panel.appendChild(img);
-
-  console.log('[DEBUG] Image element added to canvas');
 }
 
-// ---- timer helpers (multi-timer system) ----
-const timerData = new WeakMap(); // stores { total, flux, nano } for each panel
+// ---- timer helpers ----
+const startTimes = new WeakMap();
 let currentCancel = null; // function to cancel current flow
-
-function startTimer(sel, type = 'total') {
+function startTimer(sel) {
   const panel = $(sel);
   if (!panel) return;
-
-  let timers = timerData.get(panel);
-  if (!timers) {
-    timers = { total: null, flux: null, nano: null };
-    timerData.set(panel, timers);
-  }
-
-  const timerKey = type.toLowerCase();
-  if (!timers[timerKey]) {
-    timers[timerKey] = {};
-  }
-
-  const timer = timers[timerKey];
-
-  // Clear old interval if exists
-  if (timer.interval) {
-    clearInterval(timer.interval);
-  }
-
-  timer.startTime = Date.now();
-  const stepName = sel.includes('canvas1') ? 'Step1' : 'Step2';
-  const timerLabel = type.charAt(0).toUpperCase() + type.slice(1);
-
-  console.log(`[${stepName}] ${timerLabel} timer started`);
-
-  // Periodic updates every 5 seconds
-  timer.interval = setInterval(() => {
-    const elapsed = (Date.now() - timer.startTime) / 1000;
-    console.log(`[${stepName}] ${timerLabel}: ${elapsed.toFixed(1)}s`);
-  }, 5000);
+  const timerEl = panel.querySelector('.status-timer');
+  if (!timerEl) return;
+  // clear old
+  if (panel._timer) { clearInterval(panel._timer); panel._timer = null; }
+  const start = Date.now();
+  startTimes.set(panel, start);
+  panel._timer = setInterval(() => {
+    const elapsed = (Date.now() - start) / 1000;
+    timerEl.textContent = `Elapsed: ${elapsed.toFixed(1)} s`;
+  }, 100);
 }
-
-function stopTimer(sel, type = 'total', label) {
+function stopTimer(sel, label) {
   const panel = $(sel);
   if (!panel) return;
-
-  const timers = timerData.get(panel);
-  if (!timers) return;
-
-  const timerKey = type.toLowerCase();
-  const timer = timers[timerKey];
-  if (!timer) return;
-
-  // Clear interval
-  if (timer.interval) {
-    clearInterval(timer.interval);
-    timer.interval = null;
-  }
-
-  if (timer.startTime) {
-    const elapsed = ((Date.now() - timer.startTime) / 1000).toFixed(1);
-    const stepName = sel.includes('canvas1') ? 'Step1' : 'Step2';
-    const timerLabel = type.charAt(0).toUpperCase() + type.slice(1);
-    const message = label ? `${timerLabel} ${label} (${elapsed}s)` : `${timerLabel}: ${elapsed}s`;
-    console.log(`[${stepName}] ${message}`);
+  if (panel._timer) { clearInterval(panel._timer); panel._timer = null; }
+  const timerEl = panel.querySelector('.status-timer');
+  const start = startTimes.get(panel);
+  if (timerEl && start) {
+    const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+    timerEl.textContent = label ? `${label} (${elapsed} s)` : `Elapsed: ${elapsed} s`;
   }
 }
 
-function setAttempt(sel, current, max) {  const stepName = sel.includes('canvas1') ? 'Step1' : 'Step2';  console.log(`[${stepName}] Attempt: ${current}/${max}`);}
+function setAttempt(sel, current, max) {
+  const panel = $(sel);
+  if (!panel) return;
+  const el = panel.querySelector('.status-attempt');
+  if (el) el.textContent = `Attempt: ${current}/${max}`;
+}
 
 function logStatus(sel, msg, opts) {
   const withTime = !opts || opts.withTime !== false;
-  const stepName = sel.includes('canvas1') ? 'Step1' : 'Step2';
-
-  // Output to browser console instead of DOM
+  const panel = $(sel);
+  if (!panel) return;
+  let log = panel.querySelector('.status-log');
+  if (!log) {
+    log = document.createElement('div');
+    log.className = 'status-log';
+    log.style.marginTop = '12px';
+    log.style.maxHeight = '180px';
+    log.style.overflow = 'auto';
+    log.style.borderTop = '1px dashed rgba(255,255,255,.18)';
+    log.style.paddingTop = '8px';
+    log.style.color = '#a3aec2';
+    log.style.fontSize = '12px';
+    log.style.textAlign = 'left';
+    panel.appendChild(log);
+  }
+  const line = document.createElement('div');
   if (withTime) {
     const ts = new Date().toLocaleTimeString();
-    console.log(`[${stepName}] ${ts} · ${msg}`);
+    line.textContent = `${ts} · ${msg}`;
   } else {
-    console.log(`[${stepName}] ${msg}`);
+    line.textContent = `${msg}`;
   }
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
 }
 
 async function fetchBlob(url) {
@@ -264,7 +193,6 @@ async function downscaleDataURL(dataUrl, maxW, maxH, mime = 'image/jpeg', qualit
 // keep last half image for manual resend and split canvases
 let lastHalfBlob = null;
 let lastFinalImageBase64 = null; // original full-res final image from step1
-let lastStep2ImageBase64 = null; // original full-res refined image from step2
 
 async function sendToNano(finalSel, mainFile, refFile) {
   // persisted Nano prompt
@@ -273,7 +201,7 @@ async function sendToNano(finalSel, mainFile, refFile) {
 
   if (!lastHalfBlob) { setCanvasError(finalSel, 'Half image not ready'); return; }
   setCanvasLoading(finalSel, 'Sending to NanoBanana…');
-  startTimer(targetSel, 'nano');
+  startTimer(finalSel);
   logStatus(finalSel, 'Preparing garment: matching character size with white padding…');
   const mainSize = await getImageSizeFromFile(mainFile);
   const resizedRef = await FluxKontext.resizeImageWithPadding(refFile, mainSize.width, mainSize.height, '#ffffff');
@@ -297,8 +225,7 @@ async function sendToNano(finalSel, mainFile, refFile) {
     }
   }
   if (result?.imageBase64) {
-    stopTimer(targetSel, 'nano', 'completed');
-    stopTimer(targetSel, 'total', 'completed');
+    stopTimer(finalSel, 'Done');
     setCanvasImage(finalSel, result.imageBase64);
     // ensure a working download button on Live Preview as well
     try {
@@ -310,36 +237,22 @@ async function sendToNano(finalSel, mainFile, refFile) {
       btn.className = 'dl-btn';
       btn.title = 'Download original';
       const icon = document.createElement('img');
-      icon.src = DOWNLOAD_ICON;
+      icon.src = './assets/download.svg';
       icon.alt = 'download';
       btn.appendChild(icon);
       const dataUrl = result.imageBase64;
-      btn.onclick = async () => {
-        try {
-          let blobUrl = dataUrl;
-          if (!dataUrl.startsWith('data:')) {
-            const response = await fetch(dataUrl);
-            const blob = await response.blob();
-            blobUrl = URL.createObjectURL(blob);
-          }
-          const a = document.createElement('a');
-          a.href = blobUrl;
-          const ts = new Date().toISOString().replace(/[:.]/g,'-');
-          a.download = `final-${ts}.png`;
-          document.body.appendChild(a); a.click(); a.remove();
-          if (!dataUrl.startsWith('data:')) {
-            setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
-          }
-        } catch (error) {
-          console.error('[download] Failed:', error);
-          alert('Download failed. Please try again.');
-        }
+      btn.onclick = () => {
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        const ts = new Date().toISOString().replace(/[:.]/g,'-');
+        a.download = `final-${ts}.png`;
+        document.body.appendChild(a); a.click(); a.remove();
       };
       panel2?.appendChild(btn);
     } catch {}
     logStatus(finalSel, 'Done');
   } else {
-    stopTimer(targetSel, 'nano', 'failed'); stopTimer(targetSel, 'total', 'failed'); setCanvasError(finalSel, `Generation failed: ${lastError?.message || 'No image from NanoBanana after 12 attempts'}`);
+    stopTimer(finalSel, 'Failed'); setCanvasError(finalSel, `Generation failed: ${lastError?.message || 'No image from NanoBanana after 12 attempts'}`);
   }
 }
 
@@ -388,45 +301,40 @@ async function handleGenerate() {
 
   try {
     setCanvasLoading(targetSel, 'Running Flux (half image)…');
-    startTimer(targetSel, 'total');  // Total timer for entire workflow
-    startTimer(targetSel, 'flux');   // Flux-specific timer
-    // Cancel functionality removed - UI elements moved to F12 console
+    startTimer(targetSel);
+    const panel = document.querySelector(targetSel);
+    const cancelBtn = panel?.querySelector('.btn-cancel');
+    let cancelReject;
+    const cancelPromise = new Promise((_, reject)=>{ cancelReject = reject; });
+    currentCancel = () => { try { cancelReject?.(new Error('Cancelled by user')); } catch {} };
+    cancelBtn?.addEventListener('click', ()=>{ currentCancel?.(); logStatus(targetSel, 'Cancelled by user'); });
 
     const currSig = __sigOf(mainFile);
     let halfBlob;
     let fluxMs = 0;
 
-    // TEMPORARILY DISABLED: reuse half image if main not changed
-    // To re-enable caching: change the condition below from "false" to the original check
-    if (false && __lastHalfBlob && __lastMainSig === currSig) { // CACHE DISABLED
+    // reuse half image if main not changed
+    if (__lastHalfBlob && __lastMainSig === currSig) {
+      logStatus(targetSel, 'Reuse cached half image (skip Flux)');
+      halfBlob = __lastHalfBlob;
     } else {
       logStatus(targetSel, 'Uploading Character Reference…');
       const tFluxStart = performance.now();
       const fluxRes = await FluxKontext.runFlux(mainFile, 'remove clothes', { steps: 8 });
       logStatus(targetSel, 'Flux submitted. Waiting for half image…');
-      // Prefer URL over base64 for better performance
-      const halfUrl = fluxRes?.halfImageUrl;
+      // 后端代理返回的 base64 优先
       const halfB64 = fluxRes?.halfImageBase64;
-
-      if (halfUrl) {
-        // URL is fastest - backend already saved the image
-        logStatus(targetSel, 'Half image URL received. Fetching…');
-        const tFetchStart = performance.now();
-        halfBlob = await fetchBlob(halfUrl);
-        const fetchMs = performance.now() - tFetchStart;
-        logStatus(targetSel, `Half image URL fetch: ${(fetchMs/1000).toFixed(2)} s`);
-      } else if (halfB64) {
-        // Fallback to base64 if no URL provided
-        logStatus(targetSel, 'Half image received via backend proxy (base64)');
-        const tBlobStart = performance.now();
+      if (halfB64) {
+        logStatus(targetSel, 'Half image received via backend proxy');
         halfBlob = await (await fetch(halfB64)).blob();
-        const blobMs = performance.now() - tBlobStart;
-        logStatus(targetSel, `Half image blob conversion: ${(blobMs/1000).toFixed(2)} s`);
       } else {
-        throw new Error('Flux did not return half image');
+        const halfUrl = fluxRes?.halfImageUrl;
+        if (!halfUrl) throw new Error('Flux did not return half image');
+        logStatus(targetSel, 'Half image URL received. Fetching…');
+        halfBlob = await fetchBlob(halfUrl);
       }
       fluxMs = performance.now() - tFluxStart;
-      logStatus(targetSel, `Flux total time: ${(fluxMs/1000).toFixed(2)} s`);
+      logStatus(targetSel, `Flux time: ${(fluxMs/1000).toFixed(2)} s`);
       __lastHalfBlob = halfBlob; __lastMainSig = currSig;
     }
 
@@ -438,13 +346,9 @@ async function handleGenerate() {
                           __garmentOriginalSig !== currentGarmentSig; // garment变了
     if (needRecompute) {
       logStatus(targetSel, 'Recomputing garment padding to match character size…', { withTime:false });
-      const tPaddingStart = performance.now();
       paddedGarment = await computePaddedGarment(mainFile, __garmentOriginal || garmentFile);
-      const paddingMs = performance.now() - tPaddingStart;
-      logStatus(targetSel, `Garment padding complete: ${(paddingMs/1000).toFixed(2)} s`);
       console.log('[garment cache] Padded garment recomputed');
     } else {
-      logStatus(targetSel, 'Reusing cached padded garment');
       console.log('[garment cache] Reusing cached padded garment');
     }
 
@@ -463,50 +367,37 @@ async function handleGenerate() {
         const tNanoStart = performance.now();
         const { task_id } = await FluxKontext.startNanoProcess(halfBlob, [paddedGarment], nanoPrompt || '');
         logStatus(targetSel, `task_id: ${task_id}`, { withTime: false });
-        const r = await
+        const r = await Promise.race([
           FluxKontext.pollNanoResult(task_id, (j) => {
             if (j) {
               if (j.status) logStatus(targetSel, `status: ${j.status}`, { withTime: false });
               if (j.error) logStatus(targetSel, `error: ${j.error}`, { withTime: false });
               if (j.debug) { try { const dbg = typeof j.debug==='string'? j.debug : JSON.stringify(j.debug); logStatus(targetSel, `debug: ${String(dbg).slice(0,600)}${String(dbg).length>600?' …':''}`, { withTime: false }); } catch {} }
             }
-          })
-        ;
+          }),
+          cancelPromise,
+        ]);
         if (r?.imageBase64) {
           const nanoMs = performance.now() - tNanoStart;
           result = r;
-          stopTimer(targetSel, 'nano', 'completed');
-          stopTimer(targetSel, 'total', 'completed');
+          stopTimer(targetSel, 'Done');
           const panel2 = document.querySelector(targetSel);
           const cw = Math.max(1, (panel2?.clientWidth || 1024));
           const ch = Math.max(1, (panel2?.clientHeight || 768));
-          // If result is a URL (not data:), use it directly for fast display
-          // Browser will handle async download, avoiding the 80s delay from downscaleDataURL
           let previewUrl = r.imageBase64;
-          if (!r.imageBase64.startsWith('data:')) {
-            // It's a URL - use it directly
-            previewUrl = r.imageBase64;
-          } else {
-            // It's base64 data - downscale it
-            try { previewUrl = await downscaleDataURL(r.imageBase64, cw, ch, 'image/jpeg', 0.9); } catch {}
-          }
+          try { previewUrl = await downscaleDataURL(r.imageBase64, cw, ch, 'image/jpeg', 0.9); } catch {}
           setCanvasImage(targetSel, previewUrl);
           // remember original full-res for refine
           try { lastFinalImageBase64 = r.imageBase64; } catch {}
           // update download button
-          try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src=DOWNLOAD_ICON; icon.alt='download'; btn.appendChild(icon); btn.onclick=async()=>{try{let blobUrl=r.imageBase64;if(!r.imageBase64.startsWith('data:')){const response=await fetch(r.imageBase64);const blob=await response.blob();blobUrl=URL.createObjectURL(blob);}const a=document.createElement('a');a.href=blobUrl;const ts=new Date().toISOString().replace(/[:.]/g,'-');a.download=`final-${ts}.png`;document.body.appendChild(a);a.click();a.remove();if(!r.imageBase64.startsWith('data:')){setTimeout(()=>URL.revokeObjectURL(blobUrl),100);}}catch(error){console.error('[download] Failed:',error);alert('Download failed. Please try again.');}}; panel2.appendChild(btn);} catch {}
+          try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src='./assets/download.svg'; icon.alt='download'; btn.appendChild(icon); btn.onclick=()=>{ const a=document.createElement('a'); a.href=r.imageBase64; const ts=new Date().toISOString().replace(/[:.]/g,'-'); a.download=`final-${ts}.png`; document.body.appendChild(a); a.click(); a.remove(); }; panel2.appendChild(btn);} catch {}
           // auto-fill Refine Reference preview with the generated image (keep uploader behavior)
           try {
             const refine = document.querySelector('.uploader[data-role="refine"]');
             const prev = refine?.querySelector('.preview');
             if (prev) {
               let small = r.imageBase64;
-              // If it's a URL, use it directly; if base64, downscale it
-              if (!r.imageBase64.startsWith('data:')) {
-                small = r.imageBase64;
-              } else {
-                try { small = await downscaleDataURL(r.imageBase64, 270, 270, 'image/jpeg', 0.9); } catch {}
-              }
+              try { small = await downscaleDataURL(r.imageBase64, 270, 270, 'image/jpeg', 0.9); } catch {}
               prev.src = small; prev.hidden = false;
             }
           } catch {}
@@ -522,7 +413,7 @@ async function handleGenerate() {
       }
     }
     if (!result) throw new Error(lastError?.message || 'No image from NanoBanana after 6 attempts');
-  } catch (e) { const msg = e?.message || String(e); stopTimer(targetSel, 'flux', 'failed'); stopTimer(targetSel, 'total', 'failed'); setCanvasError(targetSel, `Generation failed: ${msg}`); logStatus(targetSel, 'Final status: failed after maximum retries', { withTime:false }); if (/Failed to fetch|CORS/i.test(msg)) { console.warn('Hint: ensure backend allows 127.0.0.1:5174 and ComfyUI is up'); } if (/402/.test(String(e))) { alert('余额不足，请购买或等候发放'); } }
+  } catch (e) { const msg = e?.message || String(e); stopTimer(targetSel, 'Failed'); setCanvasError(targetSel, `Generation failed: ${msg}`); logStatus(targetSel, 'Final status: failed after maximum retries', { withTime:false }); if (/Failed to fetch|CORS/i.test(msg)) { console.warn('Hint: ensure backend allows 127.0.0.1:5174 and ComfyUI is up'); } if (/402/.test(String(e))) { alert('余额不足，请购买或等候发放'); } }
 }
 
 // Bind button exclusively (remove any existing listeners like mockGenerate)
@@ -585,6 +476,40 @@ async function refreshCreditsBadge(){
     }
   }catch{}
 }
+
+// dev: show a disabled download button even in idle state
+(() => {
+  const panel = document.querySelector('#canvas1');
+  if (panel && !panel.querySelector('.dl-btn')) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'dl-btn';
+    btn.disabled = true;
+    btn.title = 'Download original';
+    const icon = document.createElement('img');
+    icon.src = './assets/download.svg';
+    icon.alt = 'download';
+    btn.appendChild(icon);
+    panel.appendChild(btn);
+  }
+})();
+
+// dev: also place a disabled download button in Live Preview when idle
+(() => {
+  const panel = document.querySelector('#canvas2');
+  if (panel && !panel.querySelector('.dl-btn')) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'dl-btn';
+    btn.disabled = true;
+    btn.title = 'Download original';
+    const icon = document.createElement('img');
+    icon.src = './assets/download.svg';
+    icon.alt = 'download';
+    btn.appendChild(icon);
+    panel.appendChild(btn);
+  }
+})();
 
 // ---- profile/login wiring (5174 用户端) ----
 (() => {
@@ -869,66 +794,30 @@ async function handleRefine(){
   const targetSel = '#canvas2';
   const promptEl = document.getElementById('prompt');
   const promptText = (promptEl?.value || '').trim();
-
-  // Validate prompt is not empty
-  if (!promptText) {
-    setCanvasError(targetSel, 'Please enter a prompt first');
-    return;
+  // half image: prefer original full-res from step1; fallback to the displayed image
+  let halfDataUrl = lastFinalImageBase64;
+  if (!halfDataUrl) {
+    const img = document.querySelector('#canvas1 img');
+    if (img && img.src) halfDataUrl = img.src;
   }
+  if (!halfDataUrl) { setCanvasError(targetSel, 'No image in Output Gallery to refine.'); return; }
 
-  // Check if user uploaded a local image in "Refine Reference" uploader
+  // optional refine reference image
   const refineInput = document.querySelector('.uploader[data-role="refine"] .file-input');
   const refFile = refineInput?.files?.[0];
 
-  // Determine the half image source:
-  // Priority 1: Use uploaded file from Refine Reference uploader (if available)
-  // Priority 2: Use Step 1 output (lastFinalImageBase64)
-  let halfSource = null;  // Will be either File or DataURL string
-  let halfBlob = null;
-
-  if (refFile) {
-    // User uploaded a local image - use it as the image to refine
-    halfSource = refFile;
-    logStatus(targetSel, 'Using uploaded image from Refine Reference', { withTime:false });
-  } else if (lastFinalImageBase64) {
-    // Use Step 1 output (must be full-res, never thumbnail!)
-    halfSource = lastFinalImageBase64;
-    logStatus(targetSel, 'Using Step 1 output image', { withTime:false });
-  } else {
-    setCanvasError(targetSel, 'No image to refine. Please upload an image in "Refine Reference" or run Step 1 first.');
-    return;
-  }
-
   try {
     setCanvasLoading(targetSel, 'Refining with NanoBanana…');
-    startTimer(targetSel, 'total');
-    // Cancel functionality removed - UI elements moved to F12 console
+    startTimer(targetSel);
+    const panel = document.querySelector(targetSel);
+    const cancelBtn = panel?.querySelector('.btn-cancel');
+    let cancelReject; const cancelPromise = new Promise((_, reject)=>{ cancelReject = reject; });
+    currentCancel = () => { try { cancelReject?.(new Error('Cancelled by user')); } catch {} };
+    cancelBtn?.addEventListener('click', ()=>{ currentCancel?.(); logStatus(targetSel, 'Cancelled by user'); });
 
-    // Determine how to handle halfSource
-    // If it's a URL (not data:), pass it directly to backend
-    // Backend will fetch it (much faster for internal URLs)
-    // If it's a File/Blob, pass as-is
-    // If it's a data: URL, it will be converted by startNanoProcess
-    let halfToSend;
-    if (halfSource instanceof File || halfSource instanceof Blob) {
-      // Direct file upload - use as-is
-      halfToSend = halfSource;
-      // Validate blob size (thumbnails are typically < 5KB, full images should be much larger)
-      if (halfToSend.size < 5000) {
-        throw new Error(`Invalid image size (${halfToSend.size} bytes). Image too small - please use a full-resolution image.`);
-      }
-    } else if (typeof halfSource === 'string' && !halfSource.startsWith('data:')) {
-      // It's a URL (from step1 result) - pass directly to backend
-      // Backend will fetch it server-side (avoids 110s browser fetch delay)
-      halfToSend = halfSource;
-      logStatus(targetSel, `Using step1 output URL (fast server-side fetch)`, { withTime:false });
-    } else {
-      // It's a data: URL - pass to startNanoProcess which will convert it
-      halfToSend = halfSource;
-    }
-
-    // No additional ref images needed since we're using the uploaded image as half_image
-    const refs = [];
+    // convert dataURL to Blob
+    const halfBlob = await (await fetch(halfDataUrl)).blob();
+    const refs = refFile ? [refFile] : [];
     if (promptText) { try { const pvw = promptText.replace(/\s+/g,' ').slice(0,120); logStatus(targetSel, `Refine prompt: "${pvw}${pvw.length===120?'…':''}"`, { withTime:false }); } catch {} }
 
     const maxRetries = 1; let attempt = 0; let lastError = null; let result = null; const tStart = performance.now();
@@ -936,10 +825,12 @@ async function handleRefine(){
       attempt++; setAttempt(targetSel, attempt, maxRetries);
       logStatus(targetSel, `Submitting to NanoBanana (attempt ${attempt}/${maxRetries})…`, { withTime:false });
       try {
-        const { task_id } = await FluxKontext.startNanoProcess(halfToSend, refs, promptText || '');
+        const { task_id } = await FluxKontext.startNanoProcess(halfBlob, refs, promptText || '');
         logStatus(targetSel, `task_id: ${task_id}`, { withTime:false });
-        const r = await
-          FluxKontext.pollNanoResult(task_id, (j)=>{ if (j) { if (j.status) logStatus(targetSel, `status: ${j.status}`, { withTime:false }); if (j.error) logStatus(targetSel, `error: ${j.error}`, { withTime:false }); if (j.debug) { try { const dbg = typeof j.debug==='string'? j.debug : JSON.stringify(j.debug); logStatus(targetSel, `debug: ${String(dbg).slice(0,600)}${String(dbg).length>600?' …':''}`, { withTime:false }); } catch {} } } });
+        const r = await Promise.race([
+          FluxKontext.pollNanoResult(task_id, (j)=>{ if (j) { if (j.status) logStatus(targetSel, `status: ${j.status}`, { withTime:false }); if (j.error) logStatus(targetSel, `error: ${j.error}`, { withTime:false }); if (j.debug) { try { const dbg = typeof j.debug==='string'? j.debug : JSON.stringify(j.debug); logStatus(targetSel, `debug: ${String(dbg).slice(0,600)}${String(dbg).length>600?' …':''}`, { withTime:false }); } catch {} } } }),
+          cancelPromise,
+        ]);
         if (r?.imageBase64) {
           result = r; break;
         }
@@ -953,23 +844,12 @@ async function handleRefine(){
     const panel2 = document.querySelector(targetSel);
     const cw = Math.max(1, (panel2?.clientWidth || 1024));
     const ch = Math.max(1, (panel2?.clientHeight || 768));
-    // If result is a URL (not data:), use it directly for fast display
-    // Browser will handle async download, avoiding the 80s delay from downscaleDataURL
-    let previewUrl = result.imageBase64;
-    if (!result.imageBase64.startsWith('data:')) {
-      // It's a URL - use it directly
-      previewUrl = result.imageBase64;
-    } else {
-      // It's base64 data - downscale it
-      try { previewUrl = await downscaleDataURL(result.imageBase64, cw, ch, 'image/jpeg', 0.9); } catch {}
-    }
-    stopTimer(targetSel, 'total', 'completed');
+    let previewUrl = result.imageBase64; try { previewUrl = await downscaleDataURL(result.imageBase64, cw, ch, 'image/jpeg', 0.9); } catch {}
+    stopTimer(targetSel, 'Done');
     setCanvasImage(targetSel, previewUrl);
-    // remember original full-res for step3
-    try { lastStep2ImageBase64 = result.imageBase64; } catch {}
-    try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src=DOWNLOAD_ICON; icon.alt='download'; btn.appendChild(icon); btn.onclick=async()=>{try{let blobUrl=result.imageBase64;if(!result.imageBase64.startsWith('data:')){const response=await fetch(result.imageBase64);const blob=await response.blob();blobUrl=URL.createObjectURL(blob);}const a=document.createElement('a');a.href=blobUrl;const ts=new Date().toISOString().replace(/[:.]/g,'-');a.download=`refined-${ts}.png`;document.body.appendChild(a);a.click();a.remove();if(!result.imageBase64.startsWith('data:')){setTimeout(()=>URL.revokeObjectURL(blobUrl),100);}}catch(error){console.error('[download] Failed:',error);alert('Download failed. Please try again.');}}; panel2.appendChild(btn);} catch {}
+    try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src='./assets/download.svg'; icon.alt='download'; btn.appendChild(icon); btn.onclick=()=>{ const a=document.createElement('a'); a.href=result.imageBase64; const ts=new Date().toISOString().replace(/[:.]/g,'-'); a.download=`refined-${ts}.png`; document.body.appendChild(a); a.click(); a.remove(); }; panel2.appendChild(btn);} catch {}
     const totalMs = performance.now() - tStart; logStatus(targetSel, `refine: ${(totalMs/1000).toFixed(2)} s`, { withTime:false });
-  } catch (e) { const msg = e?.message || String(e); stopTimer(targetSel, 'flux', 'failed'); stopTimer(targetSel, 'total', 'failed'); setCanvasError(targetSel, `Refine failed: ${msg}`); }
+  } catch (e) { const msg = e?.message || String(e); stopTimer(targetSel, 'Failed'); setCanvasError(targetSel, `Refine failed: ${msg}`); }
 }
 
 // bind Step2 Apply & Generate button
