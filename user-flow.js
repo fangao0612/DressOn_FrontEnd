@@ -157,26 +157,42 @@ let currentCancel = null; // function to cancel current flow
 function startTimer(sel) {
   const panel = $(sel);
   if (!panel) return;
-  const timerEl = panel.querySelector('.status-timer');
-  if (!timerEl) return;
-  // clear old
-  if (panel._timer) { clearInterval(panel._timer); panel._timer = null; }
+
+  // Clear old timer if exists
+  if (panel._timer) {
+    clearInterval(panel._timer);
+    panel._timer = null;
+  }
+
   const start = Date.now();
   startTimes.set(panel, start);
+
+  // Log to console instead of DOM
+  const stepName = sel.includes('canvas1') ? 'Step1' : 'Step2';
+  console.log(`[${stepName}] Timer started`);
+
+  // Periodic console updates (every 5 seconds to avoid spam)
   panel._timer = setInterval(() => {
     const elapsed = (Date.now() - start) / 1000;
-    timerEl.textContent = `Elapsed: ${elapsed.toFixed(1)} s`;
-  }, 100);
+    console.log(`[${stepName}] Elapsed: ${elapsed.toFixed(1)}s`);
+  }, 5000);
 }
 function stopTimer(sel, label) {
   const panel = $(sel);
   if (!panel) return;
-  if (panel._timer) { clearInterval(panel._timer); panel._timer = null; }
-  const timerEl = panel.querySelector('.status-timer');
+
+  // Clear timer
+  if (panel._timer) {
+    clearInterval(panel._timer);
+    panel._timer = null;
+  }
+
   const start = startTimes.get(panel);
-  if (timerEl && start) {
+  if (start) {
     const elapsed = ((Date.now() - start) / 1000).toFixed(1);
-    timerEl.textContent = label ? `${label} (${elapsed} s)` : `Elapsed: ${elapsed} s`;
+    const stepName = sel.includes('canvas1') ? 'Step1' : 'Step2';
+    const message = label ? `${label} (${elapsed}s)` : `Elapsed: ${elapsed}s`;
+    console.log(`[${stepName}] ${message}`);
   }
 }
 
@@ -189,31 +205,15 @@ function setAttempt(sel, current, max) {
 
 function logStatus(sel, msg, opts) {
   const withTime = !opts || opts.withTime !== false;
-  const panel = $(sel);
-  if (!panel) return;
-  let log = panel.querySelector('.status-log');
-  if (!log) {
-    log = document.createElement('div');
-    log.className = 'status-log';
-    log.style.marginTop = '12px';
-    log.style.maxHeight = '180px';
-    log.style.overflow = 'auto';
-    log.style.borderTop = '1px dashed rgba(255,255,255,.18)';
-    log.style.paddingTop = '8px';
-    log.style.color = '#a3aec2';
-    log.style.fontSize = '12px';
-    log.style.textAlign = 'left';
-    panel.appendChild(log);
-  }
-  const line = document.createElement('div');
+  const stepName = sel.includes('canvas1') ? 'Step1' : 'Step2';
+
+  // Output to browser console instead of DOM
   if (withTime) {
     const ts = new Date().toLocaleTimeString();
-    line.textContent = `${ts} · ${msg}`;
+    console.log(`[${stepName}] ${ts} · ${msg}`);
   } else {
-    line.textContent = `${msg}`;
+    console.log(`[${stepName}] ${msg}`);
   }
-  log.appendChild(line);
-  log.scrollTop = log.scrollHeight;
 }
 
 async function fetchBlob(url) {
