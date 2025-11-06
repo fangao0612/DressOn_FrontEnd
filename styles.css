@@ -454,8 +454,23 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 }
 
 [data-theme="light"] .canvas{
-  background:var(--panel);
+  background:var(--panel);  /* lighter: #fafbfc */
   border-color:var(--border);
+}
+
+/* Input upload areas - slightly darker than canvas */
+[data-theme="light"] .uploader{
+  background:#eef1f5;  /* slightly darker than canvas */
+}
+
+[data-theme="light"] .uploader .drop-area{
+  background:#eef1f5;  /* match uploader background */
+  border-color:var(--border);
+}
+
+[data-theme="light"] .uploader .drop-area:hover{
+  border-color:var(--primary);
+  background:rgba(255,94,102,.05);
 }
 
 /* Form elements */
@@ -465,16 +480,6 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
   background:var(--panel);
   border-color:var(--border);
   color:var(--text);
-}
-
-[data-theme="light"] .uploader .drop-area{
-  background:var(--panel);
-  border-color:var(--border);
-}
-
-[data-theme="light"] .uploader .drop-area:hover{
-  border-color:var(--primary);
-  background:rgba(255,94,102,.05);
 }
 
 /* Section backgrounds */
