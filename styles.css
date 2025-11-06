@@ -309,7 +309,7 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 .uploader[data-role="refine"] .plus{position:static;transform:none;margin-bottom:6px}
 .uploader[data-role="refine"] .hint{position:static;margin-top:0}
 /* keep plus style intact; hint remains below via default flow */
-.preview{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.preview{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;pointer-events:none}
 .note,.prompt{width:100%;background:#0e1320;border:1px solid var(--border);border-radius:12px;color:var(--text);padding:1rem}
 /* 约束提示词文本框的宽度，禁止水平拉伸，仅允许垂直方向调整 */
 .prompt{min-width:100%;max-width:100%;min-height:100px;max-height:560px;overflow:auto;resize:vertical}
