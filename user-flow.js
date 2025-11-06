@@ -585,40 +585,6 @@ async function refreshCreditsBadge(){
   }catch{}
 }
 
-// dev: show a disabled download button even in idle state
-(() => {
-  const panel = document.querySelector('#canvas1');
-  if (panel && !panel.querySelector('.dl-btn')) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'dl-btn';
-    btn.disabled = true;
-    btn.title = 'Download original';
-    const icon = document.createElement('img');
-    icon.src = DOWNLOAD_ICON;
-    icon.alt = 'download';
-    btn.appendChild(icon);
-    panel.appendChild(btn);
-  }
-})();
-
-// dev: also place a disabled download button in Live Preview when idle
-(() => {
-  const panel = document.querySelector('#canvas2');
-  if (panel && !panel.querySelector('.dl-btn')) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'dl-btn';
-    btn.disabled = true;
-    btn.title = 'Download original';
-    const icon = document.createElement('img');
-    icon.src = DOWNLOAD_ICON;
-    icon.alt = 'download';
-    btn.appendChild(icon);
-    panel.appendChild(btn);
-  }
-})();
-
 // ---- profile/login wiring (5174 用户端) ----
 (() => {
   const btn = document.querySelector('.profile-btn');
