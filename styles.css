@@ -11,6 +11,19 @@
   --header-h:72px;
 }
 
+/* Light theme colors */
+[data-theme="light"]{
+  --bg:#f5f7fa;          /* light grayish blue */
+  --surface:#ffffff;     /* pure white */
+  --panel:#fafbfc;       /* very light gray */
+  --card:#ffffff;        /* white card */
+  --text:#1a202c;        /* dark text */
+  --muted:#64748b;       /* slate muted */
+  --primary:#ff5e66;     /* coral (keep same) */
+  --primary-600:#e24b55; /* deeper coral (keep same) */
+  --border:rgba(0,0,0,.10);
+}
+
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -20,6 +33,14 @@ body{
              radial-gradient(900px 420px at 80% -5%,rgba(124,134,211,.10),transparent 60%),
              var(--bg);
   color:var(--text);
+  transition:background-color .3s ease, color .3s ease;
+}
+
+/* Light mode: softer gradients */
+[data-theme="light"] body{
+  background:radial-gradient(800px 360px at 20% 10%,rgba(255,94,102,.08),transparent 60%),
+             radial-gradient(900px 420px at 80% -5%,rgba(124,134,211,.08),transparent 60%),
+             var(--bg);
 }
 /* auth page: lock scrolling */
 body.no-scroll{overflow:hidden}
@@ -382,3 +403,93 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 .panel.left .panel-inner .uploader{width:270px;margin:0 auto}
 
 
+
+/* ========================================
+   LIGHT THEME OVERRIDES
+   ======================================== */
+
+/* Header adjustments for light mode */
+[data-theme="light"] .site-header{
+  background:rgba(255,255,255,.85);
+  border-bottom:1px solid var(--border);
+}
+
+/* Icon buttons and inputs in light mode */
+[data-theme="light"] .icon-btn{
+  background:linear-gradient(180deg,rgba(0,0,0,.03),rgba(0,0,0,.01));
+  border-color:var(--border);
+}
+
+[data-theme="light"] .icon-btn:hover{
+  background:linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.03));
+}
+
+/* Pills in light mode */
+[data-theme="light"] .pill{
+  border-color:rgba(0,0,0,.15);
+}
+
+/* Auth card and modals */
+[data-theme="light"] .auth-card{
+  background:var(--surface);
+  border-color:var(--border);
+  box-shadow:0 20px 60px rgba(0,0,0,.15);
+}
+
+[data-theme="light"] .auth-input{
+  background:var(--panel);
+  border-color:var(--border);
+}
+
+[data-theme="light"] .profile-popover{
+  background:rgba(255,255,255,.98);
+  border-color:var(--border);
+  box-shadow:0 10px 30px rgba(0,0,0,.15);
+}
+
+/* Panels and cards */
+[data-theme="light"] .panel{
+  background:var(--surface);
+  border-color:var(--border);
+}
+
+[data-theme="light"] .canvas{
+  background:var(--panel);
+  border-color:var(--border);
+}
+
+/* Form elements */
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select{
+  background:var(--panel);
+  border-color:var(--border);
+  color:var(--text);
+}
+
+[data-theme="light"] .uploader .drop-area{
+  background:var(--panel);
+  border-color:var(--border);
+}
+
+[data-theme="light"] .uploader .drop-area:hover{
+  border-color:var(--primary);
+  background:rgba(255,94,102,.05);
+}
+
+/* Section backgrounds */
+[data-theme="light"] .editor,
+[data-theme="light"] .refine,
+[data-theme="light"] .upscale{
+  background:transparent;
+}
+
+/* Shadow adjustments for light mode */
+[data-theme="light"] .btn-launch{
+  box-shadow:0 6px 18px rgba(255,94,102,.20);
+}
+
+[data-theme="light"] .profile-btn{
+  box-shadow:0 1px 0 rgba(255,255,255,.35) inset,
+             0 2px 4px rgba(0,0,0,.1);
+}
