@@ -210,7 +210,6 @@ function stopTimer(sel, type = 'total', label) {
 }
 
 function setAttempt(sel, current, max) {  const stepName = sel.includes('canvas1') ? 'Step1' : 'Step2';  console.log(`[${stepName}] Attempt: ${current}/${max}`);}
-}
 
 function logStatus(sel, msg, opts) {
   const withTime = !opts || opts.withTime !== false;
