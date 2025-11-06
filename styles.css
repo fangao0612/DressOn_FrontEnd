@@ -79,11 +79,11 @@ body.no-scroll{overflow:hidden}
 /* dropdown styles removed */
 
 .nb-right{display:flex;align-items:center;gap:14px;position:relative}
-.icon-btn{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:var(--text);cursor:pointer}
-.pill{display:inline-flex;align-items:center;gap:6px;padding:.4rem .8rem;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--text);font-weight:700}
+.icon-btn{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:var(--text);cursor:pointer}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:0 .8rem;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--text);font-weight:700}
 .pill .chev{opacity:.9}
-.btn-launch{display:inline-flex;align-items:center;justify-content:center;padding:.7rem 1.05rem;border-radius:999px;text-decoration:none;color:#fff;font-weight:900;border:1px solid rgba(255,94,102,.45);background:linear-gradient(180deg,#ff5e66,#ff5e66);box-shadow:0 6px 18px rgba(255,94,102,.25)}
-.credits{border-color:rgba(255,94,102,.25);background:rgba(255,94,102,.08)}
+.btn-launch{display:inline-flex;align-items:center;justify-content:center;padding:0 1.05rem;height:40px;border-radius:999px;text-decoration:none;color:#fff;font-weight:900;border:1px solid rgba(255,94,102,.45);background:linear-gradient(180deg,#ff5e66,#ff5e66);box-shadow:0 6px 18px rgba(255,94,102,.25)}
+.credits{height:40px;border-color:rgba(255,94,102,.25);background:rgba(255,94,102,.08)}
 .credits .coin{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffd3d6,#ff5e66);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
 .credits .amount{font-weight:900;color:#fff}
 .credits .unit{color:#ff9aa1;font-weight:800}
@@ -94,7 +94,7 @@ body.no-scroll{overflow:hidden}
 .profile-popover .me-actions{display:flex;gap:8px}
 
 /* Sign In button: same footprint as Launch Now, without stroke */
-.sign-in-btn{padding:.7rem 1.05rem;border-radius:999px;border:0}
+.sign-in-btn{padding:0 1.05rem;height:40px;border-radius:999px;border:0}
 .btn.primary.sign-in-btn{border:0 !important}
 
 /* Auth visibility guard (CSS-level, no闪烁) */
