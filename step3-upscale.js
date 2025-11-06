@@ -60,7 +60,6 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
         <div class="title">${message}</div>
         <div class="desc">Upload image and enhance to high resolution</div>
       </div>
-      <button class="dl-btn" disabled title="Download"><img src="${DOWNLOAD_ICON}" alt="download" /></button>
     `;
   }
 
@@ -72,7 +71,6 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
         <div class="title">${message}</div>
         <div class="desc">Please wait while we upscale your image</div>
       </div>
-      <button class="dl-btn" disabled title="Download"><img src="${DOWNLOAD_ICON}" alt="download" /></button>
     `;
   }
 

@@ -55,9 +55,7 @@ function setCanvasLoading(sel, text = 'Generating…') {
   panel.innerHTML = `<div style="display:grid;place-items:center;text-align:center;color:#a3aec2">
     <div style="width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,255,255,.18);border-top-color:#E4C07A;animation:spin 1s linear infinite;margin-bottom:10px"></div>
     ${text}
-  </div>
-
-  <button class="dl-btn" disabled title="Download original"><img src="${DOWNLOAD_ICON}" alt="download" /></button>`;
+  </div>`;
 }
 
 function setCanvasError(sel, message) {
