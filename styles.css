@@ -402,6 +402,7 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 .panel.left .panel-inner .field .label,.panel.left .panel-inner .refine-form .label{width:270px;text-align:left}
 .panel.left .panel-inner .uploader{width:270px;margin:0 auto}
 .panel.left .panel-inner .refine-form .prompt{width:270px;max-width:270px;min-width:270px}
+.panel.left .panel-inner .refine-form .prompt-actions{width:270px}
 
 
 
