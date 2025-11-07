@@ -232,7 +232,7 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 .hero-centered{display:grid;place-items:center;text-align:center}
 
 /* Hero content - positioned at upper-middle for stable layout across screen sizes */
-.hero-copy{width:100%;max-width:100%;display:flex;flex-direction:column;height:100%;padding:10vh clamp(48px,6vw,88px) 12px}
+.hero-copy{width:100%;max-width:100%;display:flex;flex-direction:column;height:100%;padding:20vh clamp(48px,6vw,88px) 12px}
 .hero-split .hero-copy{text-align:left;align-items:flex-start}
 .badge{display:inline-block;padding:.5rem .9rem;border-radius:999px;border:1px solid rgba(255,94,102,.35);background:rgba(255,94,102,.14);color:#ffe9ec;font-weight:800;font-size:.95rem;margin-bottom:22px;width:fit-content}
 .hero-title{font-size:clamp(40px,5.5vw,64px);line-height:1.14;margin:0 0 18px;font-weight:900;letter-spacing:-0.015em}
