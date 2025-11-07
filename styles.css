@@ -221,7 +221,7 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 .btn-small{padding:.6rem 1rem;border-radius:9999px;font-size:.85rem;font-weight:400}
 
 /* hero */
-.hero{height:100vh;display:flex;align-items:stretch;position:relative}
+.hero{height:calc(100vh - var(--header-h));display:flex;align-items:stretch;position:relative}
 
 /* Split layout (left-right) */
 .hero-split .hero-container{display:flex;align-items:stretch;gap:60px;width:100%;height:100%}
