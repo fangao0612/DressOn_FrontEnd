@@ -223,10 +223,10 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 /* hero */
 .hero{height:calc(100vh - var(--header-h));display:flex;align-items:stretch;position:relative}
 
-/* Split layout (left-right) with 1:1 ratio */
+/* Split layout (left-right) with golden ratio (38.2% : 61.8%) */
 .hero-split .hero-container{display:flex;align-items:stretch;gap:0;width:100vw;max-width:100vw;height:100%;margin:0}
-.hero-left{flex:0 0 50%;display:flex;align-items:stretch;justify-content:center;background:transparent;position:relative}
-.hero-right{flex:0 0 50%;display:flex;align-items:stretch;justify-content:flex-start;padding:72px 0 30px}
+.hero-left{flex:0 0 38.2%;display:flex;align-items:stretch;justify-content:center;background:transparent;position:relative}
+.hero-right{flex:0 0 61.8%;display:flex;align-items:stretch;justify-content:flex-start;padding:72px 0 30px}
 
 /* Centered layout (deprecated, kept for compatibility) */
 .hero-centered{display:grid;place-items:center;text-align:center}
