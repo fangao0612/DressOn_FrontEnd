@@ -262,7 +262,7 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 
 /* Hero background carousel (in left column, full height) */
 .hero-bg-carousel{position:relative;width:100%;height:100%;overflow:hidden}
-.hero-bg-image{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:calc(50% + 10vh) center;opacity:0;transition:opacity 1s ease-in-out}
+.hero-bg-image{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:calc(50% + 15vh) center;opacity:0;transition:opacity 1s ease-in-out}
 .hero-bg-image.active{opacity:1}
 
 /* editor panels */
