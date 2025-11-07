@@ -115,7 +115,7 @@
             <h1 class="hero-title">Outfit swap with ANY two photos.</h1>
             <p class="hero-sub">DressOn AI delivers stable character identity, refined fabric detail, and natural scene blending. Re‑style any photo with simple text and references.</p>
             <div class="hero-actions">
-              <a class="btn primary" href="#step1">Start Editing</a>
+              <button class="btn primary" type="button" data-scroll-to="editor">Start Editing</button>
               <a class="btn ghost" href="#showcase">View Examples</a>
             </div>
             <ul class="hero-features">
@@ -125,14 +125,14 @@
             </ul>
 
             <!-- CTA at bottom of content -->
-            <div class="hero-cta">
+            <button class="hero-cta" type="button" data-scroll-to="editor">
               <div class="hero-cta-inner">
-                <a class="hero-cta-text" href="#step1">Get Started</a>
+                <span class="hero-cta-text">Get Started</span>
                 <div class="scroll-indicator">
                   <div class="arrow-down">⌄</div>
                 </div>
               </div>
-            </div>
+            </button>
           </div>
         </div>
       </div>
@@ -426,6 +426,7 @@
   </footer>
 
   <script type="module" src="./theme.js"></script>
+  <script type="module" src="./smooth-scroll.js"></script>
   <script type="module" src="./hero-carousel.js"></script>
   <script type="module" src="./app.js"></script>
   <script type="module" src="./user-flow.js"></script>

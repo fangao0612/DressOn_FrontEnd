@@ -244,8 +244,11 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 
 /* Hero CTA (bottom of right content, left-aligned group with centered children) */
 .hero-cta{display:flex;margin-top:auto;align-self:flex-start}
+/* Reset button styles when .hero-cta is a button */
+button.hero-cta{background:none;border:none;padding:0;margin-top:auto;cursor:pointer;font:inherit;color:inherit}
 .hero-cta-inner{display:flex;flex-direction:column;align-items:center;gap:10px}
 .hero-cta-text{font-size:clamp(18px,2vw,26px);font-weight:900;letter-spacing:-0.01em;color:var(--text);text-decoration:none;transition:opacity 0.2s}
+button.hero-cta:hover .hero-cta-text{opacity:0.8}
 .hero-cta-text:hover{opacity:0.8;text-decoration:none}
 .scroll-indicator{display:flex;justify-content:center;align-items:center}
 .arrow-down{font-size:clamp(24px,3.2vw,36px);color:var(--muted);animation:arrowBounce 2s infinite}
