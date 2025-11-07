@@ -242,11 +242,11 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
 .hero-features{display:flex;gap:26px;margin:18px 0 0;color:var(--muted);padding:0;list-style:none;font-size:1rem;letter-spacing:.01em;flex-wrap:wrap}
 .hero-features li{display:flex;gap:6px;align-items:center;line-height:1.6}
 
-/* Hero CTA (bottom of right content, left-aligned with children centered with each other) */
-.hero-cta{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:48px;align-self:flex-start}
+/* Hero CTA (bottom of right content, left-aligned group with left-aligned children) */
+.hero-cta{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-top:48px;align-self:flex-start}
 .hero-cta-text{font-size:clamp(18px,2vw,26px);font-weight:900;letter-spacing:-0.01em;color:var(--text);text-decoration:none;transition:opacity 0.2s}
 .hero-cta-text:hover{opacity:0.8;text-decoration:none}
-.scroll-indicator{display:flex;justify-content:center;align-items:center}
+.scroll-indicator{display:flex;justify-content:flex-start;align-items:center}
 .arrow-down{font-size:clamp(24px,3.2vw,36px);color:var(--muted);animation:arrowBounce 2s infinite}
 @keyframes bounce{
   0%,20%,50%,80%,100%{transform:translateY(0)}
