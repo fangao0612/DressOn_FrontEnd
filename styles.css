@@ -246,6 +246,12 @@ html[data-authpage="1"] main > *:not(.auth-modal){display:none !important}
   60%{transform:translateY(-3px) scaleX(1.6)}
 }
 
+/* Hero background carousel */
+.hero-bg-carousel{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+.hero-bg-image{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:auto;height:100%;object-fit:cover;object-position:center;opacity:0;mix-blend-mode:multiply;transition:opacity 1s ease-in-out}
+.hero-bg-image.active{opacity:0.28}
+.hero .container{position:relative;z-index:1}
+
 /* editor panels */
 .editor,.refine,.upscale{padding:72px 0;background:var(--bg);min-height:110vh;display:flex;flex-direction:column;justify-content:center;align-items:center}
 .section-header{text-align:center;margin:0 auto 48px;max-width:1200px}
