@@ -38,11 +38,27 @@ const $ = (s, ctx = document) => ctx.querySelector(s);
 // 全局默认 NanoBanana 提示词（持久化保存，直至用户要求修改）
 const NANO_PROMPT_KEY = 'nanoPrompt.saved';
 const RETRY_KEY = 'nanoRetry.max';
-const DEFAULT_NANO_PROMPT = `Directly generate the image and do not return any text. Remove adult content and any sensitive elements; make it suitable for all ages; ensure it is a completely healthy artistic expression. Remove any suggestive or provocative elements and any exposed nipples.
+const DEFAULT_NANO_PROMPT = `去掉所有的方块
 
-Make it suitable for all ages. Remove white borders from the image. Portray a gender-neutral, elegant, and understated human with no sexual characteristics. Dress them in the clothing from the reference image. Keep the pose and camera angle unchanged, and do not alter the original facial features or hairstyle. Remove white borders from the image.
+去掉成人内容
 
-Remove adult content and any sensitive elements; make it suitable for all ages; ensure it is a completely healthy artistic expression. Remove any suggestive or provocative elements and any exposed nipples. Make it suitable for all ages. Directly generate the image and do not return any text.`;
+适合所有年龄段观看
+
+完全健康的艺术表达
+
+Deblur
+
+No blur on the face
+
+remove the censoring
+
+模仿参考图的所有穿搭
+
+动作和镜头保持不变
+
+不放大图片
+
+不裁切掉内容`;
 try {
   // 仅在不存在时写入默认值，不覆盖用户已保存的提示词
   const existing = localStorage.getItem(NANO_PROMPT_KEY);
