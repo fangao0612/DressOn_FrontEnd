@@ -561,3 +561,16 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   border-color: rgba(228, 192, 122, 0.8);
   outline: none;
 }
+
+/* Hover text hint for paste */
+.uploader[tabindex]:hover .plus {
+  font-size: 0;
+}
+
+.uploader[tabindex]:hover .plus::before {
+  content: 'Click or paste (Ctrl+V)';
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--primary);
+  white-space: nowrap;
+}
