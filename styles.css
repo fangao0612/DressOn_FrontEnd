@@ -418,7 +418,7 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 .refine .panel.left .panel-inner{align-items:flex-start}
 
 /* Restore classic plus sign style for all uploaders */
-.uploader .drop-area .plus{font-size:42px;color:var(--primary);margin-bottom:6px;font-weight:400}
+.uploader .drop-area .plus{font-size:42px;color:var(--primary);margin-bottom:6px;font-weight:400;position:relative}
 
 .panel.left .panel-inner{align-items:center}
 .panel.left .panel-inner .field,.panel.left .panel-inner .field.two-col,.panel.left .panel-inner .refine-form{width:100%;display:flex;flex-direction:column;align-items:center}
@@ -564,7 +564,7 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 
 /* Hover text hint for paste */
 .uploader[tabindex]:hover .plus {
-  font-size: 0;
+  color: transparent;
 }
 
 .uploader[tabindex]:hover .plus::before {
@@ -573,4 +573,8 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   font-weight: 500;
   color: var(--primary);
   white-space: nowrap;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
