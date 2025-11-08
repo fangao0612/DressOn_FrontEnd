@@ -107,10 +107,22 @@ function initClipboardPaste() {
     // Add paste event listener to uploader
     uploader.addEventListener('paste', handlePaste);
 
+    // Auto-focus on hover for better UX
+    uploader.addEventListener('mouseenter', () => {
+      uploader.focus();
+      console.log(`[clipboard-paste] Auto-focused uploader[${role}] on hover - Ready for Ctrl+V`);
+    });
+
+    // Auto-blur on mouse leave to allow next uploader to receive focus
+    uploader.addEventListener('mouseleave', () => {
+      uploader.blur();
+      console.log(`[clipboard-paste] Auto-blurred uploader[${role}] on mouse leave`);
+    });
+
     // Also listen on the uploader's children for convenience
     uploader.addEventListener('click', () => {
       uploader.focus();
-      console.log(`[clipboard-paste] Focused uploader[${role}] - Ready for Ctrl+V`);
+      console.log(`[clipboard-paste] Focused uploader[${role}] on click - Ready for Ctrl+V`);
     });
 
     // Add visual feedback when focused
