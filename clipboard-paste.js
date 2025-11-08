@@ -125,14 +125,14 @@ function initClipboardPaste() {
       console.log(`[clipboard-paste] Focused uploader[${role}] on click - Ready for Ctrl+V`);
     });
 
-    // Add visual feedback when focused
+    // Add visual feedback when focused (same as drag effect)
     uploader.addEventListener('focus', () => {
-      uploader.style.outline = '2px solid rgba(255, 94, 102, 0.5)';
+      uploader.style.borderColor = 'rgba(228,192,122,.8)';
       console.log(`[clipboard-paste] Uploader[${role}] focused`);
     });
 
     uploader.addEventListener('blur', () => {
-      uploader.style.outline = '';
+      uploader.style.borderColor = 'rgba(255,255,255,.22)';
       console.log(`[clipboard-paste] Uploader[${role}] blurred`);
     });
 
