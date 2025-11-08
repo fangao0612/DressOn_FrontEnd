@@ -1,5 +1,4 @@
 // Clipboard Paste for Image Uploaders
-// Wrap in DOMContentLoaded to ensure all elements are ready
 function initClipboardPaste() {
   console.log('[clipboard-paste] Initializing...');
 
@@ -25,12 +24,14 @@ function initClipboardPaste() {
 
     console.log(`[clipboard-paste] Setting up uploader[${role}]`);
 
-    // Make uploader focusable
+    // Make uploader focusable and add visual hint
     uploader.setAttribute('tabindex', '0');
+    uploader.style.cursor = 'pointer';
 
-    // Add paste event listener
-    uploader.addEventListener('paste', async (e) => {
+    // Handle paste on uploader
+    const handlePaste = async (e) => {
       e.preventDefault();
+      e.stopPropagation();
 
       console.log(`[clipboard-paste] Paste event on uploader[${role}]`);
 
@@ -41,10 +42,14 @@ function initClipboardPaste() {
         return;
       }
 
+      console.log(`[clipboard-paste] Clipboard items:`, items.length);
+
       // Find image in clipboard
       let imageFile = null;
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
+        console.log(`[clipboard-paste] Item ${i}: ${item.type}`);
+
         if (item.type.startsWith('image/')) {
           const blob = item.getAsFile();
           if (blob) {
@@ -52,6 +57,7 @@ function initClipboardPaste() {
             imageFile = new File([blob], `pasted-image-${Date.now()}.png`, {
               type: blob.type || 'image/png'
             });
+            console.log('[clipboard-paste] Image file created:', imageFile.name, imageFile.type, imageFile.size);
             break;
           }
         }
@@ -71,49 +77,39 @@ function initClipboardPaste() {
 
       // Set files to input
       fileInput.files = dataTransfer.files;
+      console.log('[clipboard-paste] Files set to input:', fileInput.files.length);
 
       // Trigger change event to notify the upload handlers
       const changeEvent = new Event('change', { bubbles: true });
       fileInput.dispatchEvent(changeEvent);
 
-      console.log(`[clipboard-paste] Image pasted to uploader[${role}]`);
+      console.log(`[clipboard-paste] Change event dispatched for uploader[${role}]`);
+    };
+
+    // Add paste event listener to uploader
+    uploader.addEventListener('paste', handlePaste);
+
+    // Also listen on the uploader's children for convenience
+    uploader.addEventListener('click', () => {
+      uploader.focus();
+      console.log(`[clipboard-paste] Focused uploader[${role}] - Ready for Ctrl+V`);
     });
 
     // Add visual feedback when focused
     uploader.addEventListener('focus', () => {
       uploader.style.outline = '2px solid rgba(255, 94, 102, 0.5)';
+      console.log(`[clipboard-paste] Uploader[${role}] focused`);
     });
 
     uploader.addEventListener('blur', () => {
       uploader.style.outline = '';
+      console.log(`[clipboard-paste] Uploader[${role}] blurred`);
     });
 
-    console.log(`[clipboard-paste] Enabled paste for uploader[${role}] (${index + 1}/${uploaders.length})`);
+    console.log(`[clipboard-paste] ✓ Enabled paste for uploader[${role}] (${index + 1}/${uploaders.length})`);
   });
 
-  // Global paste handler as fallback (works anywhere on the page)
-  document.addEventListener('paste', async (e) => {
-    // Only handle if not already handled by uploader
-    if (e.target.closest('.uploader')) {
-      return;
-    }
-
-    // Check if there's a focused uploader
-    const focusedUploader = document.activeElement?.closest('.uploader');
-    if (!focusedUploader) {
-      return;
-    }
-
-    // Trigger paste on focused uploader
-    const pasteEvent = new ClipboardEvent('paste', {
-      bubbles: true,
-      cancelable: true,
-      clipboardData: e.clipboardData
-    });
-    focusedUploader.dispatchEvent(pasteEvent);
-  });
-
-  console.log('[clipboard-paste] Module initialized successfully');
+  console.log('[clipboard-paste] ✓ Module initialized successfully');
   console.log('[clipboard-paste] Usage: Click on any uploader and press Ctrl+V to paste from clipboard');
 }
 
