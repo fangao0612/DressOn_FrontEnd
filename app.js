@@ -1,6 +1,7 @@
 // Minimal interactivity: upload previews, mock generation, FAQ accordion
 const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
-(function(){
+
+function initApp() {
   const $ = (s,ctx=document)=>ctx.querySelector(s);
   const $$ = (s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
 
@@ -87,13 +88,16 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
   const style=document.createElement('style');
   style.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
   document.head.appendChild(style);
-})();
+}
 
-
-
-
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
 // Temporary feature: upload test image to output gallery
-(() => {
+function initCanvasUpload() {
   const canvas = document.querySelector('#canvas1[data-role="output"]');
   const fileInput = canvas?.querySelector('.canvas-file-input');
   
@@ -215,4 +219,11 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
     };
     reader.readAsDataURL(file);
   });
-})();
+}
+
+// Initialize canvas upload when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCanvasUpload);
+} else {
+  initCanvasUpload();
+}

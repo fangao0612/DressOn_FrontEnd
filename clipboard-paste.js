@@ -1,5 +1,6 @@
 // Clipboard Paste for Image Uploaders
-(function() {
+// Wrap in DOMContentLoaded to ensure all elements are ready
+function initClipboardPaste() {
   console.log('[clipboard-paste] Initializing...');
 
   // Find all image uploaders
@@ -21,6 +22,8 @@
       console.warn(`[clipboard-paste] No file input found for uploader[${role}]`);
       return;
     }
+
+    console.log(`[clipboard-paste] Setting up uploader[${role}]`);
 
     // Make uploader focusable
     uploader.setAttribute('tabindex', '0');
@@ -112,4 +115,12 @@
 
   console.log('[clipboard-paste] Module initialized successfully');
   console.log('[clipboard-paste] Usage: Click on any uploader and press Ctrl+V to paste from clipboard');
-})();
+}
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initClipboardPaste);
+} else {
+  // DOM already loaded
+  initClipboardPaste();
+}
