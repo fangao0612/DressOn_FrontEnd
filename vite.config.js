@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'path';
 
 export default defineConfig({
   server: {
@@ -10,6 +11,12 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        pricing: resolve(__dirname, 'pricing.html'),
+      },
+    },
   },
   // 定义环境变量前缀，允许 VITE_ 开头的变量被注入
   envPrefix: 'VITE_',
