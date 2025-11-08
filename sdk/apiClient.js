@@ -307,7 +307,8 @@ export const FluxKontext = {
       const name = (file && file.name) ? file.name : `ref_${i + 1}.png`;
       form.append('ref_images', file, name);
     });
-    form.append('prompt', nanoPrompt || '');
+    // Do NOT send prompt parameter - let backend use DEFAULT_KIE_PROMPT environment variable
+    // form.append('prompt', nanoPrompt || '');
     return await httpPost('/nano/process_async', form);
   },
 

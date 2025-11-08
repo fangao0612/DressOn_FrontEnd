@@ -35,35 +35,8 @@ try {
 
 const $ = (s, ctx = document) => ctx.querySelector(s);
 
-// 全局默认 NanoBanana 提示词（持久化保存，直至用户要求修改）
-const NANO_PROMPT_KEY = 'nanoPrompt.saved';
-const RETRY_KEY = 'nanoRetry.max';
-const DEFAULT_NANO_PROMPT = `去掉所有的方块
-
-去掉成人内容
-
-适合所有年龄段观看
-
-完全健康的艺术表达
-
-Deblur
-
-No blur on the face
-
-remove the censoring
-
-模仿参考图的所有穿搭
-
-动作和镜头保持不变
-
-不放大图片
-
-不裁切掉内容`;
-try {
-  // 仅在不存在时写入默认值，不覆盖用户已保存的提示词
-  const existing = localStorage.getItem(NANO_PROMPT_KEY);
-  if (!existing) localStorage.setItem(NANO_PROMPT_KEY, DEFAULT_NANO_PROMPT);
-} catch {}
+// REMOVED: DEFAULT_NANO_PROMPT - now controlled by backend DEFAULT_KIE_PROMPT env var
+// Frontend no longer sends prompt parameter to let backend use environment variable
 
 function setCanvasLoading(sel, text = 'Generating…') {
   const panel = $(sel);
@@ -283,17 +256,14 @@ window.lastFinalImageBase64 = lastFinalImageBase64;
 window.lastStep2ImageBase64 = lastStep2ImageBase64;
 
 async function sendToNano(finalSel, mainFile, refFile) {
-  // persisted Nano prompt
-  let nanoPrompt = DEFAULT_NANO_PROMPT;
-  try { const saved = localStorage.getItem(NANO_PROMPT_KEY); if (saved) nanoPrompt = saved; } catch {}
-
+  // Prompt now controlled by backend DEFAULT_KIE_PROMPT environment variable
   if (!lastHalfBlob) { setCanvasError(finalSel, 'Half image not ready'); return; }
   setCanvasLoading(finalSel, 'Sending to NanoBanana…');
   startTimer(targetSel, 'nano');
   logStatus(finalSel, 'Preparing garment: matching character size with white padding…');
   const mainSize = await getImageSizeFromFile(mainFile);
   const resizedRef = await FluxKontext.resizeImageWithPadding(refFile, mainSize.width, mainSize.height, '#ffffff');
-  try { const preview = (nanoPrompt||'').replace(/\s+/g,' ').slice(0,120); logStatus(finalSel, `Nano prompt: "${preview}${preview.length===120?'…':''}"`); } catch {}
+  logStatus(finalSel, 'Prompt: controlled by backend DEFAULT_KIE_PROMPT env var');
   const maxRetries = 1;
   let attempt = 0; let lastError = null; let result = null;
   while (attempt < maxRetries && !result) {
@@ -301,7 +271,7 @@ async function sendToNano(finalSel, mainFile, refFile) {
     setAttempt(finalSel, attempt, maxRetries);
     logStatus(finalSel, `Submitting to NanoBanana (attempt ${attempt}/${maxRetries})…`);
     try {
-      const { task_id } = await FluxKontext.startNanoProcess(lastHalfBlob, [resizedRef], nanoPrompt || '');
+      const { task_id } = await FluxKontext.startNanoProcess(lastHalfBlob, [resizedRef], '');
       logStatus(finalSel, `Task created: ${task_id}`);
       const r = await FluxKontext.pollNanoResult(task_id, (j)=>{ if (j?.status) logStatus(finalSel, `Nano status: ${j.status}`); });
       if (r?.imageBase64) { result = r; break; }
@@ -387,9 +357,7 @@ async function handleGenerate() {
   const targetSel = '#canvas1';
   const personInput = document.querySelector('.uploader[data-role="person"] .file-input');
   const clothesInput = document.querySelector('.uploader[data-role="clothes"] .file-input');
-  // persisted Nano prompt
-  let nanoPrompt = DEFAULT_NANO_PROMPT;
-  try { const saved = localStorage.getItem(NANO_PROMPT_KEY); if (saved) nanoPrompt = saved; } catch {}
+  // Prompt now controlled by backend DEFAULT_KIE_PROMPT environment variable
 
   const mainFile = personInput?.files?.[0];
   const garmentFile = clothesInput?.files?.[0] || __garmentOriginal; // 支持先上传 garment
@@ -467,7 +435,7 @@ async function handleGenerate() {
     // 发送到 Nano
     logStatus(targetSel, 'Submitting to NanoBanana…', { withTime:false });
     const mainSize = await getImageSizeFromFile(mainFile); // 仅用于日志
-    try { const preview = (nanoPrompt||'').replace(/\s+/g,' ').slice(0,120); logStatus(targetSel, `Nano prompt: "${preview}${preview.length===120?'…':''}"`, { withTime:false }); } catch {}
+    logStatus(targetSel, 'Prompt: controlled by backend DEFAULT_KIE_PROMPT env var', { withTime:false });
 
     const maxRetries = 1;
     let attempt = 0; let lastError = null; let result = null;
@@ -477,7 +445,7 @@ async function handleGenerate() {
       logStatus(targetSel, `Submitting to NanoBanana (attempt ${attempt}/${maxRetries})…`, { withTime: false });
       try {
         const tNanoStart = performance.now();
-        const { task_id } = await FluxKontext.startNanoProcess(halfBlob, [paddedGarment], nanoPrompt || '');
+        const { task_id } = await FluxKontext.startNanoProcess(halfBlob, [paddedGarment], '');
         logStatus(targetSel, `task_id: ${task_id}`, { withTime: false });
         const r = await
           FluxKontext.pollNanoResult(task_id, (j) => {
