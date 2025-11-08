@@ -79,11 +79,29 @@ function initClipboardPaste() {
       fileInput.files = dataTransfer.files;
       console.log('[clipboard-paste] Files set to input:', fileInput.files.length);
 
-      // Trigger change event to notify the upload handlers
-      const changeEvent = new Event('change', { bubbles: true });
-      fileInput.dispatchEvent(changeEvent);
+      // Use setTimeout to ensure the change event is processed in the next tick
+      // This gives time for all other handlers to be ready
+      setTimeout(() => {
+        // Trigger change event to notify the upload handlers
+        const changeEvent = new Event('change', { bubbles: true });
+        fileInput.dispatchEvent(changeEvent);
+        console.log(`[clipboard-paste] Change event dispatched for uploader[${role}]`);
 
-      console.log(`[clipboard-paste] Change event dispatched for uploader[${role}]`);
+        // Also manually trigger the preview update as a fallback
+        const file = fileInput.files[0];
+        if (file) {
+          const preview = uploader.querySelector('.preview');
+          const dropArea = uploader.querySelector('.drop-area');
+
+          if (preview && dropArea) {
+            const url = URL.createObjectURL(file);
+            preview.src = url;
+            preview.hidden = false;
+            dropArea.style.display = 'none';
+            console.log(`[clipboard-paste] Preview updated manually for uploader[${role}]`);
+          }
+        }
+      }, 10);
     };
 
     // Add paste event listener to uploader
