@@ -551,3 +551,31 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   overflow: visible;
   padding-bottom: 8px;  /* Extra space to ensure shadow isn't clipped */
 }
+
+/* Clipboard Paste Support */
+.uploader[tabindex] {
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.uploader[tabindex]:focus {
+  border-color: rgba(255, 94, 102, 0.6);
+  box-shadow: 0 0 0 3px rgba(255, 94, 102, 0.15);
+  outline: none;
+}
+
+.uploader[tabindex]:focus::after {
+  content: 'Click here and press Ctrl+V to paste';
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 94, 102, 0.95);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
