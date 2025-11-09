@@ -15,10 +15,12 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
   const canvas3 = $('#canvas3');
   const getStep1Btn = $('#get-step1-image');
   const getStep2Btn = $('#get-step2-image');
+  const resolutionBtns = document.querySelectorAll('.resolution-btn');
 
   // 状态
   let uploadedFile = null;
   let uploadedFileUrl = null;
+  let selectedResolution = '4K';  // 默认4K
 
   if (!uploader || !fileInput || !upscaleBtn || !canvas3) {
     console.warn('[step3] Required elements not found');
@@ -320,6 +322,8 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
 
       const formData = new FormData();
       formData.append('image', uploadedFile);
+      formData.append('resolution', selectedResolution);
+      console.log('[step3] Selected resolution:', selectedResolution);
       // Don't send prompt - let backend use UPSCALE_PROMPT environment variable
       // formData.append('prompt', 'Upscale this image to high resolution while preserving all details and quality.');
 
@@ -559,6 +563,22 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
     console.log('[step3] Get Step2 button listener attached');
   }
 
+  // Resolution selector buttons
+  if (resolutionBtns.length > 0) {
+    resolutionBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Remove active class from all buttons
+        resolutionBtns.forEach(b => b.classList.remove('active'));
+        // Add active class to clicked button
+        btn.classList.add('active');
+        // Update selected resolution
+        selectedResolution = btn.dataset.resolution;
+        console.log('[step3] Resolution changed to:', selectedResolution);
+      });
+    });
+    console.log('[step3] Resolution selector listeners attached');
+  }
+
   // 初始化
   upscaleBtn.disabled = true;
   showPlaceholder();
@@ -566,8 +586,8 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
   // 更新按钮状态
   updateGetImageButtons();
 
-  // 自动加载最新图片
-  autoLoadLatestImage();
+  // 自动加载最新图片（已禁用 - 页面刷新后清空输入）
+  // autoLoadLatestImage();
 
   console.log('[step3] Upscale module initialized successfully');
   console.log('[step3] Elements:', {
