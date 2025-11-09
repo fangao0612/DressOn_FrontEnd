@@ -66,14 +66,42 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
   }
 
   // 显示加载状态
-  function showLoading(message = 'Processing...') {
+  function showLoading(message = 'Processing...', duration = 40) {
     canvas3.innerHTML = `
-      <div class="placeholder">
-        <div class="icon">⏳</div>
-        <div class="title">${message}</div>
-        <div class="desc">Please wait while we upscale your image</div>
+      <div class="placeholder" style="padding:20px">
+        <div class="icon" style="font-size:48px;margin-bottom:10px">⏳</div>
+        <div class="title" style="margin-bottom:8px">${message}</div>
+        <div class="desc" style="margin-bottom:16px">Please wait while we upscale your image</div>
+        <div style="width:80%;max-width:300px;height:8px;background:rgba(255,255,255,.08);border-radius:4px;margin:16px auto 0;overflow:hidden">
+          <div class="progress-bar-fill" style="width:0%;height:100%;background:linear-gradient(90deg,#E4C07A,#C4A05A);border-radius:4px;transition:width 0.3s ease"></div>
+        </div>
       </div>
     `;
+
+    // Start progress animation
+    const fillEl = canvas3.querySelector('.progress-bar-fill');
+    if (fillEl) {
+      startProgressBar(fillEl, duration);
+    }
+  }
+
+  function startProgressBar(fillEl, durationSeconds) {
+    if (!fillEl) return;
+
+    const startTime = Date.now();
+    const updateInterval = 100; // Update every 100ms
+
+    const update = () => {
+      const elapsed = (Date.now() - startTime) / 1000;
+      const progress = Math.min((elapsed / durationSeconds) * 100, 99); // Cap at 99%
+      fillEl.style.width = `${progress}%`;
+
+      if (progress < 99) {
+        setTimeout(update, updateInterval);
+      }
+    };
+
+    update();
   }
 
   // 显示结果图片 (复刻 step2 的居中和自适应逻辑)

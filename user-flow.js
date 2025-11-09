@@ -38,13 +38,54 @@ const $ = (s, ctx = document) => ctx.querySelector(s);
 // REMOVED: DEFAULT_NANO_PROMPT - now controlled by backend DEFAULT_KIE_PROMPT env var
 // Frontend no longer sends prompt parameter to let backend use environment variable
 
-function setCanvasLoading(sel, text = 'Generating…') {
+// Progress bar trackers for each panel
+const progressBars = new WeakMap();
+
+function setCanvasLoading(sel, text = 'Generating…', duration = 150) {
   const panel = $(sel);
   if (!panel) return;
-  panel.innerHTML = `<div style="display:grid;place-items:center;text-align:center;color:#a3aec2">
+
+  // Determine duration based on text if not explicitly provided
+  if (text.includes('Flux')) {
+    duration = 150; // Step 1: Mix Character with Garment
+  } else if (text.includes('NanoBanana') || text.includes('Refining')) {
+    duration = 50;  // Step 2: Refine with Prompt
+  }
+
+  panel.innerHTML = `<div style="display:grid;place-items:center;text-align:center;color:#a3aec2;padding:20px">
     <div style="width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,255,255,.18);border-top-color:#E4C07A;animation:spin 1s linear infinite;margin-bottom:10px"></div>
     ${text}
+    <div style="width:80%;max-width:300px;height:8px;background:rgba(255,255,255,.08);border-radius:4px;margin-top:16px;overflow:hidden">
+      <div class="progress-bar-fill" style="width:0%;height:100%;background:linear-gradient(90deg,#E4C07A,#C4A05A);border-radius:4px;transition:width 0.3s ease"></div>
+    </div>
   </div>`;
+
+  // Start progress animation
+  const fillEl = panel.querySelector('.progress-bar-fill');
+  if (fillEl) {
+    startProgressBar(fillEl, duration);
+    // Store reference for potential cleanup
+    progressBars.set(panel, { fillEl, duration });
+  }
+}
+
+function startProgressBar(fillEl, durationSeconds) {
+  if (!fillEl) return;
+
+  const startTime = Date.now();
+  const updateInterval = 100; // Update every 100ms
+
+  const update = () => {
+    const elapsed = (Date.now() - startTime) / 1000;
+    const progress = Math.min((elapsed / durationSeconds) * 100, 99); // Cap at 99%
+    fillEl.style.width = `${progress}%`;
+
+    if (progress < 99) {
+      setTimeout(update, updateInterval);
+    }
+  };
+
+  update();
 }
 
 function setCanvasError(sel, message) {
