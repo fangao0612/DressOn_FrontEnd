@@ -251,6 +251,22 @@ let lastHalfBlob = null;
 let lastFinalImageBase64 = null; // original full-res final image from step1
 let lastStep2ImageBase64 = null; // original full-res refined image from step2
 
+// Restore from localStorage if available
+try {
+  const stored1 = localStorage.getItem('lastFinalImageBase64');
+  const stored2 = localStorage.getItem('lastStep2ImageBase64');
+  if (stored1) {
+    lastFinalImageBase64 = stored1;
+    console.log('[step1] Restored image from localStorage');
+  }
+  if (stored2) {
+    lastStep2ImageBase64 = stored2;
+    console.log('[step2] Restored image from localStorage');
+  }
+} catch (e) {
+  console.warn('[localStorage] Failed to restore images:', e);
+}
+
 // Expose to window for step3-upscale.js access
 window.lastFinalImageBase64 = lastFinalImageBase64;
 window.lastStep2ImageBase64 = lastStep2ImageBase64;
@@ -476,7 +492,12 @@ async function handleGenerate() {
           }
           setCanvasImage(targetSel, previewUrl);
           // remember original full-res for refine
-          try { lastFinalImageBase64 = r.imageBase64; window.lastFinalImageBase64 = r.imageBase64; } catch {}
+          try {
+            lastFinalImageBase64 = r.imageBase64;
+            window.lastFinalImageBase64 = r.imageBase64;
+            // Save to localStorage for persistence across page refreshes
+            try { localStorage.setItem('lastFinalImageBase64', r.imageBase64); } catch (e) { console.warn('[localStorage] Failed to save step1 image:', e); }
+          } catch {}
           // update step3 buttons
           try { if (window.updateStep3Buttons) window.updateStep3Buttons(); } catch {}
           // update download button
@@ -952,7 +973,12 @@ async function handleRefine(){
     stopTimer(targetSel, 'total', 'completed');
     setCanvasImage(targetSel, previewUrl);
     // remember original full-res for step3
-    try { lastStep2ImageBase64 = result.imageBase64; window.lastStep2ImageBase64 = result.imageBase64; } catch {}
+    try {
+      lastStep2ImageBase64 = result.imageBase64;
+      window.lastStep2ImageBase64 = result.imageBase64;
+      // Save to localStorage for persistence across page refreshes
+      try { localStorage.setItem('lastStep2ImageBase64', result.imageBase64); } catch (e) { console.warn('[localStorage] Failed to save step2 image:', e); }
+    } catch {}
     // update step3 buttons
     try { if (window.updateStep3Buttons) window.updateStep3Buttons(); } catch {}
     try { const old = panel2.querySelector('.dl-btn'); if (old) old.remove(); const btn = document.createElement('button'); btn.type='button'; btn.className='dl-btn'; btn.title='Download original'; const icon=document.createElement('img'); icon.src=DOWNLOAD_ICON; icon.alt='download'; btn.appendChild(icon); btn.onclick=async()=>{try{let blobUrl=result.imageBase64;if(!result.imageBase64.startsWith('data:')){const response=await fetch(result.imageBase64);const blob=await response.blob();blobUrl=URL.createObjectURL(blob);}const a=document.createElement('a');a.href=blobUrl;const ts=new Date().toISOString().replace(/[:.]/g,'-');a.download=`refined-${ts}.png`;document.body.appendChild(a);a.click();a.remove();if(!result.imageBase64.startsWith('data:')){setTimeout(()=>URL.revokeObjectURL(blobUrl),100);}}catch(error){console.error('[download] Failed:',error);alert('Download failed. Please try again.');}}; panel2.appendChild(btn);} catch {}
