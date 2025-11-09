@@ -111,14 +111,12 @@ function setCanvasImage(sel, src, retryCount = 0) {
     retryAttempt: retryCount
   });
 
-  // Show loading state
-  panel.innerHTML = `<div style="display:grid;place-items:center;text-align:center;color:#a3aec2">
-    <div style="width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.18);border-top-color:#E4C07A;animation:spin 1s linear infinite;margin-bottom:8px"></div>
-    Loading image...
-  </div>`;
+  // Clear panel and directly add image (show loading progress)
+  panel.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = 'Generated result';
 
-  // Pre-load image to validate before displaying
-  const img = new Image();
   let loadTimeout = null;
   let hasCompleted = false;
 
@@ -141,27 +139,17 @@ function setCanvasImage(sel, src, retryCount = 0) {
       aspectRatio: (img.naturalWidth / img.naturalHeight).toFixed(3)
     });
 
-    // Clear panel and add the validated image
-    panel.innerHTML = '';
-    const displayImg = document.createElement('img');
-    displayImg.src = src;
-    displayImg.alt = 'Generated result';
-
-    // Size calculation on load
-    displayImg.onload = () => {
-      const panelWidth = panel.clientWidth || panel.offsetWidth;
-      const panelHeight = panel.clientHeight || panel.offsetHeight;
-      if (panelWidth && panelHeight && displayImg.naturalWidth && displayImg.naturalHeight) {
-        const scale = Math.min(panelWidth / displayImg.naturalWidth, panelHeight / displayImg.naturalHeight, 1);
-        displayImg.style.width = `${Math.round(displayImg.naturalWidth * scale)}px`;
-        displayImg.style.height = `${Math.round(displayImg.naturalHeight * scale)}px`;
-      } else {
-        displayImg.style.width = 'auto';
-        displayImg.style.height = 'auto';
-      }
-    };
-
-    panel.appendChild(displayImg);
+    // Size calculation
+    const panelWidth = panel.clientWidth || panel.offsetWidth;
+    const panelHeight = panel.clientHeight || panel.offsetHeight;
+    if (panelWidth && panelHeight && img.naturalWidth && img.naturalHeight) {
+      const scale = Math.min(panelWidth / img.naturalWidth, panelHeight / img.naturalHeight, 1);
+      img.style.width = `${Math.round(img.naturalWidth * scale)}px`;
+      img.style.height = `${Math.round(img.naturalHeight * scale)}px`;
+    } else {
+      img.style.width = 'auto';
+      img.style.height = 'auto';
+    }
   };
 
   const handleError = (errorType) => {
@@ -173,10 +161,10 @@ function setCanvasImage(sel, src, retryCount = 0) {
 
     // Retry logic
     if (retryCount < MAX_RETRIES) {
-      console.log(`[Image Retry] Attempting retry ${retryCount + 1}...`);
+      console.log(`[Image Retry] Attempting retry ${retryCount + 1} in ${retryCount + 1}s...`);
       setTimeout(() => {
         setCanvasImage(sel, src, retryCount + 1);
-      }, 1000 * (retryCount + 1)); // Exponential backoff
+      }, 1000 * (retryCount + 1)); // Exponential backoff: 1s, 2s, 3s
       return;
     }
 
@@ -196,17 +184,17 @@ function setCanvasImage(sel, src, retryCount = 0) {
     };
   };
 
+  // Set up event handlers
+  img.onload = handleSuccess;
+  img.onerror = () => handleError('Image load error (network or CORS issue)');
+
   // Set up timeout
   loadTimeout = setTimeout(() => {
     handleError('Load timeout (30s exceeded)');
   }, LOAD_TIMEOUT);
 
-  // Set up event handlers
-  img.onload = handleSuccess;
-  img.onerror = () => handleError('Image load error (network or CORS issue)');
-
-  // Start loading
-  img.src = src;
+  // Add image to panel immediately (user sees loading progress)
+  panel.appendChild(img);
 }
 
 // ---- timer helpers (multi-timer system) ----
