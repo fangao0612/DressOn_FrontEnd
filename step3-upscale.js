@@ -104,9 +104,12 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
     update();
   }
 
-  // 显示结果图片 (复刻 step2 的居中和自适应逻辑)
-  function showResult(imageUrl) {
-    console.log('[step3] Showing result image:', imageUrl.substring(0, 100));
+  // 显示结果图片 (复刻 step2 的居中和自适应逻辑，带重试保护)
+  function showResult(imageUrl, retryCount = 0) {
+    const MAX_RETRIES = 3;
+    const LOAD_TIMEOUT = 30000; // 30 seconds
+
+    console.log('[step3] Showing result image:', imageUrl.substring(0, 100), 'retry:', retryCount);
 
     canvas3.innerHTML = '';
     const img = document.createElement('img');
@@ -121,14 +124,28 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
     img.style.objectFit = 'contain';
     img.style.objectPosition = 'center';
 
-    // 图片加载后调整尺寸以保持完整显示
-    img.onload = () => {
-      console.log('[step3] Image loaded:', {
+    let loadTimeout = null;
+    let hasCompleted = false;
+
+    const cleanup = () => {
+      if (loadTimeout) {
+        clearTimeout(loadTimeout);
+        loadTimeout = null;
+      }
+    };
+
+    const handleSuccess = () => {
+      if (hasCompleted) return;
+      hasCompleted = true;
+      cleanup();
+
+      console.log('[step3] Image loaded successfully:', {
         naturalWidth: img.naturalWidth,
         naturalHeight: img.naturalHeight,
         aspectRatio: (img.naturalWidth / img.naturalHeight).toFixed(3)
       });
 
+      // 图片加载后调整尺寸以保持完整显示
       const panelWidth = canvas3.clientWidth || canvas3.offsetWidth;
       const panelHeight = canvas3.clientHeight || canvas3.offsetHeight;
 
@@ -140,11 +157,58 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
         img.style.width = 'auto';
         img.style.height = 'auto';
       }
+
+      // 添加下载按钮
+      addDownloadButton(imageUrl);
     };
 
-    canvas3.appendChild(img);
+    const handleError = (errorType) => {
+      if (hasCompleted) return;
+      hasCompleted = true;
+      cleanup();
 
-    // 添加下载按钮 - 使用fetch确保真正下载而不是打开新窗口
+      console.error(`[step3] Image load error: ${errorType} - Retry ${retryCount}/${MAX_RETRIES}`);
+
+      // Retry logic
+      if (retryCount < MAX_RETRIES) {
+        console.log(`[step3] Attempting retry ${retryCount + 1} in ${retryCount + 1}s...`);
+        setTimeout(() => {
+          showResult(imageUrl, retryCount + 1);
+        }, 1000 * (retryCount + 1)); // Exponential backoff: 1s, 2s, 3s
+        return;
+      }
+
+      // All retries failed - show error with manual retry button
+      canvas3.innerHTML = `<div style="display:grid;place-items:center;text-align:center;color:#ff8585;padding:20px">
+        <div style="font-size:32px;margin-bottom:12px">⚠️</div>
+        <div style="margin-bottom:8px">Failed to load image</div>
+        <div style="font-size:12px;color:#a3aec2;margin-bottom:16px">${errorType}</div>
+        <button onclick="window.retryStep3Image()" style="padding:8px 16px;background:#E4C07A;color:#1b2332;border:none;border-radius:4px;cursor:pointer;font-size:14px">
+          Retry Loading
+        </button>
+      </div>`;
+
+      // Store retry function globally
+      window.retryStep3Image = () => {
+        showResult(imageUrl, 0);
+      };
+    };
+
+    // Set up event handlers
+    img.onload = handleSuccess;
+    img.onerror = () => handleError('Image load error (network or CORS issue)');
+
+    // Set up timeout
+    loadTimeout = setTimeout(() => {
+      handleError('Load timeout (30s exceeded)');
+    }, LOAD_TIMEOUT);
+
+    // Add image to panel immediately (user sees loading progress)
+    canvas3.appendChild(img);
+  }
+
+  // 添加下载按钮 - 使用fetch确保真正下载而不是打开新窗口
+  function addDownloadButton(imageUrl) {
     const downloadBtn = document.createElement('button');
     downloadBtn.type = 'button';
     downloadBtn.className = 'dl-btn';
