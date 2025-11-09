@@ -94,78 +94,119 @@ function setCanvasError(sel, message) {
   panel.innerHTML = `<div style="color:#ff8585;line-height:1.6">${message}</div>`;
 }
 
-function setCanvasImage(sel, src) {
+function setCanvasImage(sel, src, retryCount = 0) {
   const panel = $(sel);
   if (!panel) {
     console.error('[DEBUG] Panel not found:', sel);
     return;
   }
 
-  // Add debug border to canvas
+  const MAX_RETRIES = 3;
+  const LOAD_TIMEOUT = 30000; // 30 seconds
 
   console.log('[DEBUG] Canvas dimensions:', {
     selector: sel,
     width: panel.clientWidth,
     height: panel.clientHeight,
-    offsetWidth: panel.offsetWidth,
-    offsetHeight: panel.offsetHeight,
-    scrollWidth: panel.scrollWidth,
-    scrollHeight: panel.scrollHeight,
-    computedStyles: {
-      width: window.getComputedStyle(panel).width,
-      height: window.getComputedStyle(panel).height,
-      flex: window.getComputedStyle(panel).flex,
-      display: window.getComputedStyle(panel).display,
-      overflow: window.getComputedStyle(panel).overflow
-    }
+    retryAttempt: retryCount
   });
 
-  panel.innerHTML = '';
-  const img = document.createElement('img');
-  img.src = src;
+  // Show loading state
+  panel.innerHTML = `<div style="display:grid;place-items:center;text-align:center;color:#a3aec2">
+    <div style="width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.18);border-top-color:#E4C07A;animation:spin 1s linear infinite;margin-bottom:8px"></div>
+    Loading image...
+  </div>`;
 
+  // Pre-load image to validate before displaying
+  const img = new Image();
+  let loadTimeout = null;
+  let hasCompleted = false;
 
-  // Let CSS handle default sizing - don't override with inline styles
-  // The CSS already defines: .canvas img { max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; }
-  // Only set explicit dimensions after image loads to prevent container distortion
-
-  // Log image dimensions after load
-  img.onload = () => {
-    console.log('[DEBUG] Image loaded:', {
-      src: src.substring(0, 100) + '...',
-      naturalWidth: img.naturalWidth,
-      naturalHeight: img.naturalHeight,
-      aspectRatio: (img.naturalWidth / img.naturalHeight).toFixed(3),
-      clientWidth: img.clientWidth,
-      clientHeight: img.clientHeight,
-      renderedAspectRatio: (img.clientWidth / img.clientHeight).toFixed(3),
-      offsetWidth: img.offsetWidth,
-      offsetHeight: img.offsetHeight,
-      computedStyles: {
-        width: window.getComputedStyle(img).width,
-        height: window.getComputedStyle(img).height,
-        maxWidth: window.getComputedStyle(img).maxWidth,
-        maxHeight: window.getComputedStyle(img).maxHeight,
-        objectFit: window.getComputedStyle(img).objectFit,
-        objectPosition: window.getComputedStyle(img).objectPosition
-      }
-    });
-
-    const panelWidth = panel.clientWidth || panel.offsetWidth;
-    const panelHeight = panel.clientHeight || panel.offsetHeight;
-    if (panelWidth && panelHeight && img.naturalWidth && img.naturalHeight) {
-      const scale = Math.min(panelWidth / img.naturalWidth, panelHeight / img.naturalHeight, 1);
-      img.style.width = `${Math.round(img.naturalWidth * scale)}px`;
-      img.style.height = `${Math.round(img.naturalHeight * scale)}px`;
-    } else {
-      img.style.width = 'auto';
-      img.style.height = 'auto';
+  const cleanup = () => {
+    if (loadTimeout) {
+      clearTimeout(loadTimeout);
+      loadTimeout = null;
     }
   };
 
-  panel.appendChild(img);
+  const handleSuccess = () => {
+    if (hasCompleted) return;
+    hasCompleted = true;
+    cleanup();
 
-  console.log('[DEBUG] Image element added to canvas');
+    console.log('[DEBUG] Image loaded successfully:', {
+      src: src.substring(0, 100) + '...',
+      naturalWidth: img.naturalWidth,
+      naturalHeight: img.naturalHeight,
+      aspectRatio: (img.naturalWidth / img.naturalHeight).toFixed(3)
+    });
+
+    // Clear panel and add the validated image
+    panel.innerHTML = '';
+    const displayImg = document.createElement('img');
+    displayImg.src = src;
+    displayImg.alt = 'Generated result';
+
+    // Size calculation on load
+    displayImg.onload = () => {
+      const panelWidth = panel.clientWidth || panel.offsetWidth;
+      const panelHeight = panel.clientHeight || panel.offsetHeight;
+      if (panelWidth && panelHeight && displayImg.naturalWidth && displayImg.naturalHeight) {
+        const scale = Math.min(panelWidth / displayImg.naturalWidth, panelHeight / displayImg.naturalHeight, 1);
+        displayImg.style.width = `${Math.round(displayImg.naturalWidth * scale)}px`;
+        displayImg.style.height = `${Math.round(displayImg.naturalHeight * scale)}px`;
+      } else {
+        displayImg.style.width = 'auto';
+        displayImg.style.height = 'auto';
+      }
+    };
+
+    panel.appendChild(displayImg);
+  };
+
+  const handleError = (errorType) => {
+    if (hasCompleted) return;
+    hasCompleted = true;
+    cleanup();
+
+    console.error(`[Image Load Error] ${errorType} - Retry ${retryCount}/${MAX_RETRIES}`);
+
+    // Retry logic
+    if (retryCount < MAX_RETRIES) {
+      console.log(`[Image Retry] Attempting retry ${retryCount + 1}...`);
+      setTimeout(() => {
+        setCanvasImage(sel, src, retryCount + 1);
+      }, 1000 * (retryCount + 1)); // Exponential backoff
+      return;
+    }
+
+    // All retries failed - show error with manual retry button
+    panel.innerHTML = `<div style="display:grid;place-items:center;text-align:center;color:#ff8585;padding:20px">
+      <div style="font-size:32px;margin-bottom:12px">⚠️</div>
+      <div style="margin-bottom:8px">Failed to load image</div>
+      <div style="font-size:12px;color:#a3aec2;margin-bottom:16px">${errorType}</div>
+      <button onclick="window.retryImageLoad_${sel.replace(/[^a-zA-Z0-9]/g, '_')}()" style="padding:8px 16px;background:#E4C07A;color:#1b2332;border:none;border-radius:4px;cursor:pointer;font-size:14px">
+        Retry Loading
+      </button>
+    </div>`;
+
+    // Store retry function globally
+    window[`retryImageLoad_${sel.replace(/[^a-zA-Z0-9]/g, '_')}`] = () => {
+      setCanvasImage(sel, src, 0);
+    };
+  };
+
+  // Set up timeout
+  loadTimeout = setTimeout(() => {
+    handleError('Load timeout (30s exceeded)');
+  }, LOAD_TIMEOUT);
+
+  // Set up event handlers
+  img.onload = handleSuccess;
+  img.onerror = () => handleError('Image load error (network or CORS issue)');
+
+  // Start loading
+  img.src = src;
 }
 
 // ---- timer helpers (multi-timer system) ----
