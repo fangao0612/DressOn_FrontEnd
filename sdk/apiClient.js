@@ -309,8 +309,10 @@ export const FluxKontext = {
     });
     // Send prompt parameter
     // - Step 1 sends empty string '' -> backend uses DEFAULT_KIE_PROMPT
-    // - Step 2 sends user input -> backend uses user's prompt
-    form.append('prompt', nanoPrompt || '');
+    // - Step 2 sends user input -> backend uses user's custom prompt
+    const promptValue = nanoPrompt || '';
+    console.log('[API] startNanoProcess - prompt value:', promptValue.length > 0 ? `"${promptValue.slice(0, 100)}${promptValue.length > 100 ? '...' : ''}"` : '(empty - will use DEFAULT_KIE_PROMPT)');
+    form.append('prompt', promptValue);
     return await httpPost('/nano/process_async', form);
   },
 
