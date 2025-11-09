@@ -116,15 +116,11 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
   }
 
   // 显示结果图片 (复刻 step2 的居中和自适应逻辑，带重试保护)
-  function showResult(imageUrl, downloadUrl, retryCount = 0) {
+  function showResult(imageUrl, retryCount = 0) {
     const MAX_RETRIES = 3;
     const LOAD_TIMEOUT = 30000; // 30 seconds
 
-    // 如果没有提供 downloadUrl，回退到使用 imageUrl
-    downloadUrl = downloadUrl || imageUrl;
-
     console.log('[step3] Showing result image:', imageUrl.substring(0, 100), 'retry:', retryCount);
-    console.log('[step3] Download URL:', downloadUrl.substring(0, 100));
 
     canvas3.innerHTML = '';
     const img = document.createElement('img');
@@ -173,8 +169,8 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
         img.style.height = 'auto';
       }
 
-      // 添加下载按钮（使用完整版4K）
-      addDownloadButton(downloadUrl);
+      // 添加下载按钮
+      addDownloadButton(imageUrl);
     };
 
     const handleError = (errorType) => {
@@ -188,7 +184,7 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
       if (retryCount < MAX_RETRIES) {
         console.log(`[step3] Attempting retry ${retryCount + 1} in ${retryCount + 1}s...`);
         setTimeout(() => {
-          showResult(imageUrl, downloadUrl, retryCount + 1);
+          showResult(imageUrl, retryCount + 1);
         }, 1000 * (retryCount + 1)); // Exponential backoff: 1s, 2s, 3s
         return;
       }
@@ -205,7 +201,7 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
 
       // Store retry function globally
       window.retryStep3Image = () => {
-        showResult(imageUrl, downloadUrl, 0);
+        showResult(imageUrl, 0);
       };
     };
 
@@ -383,27 +379,20 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
 
         if (data.status === 'done') {
           // 成功
-          const resultUrl = data.result_url;  // 预览版 (1.5K JPG)
-          const downloadUrl = data.download_url;  // 完整版 (4K PNG)
+          const resultUrl = data.result_url;
 
           if (!resultUrl) {
             throw new Error('No result URL in response');
           }
 
-          // 构造完整URL (预览版)
-          const fullPreviewUrl = resultUrl.startsWith('http')
+          // 构造完整URL
+          const fullUrl = resultUrl.startsWith('http')
             ? resultUrl
             : `${apiBase}${resultUrl}`;
 
-          // 构造完整URL (下载版)
-          const fullDownloadUrl = downloadUrl
-            ? (downloadUrl.startsWith('http') ? downloadUrl : `${apiBase}${downloadUrl}`)
-            : fullPreviewUrl;  // 如果没有 download_url，回退到 preview
+          console.log('[step3] Success! URL:', fullUrl);
 
-          console.log('[step3] Success! Preview URL:', fullPreviewUrl);
-          console.log('[step3] Success! Download URL:', fullDownloadUrl);
-
-          showResult(fullPreviewUrl, fullDownloadUrl);
+          showResult(fullUrl);
 
           upscaleBtn.disabled = false;
           upscaleBtn.textContent = 'Upscale Image';
