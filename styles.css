@@ -355,6 +355,10 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 .placeholder .desc{max-width:40ch}
 .prompt-actions{display:flex;gap:.7rem;margin-top:.8rem}
 .get-image-actions{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1rem;width:270px}
+.resolution-selector{display:flex;gap:2.1rem;margin-top:23px;width:270px}
+.resolution-btn{transition:all .2s ease}
+.resolution-btn.active{background:var(--primary);color:#fff;font-weight:600}
+.resolution-btn.active:hover{background:var(--primary-600)}
 
 /* showcase section */
 .showcase{padding:72px 0;background:var(--bg);min-height:90vh;display:flex;align-items:center}
