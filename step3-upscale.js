@@ -70,7 +70,7 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
     canvas3.innerHTML = `
       <div class="placeholder" style="padding:20px">
         <div class="icon" style="font-size:48px;margin-bottom:10px">⏳</div>
-        <div class="title" style="margin-bottom:8px">${message}</div>
+        <div class="loading-title" style="margin-bottom:8px">${message}</div>
         <div class="desc" style="margin-bottom:16px">Please wait while we upscale your image</div>
         <div style="width:80%;max-width:300px;height:8px;background:rgba(255,255,255,.08);border-radius:4px;margin:16px auto 0;overflow:hidden">
           <div class="progress-bar-fill" style="width:0%;height:100%;background:linear-gradient(90deg,#E4C07A,#C4A05A);border-radius:4px;transition:width 0.3s ease"></div>
@@ -82,6 +82,17 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
     const fillEl = canvas3.querySelector('.progress-bar-fill');
     if (fillEl) {
       startProgressBar(fillEl, duration);
+    }
+  }
+
+  // 只更新加载消息，不重新创建进度条
+  function updateLoadingText(message) {
+    const titleEl = canvas3.querySelector('.loading-title');
+    if (titleEl) {
+      titleEl.textContent = message;
+    } else {
+      // 如果找不到title元素，说明可能被清空了，重新调用showLoading
+      showLoading(message);
     }
   }
 
@@ -390,8 +401,9 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
         }
 
         // 继续轮询（status === 'pending' 或 'running'）
+        // 只更新文本，不重新创建进度条
         const stage = data.stage || 'processing';
-        showLoading(`${stage.replace(/_/g, ' ')}...`);
+        updateLoadingText(`${stage.replace(/_/g, ' ')}...`);
 
       } catch (error) {
         console.error(`[step3] Poll error:`, error);
