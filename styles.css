@@ -574,10 +574,20 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   /* === Navbar === */
   .nb-left{gap:9px;}
   .nb-center{gap:24px;}
+  .nb-center .nav-link{font-size:11px;}
   .nb-right{gap:11px;}
   .nb-left .nav-link{padding:.3rem .3rem;border-radius:8px;}
   .pill{gap:5px;padding:0 .6rem;height:30px;}
   .btn-launch{padding:0 .79rem;height:30px;}
+
+  /* === Additional text elements in sections === */
+  .panel .bar-title{font-size:0.75rem;}
+  .placeholder .title{font-size:0.75rem;}
+  .placeholder .desc{font-size:0.75rem;}
+  .panel-head p{font-size:0.75rem;}
+  .review{font-size:0.75rem;}
+  .acc-head{font-size:0.75rem;}
+  .acc-panel{font-size:0.75rem;}
 }
 @media (max-width: 1700px){
   .showcase-grid{grid-template-columns:1fr;max-width:789px;margin:0 auto}
