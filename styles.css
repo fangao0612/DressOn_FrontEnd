@@ -593,13 +593,15 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 @media (max-width: 1700px){
   /* Showcase keeps 2-column layout with dynamic scaling */
 
-  /* Navbar layout adjustments for MacBook Pro and medium screens */
+  /* Navbar - match 1700-1920px sizing */
   .container.header-inner.nb-header{padding-inline:clamp(12px, 2vw, 24px)}
-  .nb-left{margin-left:clamp(60px, 8vw, 120px)}
-  .nb-right{margin-right:clamp(60px, 8vw, 120px)}
-  .nb-center{gap:20px}
-  .nb-right{gap:8px}
-  .nb-center .nav-link{font-size:14px}
+  .nb-left{margin-left:clamp(60px, 8vw, 120px);gap:9px;}
+  .nb-right{margin-right:clamp(60px, 8vw, 120px);gap:11px;}
+  .nb-center{gap:24px;}
+  .nb-center .nav-link{font-size:11px;}
+  .nb-left .nav-link{padding:.3rem .3rem;border-radius:8px;}
+  .pill{gap:5px;padding:0 .6rem;height:30px;}
+  .btn-launch{padding:0 .79rem;height:30px;}
 
   /* Hero section refinements for 16:9 desktops */
   .hero-split .hero-container{
