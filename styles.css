@@ -515,8 +515,8 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   .panel.left .panel-inner .refine-form .prompt-actions{width:203px;}
 
   .uploader{border-radius:11px;height:180px;}
-  .uploader.square{width:203px;}
-  .panel.left .panel-inner .uploader{width:203px;}
+  .uploader.square{width:203px !important;}
+  .panel.left .panel-inner .uploader{width:203px !important;margin:0 auto;}
   .uploader .drop-area .plus{font-size:32px;margin-bottom:5px;}
   .uploader[data-role="refine"] .plus{margin-bottom:5px;}
 
