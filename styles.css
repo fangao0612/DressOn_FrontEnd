@@ -76,6 +76,17 @@ body.no-scroll{overflow:hidden}
 .nav-link:visited{color:var(--text)}
 .nav-link:hover{text-decoration:none}
 
+/* Nav menu dropdown - hidden by default on desktop */
+.nav-menu-wrapper{display:none;position:relative;}
+.nav-menu-btn{display:flex;align-items:center;gap:6px;padding:.5rem .8rem;font-size:11px;font-weight:800;}
+.menu-icon{font-size:14px;}
+.nav-dropdown{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:8px;background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.3);min-width:160px;z-index:100;}
+.nav-dropdown[hidden]{display:none;}
+.dropdown-link{display:block;padding:.7rem 1rem;color:var(--text);text-decoration:none;font-weight:600;font-size:13px;transition:background .15s ease;}
+.dropdown-link:hover{background:rgba(255,255,255,.05);}
+.dropdown-link:first-child{border-radius:8px 8px 0 0;}
+.dropdown-link:last-child{border-radius:0 0 8px 8px;}
+
 /* dropdown styles removed */
 
 .nb-right{display:flex;align-items:center;gap:14px;position:relative}
@@ -640,6 +651,10 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   .btn-launch{display:none !important;}
 }
 @media (max-width: 1100px){
+  /* Hide regular nav links, show Menu dropdown */
+  .nb-center .nav-link{display:none;}
+  .nav-menu-wrapper{display:block;}
+
   .nb-center{gap:14px}
   .hero-inner{grid-template-columns:1fr}
   .reviews-grid{grid-template-columns:1fr 1fr}
