@@ -408,6 +408,25 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   .nb-center{gap:20px}
   .nb-right{gap:8px}
   .nb-center .nav-link{font-size:14px}
+
+  /* Hero section refinements for 16:9 desktops */
+  .hero-split .hero-container{
+    max-width:min(1480px,94vw);
+    margin:0 auto;
+    padding-inline:clamp(32px,5vw,72px);
+    gap:clamp(24px,4vw,56px);
+  }
+  .hero-left{flex:0 0 40%;}
+  .hero-right{flex:0 0 60%;padding:clamp(48px,7vw,92px) 0 30px;}
+  .hero-bg-image{object-position:center;}
+  .hero-copy{
+    max-width:580px;
+    padding:clamp(120px,14vh,180px) 0 24px;
+  }
+  .hero-title{font-size:clamp(38px,4.2vw,56px);}
+  .hero-sub{font-size:1.08rem;}
+  .hero-actions{gap:clamp(16px,2.5vw,28px);flex-wrap:wrap;}
+  .hero-features{gap:18px;}
 }
 @media (max-width: 1400px){
   /* Additional compression for smaller MacBook screens */
@@ -417,7 +436,9 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   .nb-right{gap:6px}
   .nb-center .nav-link{font-size:13px}
   .btn-launch{padding:8px 16px;font-size:14px}
-  .pill.credits{display:none}
+  .pill.credits{display:none !important}
+  /* TEST: Make navbar background red to confirm CSS is loaded */
+  .site-header{background:rgba(255,0,0,0.3) !important}
 }
 @media (max-width: 1100px){
   .nb-center{gap:14px}
