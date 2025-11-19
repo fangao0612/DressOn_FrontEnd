@@ -615,16 +615,17 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   .hero-bg-image{object-position:calc(50% + 8vh) center;}
   .hero-copy{
     max-width:580px;
-    padding:10vh 0 24px;
+    padding:10vh 0 5px;
   }
 
   /* Match text sizes with 1700-1920px range */
-  .badge{font-size:.71rem;}
-  .hero-title{font-size:clamp(30px,5.5vw,48px);}
-  .hero-sub{font-size:0.86rem;}
+  .badge{margin-bottom:17px;font-size:.71rem;}
+  .hero-title{margin:0 0 14px;font-size:clamp(30px,5.5vw,48px);}
+  .hero-sub{margin:0 0 27px;font-size:0.86rem;}
   .hero-actions{gap:clamp(16px,2.5vw,28px);flex-wrap:wrap;margin:0 0 14px;}
-  .hero-actions .btn{font-size:0.75rem;}
-  .hero-features{gap:18px;font-size:0.75rem;}
+  .hero-actions .btn{padding:0.79rem 1.09rem;font-size:0.75rem;}
+  .hero-features{gap:18px;margin:14px 0 0;font-size:0.75rem;}
+  .hero-cta-inner{gap:8px;}
   .hero-cta-text{font-size:clamp(14px,2vw,20px);}
   .arrow-down{font-size:clamp(18px,3.2vw,27px);}
 }
