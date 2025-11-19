@@ -593,7 +593,12 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   .acc-panel{font-size:0.75rem;}
 }
 @media (max-width: 1700px){
-  .showcase-grid{grid-template-columns:1fr;max-width:789px;margin:0 auto}
+  /* Showcase - keep box scaling but restore text sizes */
+  .showcase-grid{grid-template-columns:1fr;max-width:592px;margin:0 auto}
+  .showcase-images{width:592px;}
+  .showcase-img{width:197px;height:263px;}
+  .showcase-meta h4{font-size:18px;}
+  .showcase-meta p{font-size:14px;}
 
   /* Navbar layout adjustments for MacBook Pro and medium screens */
   .container.header-inner.nb-header{padding-inline:clamp(12px, 2vw, 24px)}
