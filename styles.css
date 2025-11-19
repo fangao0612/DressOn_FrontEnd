@@ -399,11 +399,38 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 
 /* responsive */
 @media (max-width: 1920px){
-  /* Full HD and below - reduce top spacing */
-  .hero-copy{padding-top:10vh;}
+  /* Full HD and below - scale elements to 0.75x */
+
+  /* Hero layout */
   .hero-left{flex:0 0 48%;max-width:48%;}
-  .hero-right{flex:0 0 50%;max-width:50%;}
+  .hero-right{flex:0 0 50%;max-width:50%;padding:54px 0 23px;}
   .hero-bg-image{object-position:calc(50% + 13vh) center;}
+
+  /* Hero content spacing */
+  .hero-copy{
+    padding-top:10vh;
+    padding-left:clamp(36px,6vw,66px);
+    padding-right:clamp(36px,6vw,66px);
+    padding-bottom:5px;
+  }
+
+  /* Badge */
+  .badge{padding:.375rem .675rem;margin-bottom:17px;}
+
+  /* Typography spacing */
+  .hero-title{margin:0 0 14px;}
+  .hero-sub{margin:0 0 27px;max-width:450px;}
+
+  /* Actions and buttons */
+  .hero-actions{gap:0.9rem;margin:0 0 14px;}
+  .hero-actions .btn{padding:0.79rem 1.09rem;}
+
+  /* Features list */
+  .hero-features{gap:20px;margin:14px 0 0;}
+  .hero-features li{gap:5px;}
+
+  /* CTA */
+  .hero-cta-inner{gap:8px;}
 }
 @media (max-width: 1700px){
   .showcase-grid{grid-template-columns:1fr;max-width:789px;margin:0 auto}
