@@ -612,7 +612,7 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   }
   .hero-left{flex:0 0 45%;max-width:45%;}
   .hero-right{flex:0 0 55%;max-width:55%;padding:clamp(48px,7vw,92px) 0 30px;}
-  .hero-bg-image{object-position:calc(50% + 8vh) center;}
+  .hero-bg-image{object-fit:contain;object-position:center;}
   .hero-copy{
     max-width:580px;
     padding:10vh 0 5px;
