@@ -398,6 +398,10 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 .footer-inner a{color:var(--muted);text-decoration:none;margin-left:12px}
 
 /* responsive */
+@media (max-width: 1920px){
+  /* Full HD and below - reduce top spacing */
+  .hero-copy{padding-top:10vh;}
+}
 @media (max-width: 1700px){
   .showcase-grid{grid-template-columns:1fr;max-width:789px;margin:0 auto}
 
@@ -421,7 +425,7 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   .hero-bg-image{object-position:calc(50% + 8vh) center;}
   .hero-copy{
     max-width:580px;
-    padding:clamp(120px,14vh,180px) 0 24px;
+    padding:10vh 0 24px;
   }
   .hero-title{font-size:clamp(38px,4.2vw,56px);}
   .hero-sub{font-size:1.08rem;}
