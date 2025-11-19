@@ -508,11 +508,11 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   .panel-head h3{font-size:17px;}
 
   .field{gap:8px;margin:14px 0;}
-  .field.two-col{gap:11px;width:203px;}
+  .field.two-col{gap:11px;width:203px !important;}
   .refine .refine-form{width:203px;gap:9px;}
-  .panel.left .panel-inner .field .label,.panel.left .panel-inner .refine-form .label{width:203px;}
-  .panel.left .panel-inner .refine-form .prompt{width:203px;max-width:203px;min-width:203px;}
-  .panel.left .panel-inner .refine-form .prompt-actions{width:203px;}
+  .panel.left .panel-inner .field .label,.panel.left .panel-inner .refine-form .label{width:203px !important;}
+  .panel.left .panel-inner .refine-form .prompt{width:203px !important;max-width:203px !important;min-width:203px !important;}
+  .panel.left .panel-inner .refine-form .prompt-actions{width:203px !important;}
 
   .uploader{border-radius:11px;height:180px;}
   .uploader.square{width:203px !important;}
