@@ -50,7 +50,7 @@ body.no-scroll{overflow:hidden}
 .refine .container{width:min(1318px,96vw)}
 /* Step3 使用与 Step1/Step2 一致的容器宽度 */
 .upscale .container{width:min(1318px,96vw)}
-.container.header-inner.nb-header{width:100%;max-width:none;padding-inline:clamp(20px, calc(25vw - 128px), 352px)}
+.container.header-inner.nb-header{width:100%;max-width:none;padding-inline:0;}
 
 /* header */
 .site-header{position:sticky;top:0;z-index:60;background:rgba(11,15,20,.6);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);height:var(--header-h)}
@@ -416,7 +416,7 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   :root{--header-h:54px;}
   .container{width:min(1200px,96vw);}
   .editor .container,.refine .container,.upscale .container{width:min(989px,96vw);}
-  .container.header-inner.nb-header{padding-inline:clamp(15px, calc(25vw - 96px), 264px);}
+  .container.header-inner.nb-header{padding-inline:0;}
 
   /* === Navbar Brand === */
   .brand .logo{font-size:14px;}
@@ -605,7 +605,7 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   /* Showcase keeps 2-column layout with dynamic scaling */
 
   /* Navbar - match 1700-1920px sizing */
-  .container.header-inner.nb-header{padding-inline:clamp(12px, 2vw, 24px)}
+  .container.header-inner.nb-header{padding-inline:0;}
   .nb-left{margin-left:38px;gap:9px;}
   .nb-right{margin-right:38px;gap:11px;}
   .nb-center{gap:24px;}
