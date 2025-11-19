@@ -655,7 +655,15 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   .nb-center .nav-link{display:none;}
   .nav-menu-wrapper{display:block;}
 
-  .nb-center{gap:14px}
+  /* Center Menu button between logo and right buttons */
+  .nb-center{
+    position:static;
+    transform:none;
+    gap:14px;
+    flex:1;
+    justify-content:center;
+  }
+
   .hero-inner{grid-template-columns:1fr}
   .reviews-grid{grid-template-columns:1fr 1fr}
 }
