@@ -60,10 +60,10 @@ body.no-scroll{overflow:hidden}
 .nb-header{display:flex;align-items:center;justify-content:space-between;padding:0;width:100%;position:relative}
 .nb-left{display:flex;align-items:center;gap:12px}
 .nb-center{display:flex;align-items:center;gap:32px;position:absolute;left:50%;transform:translateX(-50%)}
-.brand{display:flex;align-items:center;gap:.6rem;font-weight:800}
+.brand{display:flex;align-items:center;gap:.6rem;font-weight:800;white-space:nowrap;}
 .brand .logo{font-size:18px;filter:drop-shadow(0 0 0 rgba(0,0,0,0))}
 .logo-img{width:44px;height:44px;display:block}
-.brand .name{font-size:1.365rem;letter-spacing:.2px;color:var(--text);font-weight:800}
+.brand .name{font-size:1.365rem;letter-spacing:.2px;color:var(--text);font-weight:800;white-space:nowrap;}
 .nb-left .nav-link{color:var(--text);text-decoration:none;font-weight:600;opacity:.9;padding:.4rem .4rem;border-radius:10px;transition:opacity .15s ease}
 .nb-left .nav-link:hover{opacity:1}
 
@@ -105,7 +105,7 @@ body.no-scroll{overflow:hidden}
 .profile-popover .me-actions{display:flex;gap:8px}
 
 /* Sign In button: same footprint as Launch Now, without stroke */
-.sign-in-btn{padding:0 1.05rem;height:40px;border-radius:999px;border:0}
+.sign-in-btn{padding:0 1.05rem;height:40px;border-radius:999px;border:0;white-space:nowrap;}
 .btn.primary.sign-in-btn{border:0 !important}
 
 /* Auth visibility guard (CSS-level, no闪烁) */
