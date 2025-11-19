@@ -50,7 +50,7 @@ body.no-scroll{overflow:hidden}
 .refine .container{width:min(1318px,96vw)}
 /* Step3 使用与 Step1/Step2 一致的容器宽度 */
 .upscale .container{width:min(1318px,96vw)}
-.container.header-inner.nb-header{width:100%;max-width:none;padding-inline:0;}
+.container.header-inner.nb-header{width:100% !important;max-width:none !important;margin:0 !important;padding-inline:0;}
 
 /* header */
 .site-header{position:sticky;top:0;z-index:60;background:rgba(11,15,20,.6);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);height:var(--header-h)}
