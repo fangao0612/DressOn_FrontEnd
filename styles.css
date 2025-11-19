@@ -514,11 +514,14 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   .panel.left .panel-inner .refine-form .prompt{width:203px !important;max-width:203px !important;min-width:203px !important;}
   .panel.left .panel-inner .refine-form .prompt-actions{width:203px !important;}
 
-  .uploader{border-radius:11px;height:180px;}
+  .uploader{border-radius:11px;height:180px;font-size:0.75rem;}
   .uploader.square{width:203px !important;}
   .panel.left .panel-inner .uploader{width:203px !important;margin:0 auto;}
+  .uploader .drop-area{font-size:0.75rem;}
   .uploader .drop-area .plus{font-size:32px;margin-bottom:5px;}
   .uploader[data-role="refine"] .plus{margin-bottom:5px;}
+  .uploader .hint{font-size:0.75rem;}
+  .uploader[tabindex]:hover .plus::before{font-size:0.75rem;}
 
   .note,.prompt{border-radius:9px;padding:0.75rem;}
   .prompt{height:151px;min-height:75px;max-height:194px;}
