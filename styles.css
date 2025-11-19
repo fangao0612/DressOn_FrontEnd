@@ -521,7 +521,7 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   .uploader .drop-area .plus{font-size:32px;margin-bottom:5px;}
   .uploader[data-role="refine"] .plus{margin-bottom:5px;}
   .uploader .hint{font-size:0.75rem;}
-  .uploader[tabindex]:hover .plus::before{font-size:0.75rem;}
+  .uploader[tabindex]:hover .plus::before{font-size:10px !important;}
 
   .note,.prompt{border-radius:9px;padding:0.75rem;}
   .prompt{height:151px;min-height:75px;max-height:194px;}
