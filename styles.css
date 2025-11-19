@@ -457,6 +457,7 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   /* === Global Buttons === */
   .btn{padding:.71rem .86rem;font-size:.71rem;}
   .btn-small{padding:.45rem .75rem;font-size:.64rem;}
+  .pill{font-size:.71rem;}
 
   /* Hero layout */
   .hero-left{flex:0 0 48%;max-width:48%;}
