@@ -404,9 +404,9 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 .acc-panel{padding:0 18px 16px;color:var(--muted)}
 
 /* footer */
-.site-footer{border-top:1px solid var(--border);background:linear-gradient(180deg,transparent,rgba(255,255,255,.02));padding:18px 0;color:var(--muted)}
-.footer-inner{display:flex;justify-content:space-between;align-items:center}
-.footer-inner a{color:var(--muted);text-decoration:none;margin-left:12px}
+.site-footer{border-top:1px solid var(--border);background:linear-gradient(180deg,transparent,rgba(255,255,255,.02));padding:18px 0;color:var(--muted);font-size:0.75rem;}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;}
+.footer-inner a{color:var(--muted);text-decoration:none;margin-left:12px;font-size:0.75rem;}
 
 /* responsive */
 @media (max-width: 1920px){
