@@ -22,35 +22,35 @@
         </div>
       </div>
       <div class="nb-center">
-        <a class="nav-link" href="#editor">Image Editor</a>
-        <a class="nav-link" href="#showcase">Showcase</a>
-        <a class="nav-link" href="/pricing.html">Pricing</a>
-        <a class="nav-link" href="#api">API</a>
-        <a class="nav-link" href="/calculator.html" target="_blank">Calculator</a>
+        <a class="nav-link" href="#editor" data-i18n="nav.imageEditor">Image Editor</a>
+        <a class="nav-link" href="#showcase" data-i18n="nav.showcase">Showcase</a>
+        <a class="nav-link" href="/pricing.html" data-i18n="nav.pricing">Pricing</a>
+        <a class="nav-link" href="#api" data-i18n="nav.api">API</a>
+        <a class="nav-link" href="/calculator.html" target="_blank" data-i18n="nav.calculator">Calculator</a>
         <div class="nav-menu-wrapper">
           <button class="btn nav-menu-btn" type="button" aria-expanded="false">
-            <span class="menu-icon">☰</span> Menu
+            <span class="menu-icon">☰</span> <span data-i18n="nav.menu">Menu</span>
           </button>
           <div class="nav-dropdown" hidden>
-            <a class="dropdown-link" href="#editor">Image Editor</a>
-            <a class="dropdown-link" href="#showcase">Showcase</a>
-            <a class="dropdown-link" href="/pricing.html">Pricing</a>
-            <a class="dropdown-link" href="#api">API</a>
-            <a class="dropdown-link" href="/calculator.html" target="_blank">Calculator</a>
+            <a class="dropdown-link" href="#editor" data-i18n="nav.imageEditor">Image Editor</a>
+            <a class="dropdown-link" href="#showcase" data-i18n="nav.showcase">Showcase</a>
+            <a class="dropdown-link" href="/pricing.html" data-i18n="nav.pricing">Pricing</a>
+            <a class="dropdown-link" href="#api" data-i18n="nav.api">API</a>
+            <a class="dropdown-link" href="/calculator.html" target="_blank" data-i18n="nav.calculator">Calculator</a>
           </div>
         </div>
       </div>
         <div class="nb-right">
         <button class="icon-btn theme-toggle" aria-label="Toggle theme">🌙</button>
-        <button class="pill locale" aria-haspopup="listbox">US <span class="chev" aria-hidden>▾</span></button>
-        <a class="btn btn-launch" href="#step1">Launch Now</a>
+        <button class="pill locale" aria-haspopup="listbox"><span>US</span> <span class="chev" aria-hidden>▾</span></button>
+        <a class="btn btn-launch" href="#step1" data-i18n="nav.launchNow">Launch Now</a>
         <div class="pill credits" role="status">
           <span class="coin" aria-hidden>◎</span>
           <span class="amount">19050</span>
-          <span class="unit">credits</span>
+          <span class="unit" data-i18n="nav.credits">credits</span>
         </div>
         <button class="avatar profile-btn" aria-label="Profile" hidden>F</button>
-        <button class="btn primary sign-in-btn" type="button">Sign In</button>
+        <button class="btn primary sign-in-btn" type="button" data-i18n="nav.signIn">Sign In</button>
         <div class="profile-popover" hidden>
           <div class="me-line">Not signed in</div>
           <div class="me-actions">
@@ -450,11 +450,11 @@
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <div>© 2025 DressOn AI. All rights reserved.</div>
+      <div data-i18n="footer.copyright">© 2025 DressOn AI. All rights reserved.</div>
       <div class="links">
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-        <a href="#">Refund</a>
+        <a href="#" data-i18n="footer.privacy">Privacy</a>
+        <a href="#" data-i18n="footer.terms">Terms</a>
+        <a href="#" data-i18n="footer.refund">Refund</a>
       </div>
     </div>
   </footer>
@@ -463,6 +463,7 @@
   <script type="module" src="./smooth-scroll.js"></script>
   <script type="module" src="./hero-carousel.js"></script>
   <script type="module" src="./nav-menu.js"></script>
+  <script type="module" src="./language-switcher.js"></script>
   <script type="module" src="./app.js"></script>
   <script type="module" src="./user-flow.js"></script>
   <script type="module" src="./step3-upscale.js"></script>
