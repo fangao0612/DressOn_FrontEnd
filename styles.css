@@ -454,7 +454,7 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 
   /* Hero content spacing */
   .hero-copy{
-    padding-top:10vh;
+    padding-top:16vh;
     padding-left:clamp(36px,6vw,66px);
     padding-right:clamp(36px,6vw,66px);
     padding-bottom:5px;
