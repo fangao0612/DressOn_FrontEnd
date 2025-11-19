@@ -516,6 +516,7 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 
   .uploader{border-radius:11px;height:180px;}
   .uploader.square{width:203px;}
+  .panel.left .panel-inner .uploader{width:203px;}
   .uploader .drop-area .plus{font-size:32px;margin-bottom:5px;}
   .uploader[data-role="refine"] .plus{margin-bottom:5px;}
 
@@ -558,7 +559,10 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 
   /* === FAQ Section === */
   .faq{padding:54px 0;}
-  .accordion{gap:9px;max-width:900px;margin:0 auto;}
+  .faq .container{max-width:1200px;}
+  .faq .section-header{max-width:1200px;text-align:left;}
+  .faq .section-title{text-align:left;}
+  .accordion{gap:9px;max-width:1200px;margin:0 auto;}
   .acc-item{border-radius:11px;}
   .acc-head{padding:12px 14px;}
   .acc-panel{padding:0 14px 12px;}
