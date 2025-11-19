@@ -416,8 +416,8 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
     padding-inline:clamp(32px,5vw,72px);
     gap:clamp(24px,4vw,56px);
   }
-  .hero-left{flex:0 0 44%;max-width:44%;}
-  .hero-right{flex:0 0 56%;max-width:56%;padding:clamp(48px,7vw,92px) 0 30px;}
+  .hero-left{flex:0 0 46%;max-width:46%;}
+  .hero-right{flex:0 0 54%;max-width:54%;padding:clamp(48px,7vw,92px) 0 30px;}
   .hero-bg-image{object-position:center;}
   .hero-copy{
     max-width:580px;
