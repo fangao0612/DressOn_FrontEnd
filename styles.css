@@ -401,6 +401,52 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 @media (max-width: 1920px){
   /* Full HD and below - scale elements to 0.75x */
 
+  /* === Global Containers === */
+  :root{--header-h:54px;}
+  .container{width:min(1200px,96vw);}
+  .editor .container,.refine .container,.upscale .container{width:min(989px,96vw);}
+  .container.header-inner.nb-header{padding-inline:clamp(15px, calc(25vw - 96px), 264px);}
+
+  /* === Navbar Brand === */
+  .brand .logo{font-size:14px;}
+  .logo-img{width:33px;height:33px;}
+  .brand .name{font-size:1.024rem;}
+
+  /* === Navbar Buttons === */
+  .icon-btn{width:30px;height:30px;border-radius:8px;}
+  .credits .coin{width:12px;height:12px;}
+  .sign-in-btn{padding:0 .79rem;height:30px;}
+
+  /* === Profile Menu === */
+  .profile-popover{right:14px;top:48px;border-radius:9px;padding:9px 11px;min-width:165px;}
+  .profile-popover .me-line{margin-bottom:6px;}
+  .profile-popover .me-actions{gap:6px;}
+
+  /* === Auth Modal === */
+  .auth-card{width:min(420px,92vw);border-radius:14px;padding:21px 21px 18px;gap:9px;}
+  .auth-logo{font-size:21px;}
+  .auth-title{margin:3px 0 0;font-size:20px;}
+  .auth-sub{margin:0 0 6px;}
+  .auth-tabs{gap:21px;margin:5px 0 5px;}
+  .auth-tab{padding:6px 5px;}
+  .auth-pane{gap:8px;margin-top:5px;}
+  .auth-label{font-size:11px;}
+  .auth-input{height:36px;border-radius:9px;padding:0 9px;}
+  .auth-close{right:8px;top:8px;border-radius:8px;width:24px;height:24px;}
+  .auth-tip{font-size:9px;}
+  .spinner{width:12px;height:12px;margin-right:6px;}
+  .auth-back-btn{padding:6px 0;margin-bottom:9px;font-size:11px;gap:5px;}
+  .back-arrow{font-size:14px;}
+  .auth-success-banner{border-radius:9px;padding:12px;margin-bottom:12px;gap:9px;}
+  .success-icon{width:18px;height:18px;font-size:12px;}
+  .success-text{font-size:11px;}
+  .auth-expire-tip{margin-top:3px;margin-bottom:9px;font-size:9px;}
+  .auth-consent{margin:8px 0 0;font-size:9px;}
+
+  /* === Global Buttons === */
+  .btn{padding:.71rem .86rem;font-size:.71rem;}
+  .btn-small{padding:.45rem .75rem;font-size:.64rem;}
+
   /* Hero layout */
   .hero-left{flex:0 0 48%;max-width:48%;}
   .hero-right{flex:0 0 50%;max-width:50%;padding:54px 0 23px;}
@@ -463,9 +509,15 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 
   .field{gap:8px;margin:14px 0;}
   .field.two-col{gap:11px;width:203px;}
+  .refine .refine-form{width:203px;gap:9px;}
+  .panel.left .panel-inner .field .label,.panel.left .panel-inner .refine-form .label{width:203px;}
+  .panel.left .panel-inner .refine-form .prompt{width:203px;max-width:203px;min-width:203px;}
+  .panel.left .panel-inner .refine-form .prompt-actions{width:203px;}
 
   .uploader{border-radius:11px;height:180px;}
   .uploader.square{width:203px;}
+  .uploader .drop-area .plus{font-size:32px;margin-bottom:5px;}
+  .uploader[data-role="refine"] .plus{margin-bottom:5px;}
 
   .note,.prompt{border-radius:9px;padding:0.75rem;}
   .prompt{height:151px;min-height:75px;max-height:194px;}
@@ -506,7 +558,7 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 
   /* === FAQ Section === */
   .faq{padding:54px 0;}
-  .accordion{gap:9px;}
+  .accordion{gap:9px;max-width:900px;margin:0 auto;}
   .acc-item{border-radius:11px;}
   .acc-head{padding:12px 14px;}
   .acc-panel{padding:0 14px 12px;}
