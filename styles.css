@@ -363,10 +363,10 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 /* showcase section */
 .showcase{padding:72px 0;background:var(--bg);min-height:90vh;display:flex;align-items:center}
 .showcase .section-title{font-size:28px;margin:0 0 32px;text-align:center}
-.showcase-grid{display:grid;grid-template-columns:repeat(2,789px);gap:24px;justify-content:center}
+.showcase-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(18px,1.5vw,24px);max-width:min(1600px,96vw);margin:0 auto;justify-content:center}
 .showcase-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04)}
-.showcase-images{display:flex;gap:0;width:789px}
-.showcase-img{width:263px;height:350px;background-size:cover;background-position:center;border-right:1px solid var(--border)}
+.showcase-images{display:flex;gap:0;width:100%}
+.showcase-img{flex:1;aspect-ratio:263/350;background-size:cover;background-position:center;border-right:1px solid var(--border)}
 .showcase-img:last-child{border-right:none}
 .showcase-img.img-1{background-image:linear-gradient(135deg,#4b5b8a,#1a2033)}
 .showcase-img.img-2{background-image:linear-gradient(135deg,#6b5b8a,#221a33)}
@@ -544,13 +544,11 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   /* === Showcase Section === */
   .showcase{padding:54px 0;}
   .showcase .section-title{font-size:21px;margin:0 0 24px;}
-  .showcase-grid{grid-template-columns:repeat(2,592px);gap:18px;}
   .showcase-card{border-radius:12px;}
-  .showcase-images{width:592px;}
-  .showcase-img{width:197px;height:263px;}
   .showcase-meta{padding:0.9rem 1.125rem;}
-  .showcase-meta h4{font-size:14px;}
-  .showcase-meta p{font-size:11px;}
+  /* Text keeps original size - no scaling */
+  .showcase-meta h4{font-size:18px;}
+  .showcase-meta p{font-size:14px;}
 
   /* === Reviews Section === */
   .reviews{padding:54px 0;}
@@ -593,12 +591,7 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   .acc-panel{font-size:0.75rem;}
 }
 @media (max-width: 1700px){
-  /* Showcase - keep box scaling but restore text sizes */
-  .showcase-grid{grid-template-columns:1fr;max-width:592px;margin:0 auto}
-  .showcase-images{width:592px;}
-  .showcase-img{width:197px;height:263px;}
-  .showcase-meta h4{font-size:18px;}
-  .showcase-meta p{font-size:14px;}
+  /* Showcase keeps 2-column layout with dynamic scaling */
 
   /* Navbar layout adjustments for MacBook Pro and medium screens */
   .container.header-inner.nb-header{padding-inline:clamp(12px, 2vw, 24px)}
@@ -652,10 +645,11 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   .reviews-grid{grid-template-columns:1fr 1fr}
 }
 @media (max-width: 850px){
-  .showcase-grid{max-width:100%}
+  /* Switch to single column for mobile */
+  .showcase-grid{grid-template-columns:1fr;max-width:100%}
   .showcase-card{max-width:100%}
   .showcase-images{flex-direction:column;width:100%}
-  .showcase-img{width:100%;height:280px}
+  .showcase-img{width:100%;aspect-ratio:auto;height:280px}
 }
 @media (max-width: 680px){
   .nb-center .nav-link{display:none}
