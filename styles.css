@@ -638,8 +638,6 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   .nb-center .nav-link{font-size:13px}
   .btn-launch{padding:8px 16px;font-size:14px}
   .pill.credits{display:none !important}
-  /* TEST: Make navbar background red to confirm CSS is loaded */
-  .site-header{background:rgba(255,0,0,0.3) !important}
 }
 @media (max-width: 1100px){
   .nb-center{gap:14px}
