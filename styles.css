@@ -91,7 +91,7 @@ body.no-scroll{overflow:hidden}
 
 .nb-right{display:flex;align-items:center;gap:14px;position:relative;margin-right:38px;}
 .icon-btn{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:var(--text);cursor:pointer}
-.pill{display:inline-flex;align-items:center;gap:6px;padding:0 .8rem;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--text);font-weight:700}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:0 .8rem;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--text);font-weight:700;font-size:.95rem;}
 .pill .chev{opacity:.9}
 .btn-launch{display:inline-flex;align-items:center;justify-content:center;padding:0 1.05rem;height:40px;border-radius:999px;text-decoration:none;color:#fff;font-weight:900;border:1px solid rgba(255,94,102,.45);background:linear-gradient(180deg,#ff5e66,#ff5e66);box-shadow:0 6px 18px rgba(255,94,102,.25)}
 .credits{height:40px;border-color:rgba(255,94,102,.25);background:rgba(255,94,102,.08)}
