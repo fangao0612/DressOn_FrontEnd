@@ -862,3 +862,84 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   transform: translate(-50%, -50%);
   margin-top: 3px;
 }
+
+/* Showcase Editor Styles */
+.editable-img {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.editable-img .upload-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.editable-img:hover .upload-overlay {
+  opacity: 1;
+}
+
+.editable-img .upload-icon {
+  font-size: 32px;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.editable-img .upload-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.editable-img.dragover {
+  outline: 2px dashed var(--primary);
+  outline-offset: -4px;
+}
+
+.editable-img.dragover .upload-overlay {
+  opacity: 1;
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.editable-img.has-image .upload-overlay {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.showcase-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.showcase-meta-content {
+  flex: 1;
+}
+
+.showcase-save-btn {
+  flex-shrink: 0;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Hide editing controls when EDIT_MODE is false */
+body[data-edit-mode="false"] .upload-overlay,
+body[data-edit-mode="false"] .showcase-save-btn {
+  display: none !important;
+}
+
+body[data-edit-mode="false"] .editable-img {
+  cursor: default;
+}
+
+body[data-edit-mode="false"] .editable-img:hover .upload-overlay {
+  opacity: 0;
+}
