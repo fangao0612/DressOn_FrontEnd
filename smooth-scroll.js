@@ -1,49 +1,76 @@
 // Smooth Scroll Handler
 (function() {
+  // Precise scroll positions for different sections
+  const SCROLL_POSITIONS = {
+    'editor': 1337,  // Precise position for Image Editor section
+    'step1': 1337    // Same position for Launch Now button
+  };
+
   // Find all elements with data-scroll-to attribute
   const scrollButtons = document.querySelectorAll('[data-scroll-to]');
 
-  if (!scrollButtons || scrollButtons.length === 0) {
-    console.warn('[smooth-scroll] No scroll buttons found');
-    return;
-  }
+  // Also handle navigation links with href="#editor" or href="#step1"
+  const navLinks = document.querySelectorAll('a[href="#editor"], a[href="#step1"]');
 
-  console.log(`[smooth-scroll] Found ${scrollButtons.length} scroll button(s)`);
+  console.log(`[smooth-scroll] Found ${scrollButtons.length} scroll button(s) and ${navLinks.length} nav link(s)`);
 
-  // Handle scroll click
+  // Handle scroll click with precise positioning
   function handleScrollClick(event) {
     event.preventDefault();
 
-    const button = event.currentTarget;
-    const targetId = button.getAttribute('data-scroll-to');
+    const element = event.currentTarget;
+    let targetId = element.getAttribute('data-scroll-to');
+
+    // If it's a navigation link, extract ID from href
+    if (!targetId) {
+      const href = element.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        targetId = href.substring(1);
+      }
+    }
 
     if (!targetId) {
       console.warn('[smooth-scroll] No target ID specified');
       return;
     }
 
-    const targetElement = document.getElementById(targetId);
+    // Check if we have a precise position for this target
+    const precisePosition = SCROLL_POSITIONS[targetId];
 
-    if (!targetElement) {
-      console.warn(`[smooth-scroll] Target element #${targetId} not found`);
-      return;
+    if (precisePosition !== undefined) {
+      console.log(`[smooth-scroll] Scrolling to precise position: ${precisePosition}px (target: #${targetId})`);
+      window.scrollTo({
+        top: precisePosition,
+        behavior: 'smooth'
+      });
+    } else {
+      // Fallback to element scrollIntoView
+      const targetElement = document.getElementById(targetId);
+      if (targetElement) {
+        console.log(`[smooth-scroll] Scrolling to element #${targetId}`);
+        targetElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'nearest'
+        });
+      } else {
+        console.warn(`[smooth-scroll] Target element #${targetId} not found`);
+      }
     }
-
-    console.log(`[smooth-scroll] Scrolling to #${targetId}`);
-
-    // Scroll to target with smooth behavior
-    targetElement.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-      inline: 'nearest'
-    });
   }
 
-  // Bind click events to all scroll buttons
+  // Bind click events to scroll buttons
   scrollButtons.forEach((button, index) => {
     button.addEventListener('click', handleScrollClick);
     const targetId = button.getAttribute('data-scroll-to');
     console.log(`[smooth-scroll] Bound button ${index + 1} -> #${targetId}`);
+  });
+
+  // Bind click events to navigation links
+  navLinks.forEach((link, index) => {
+    link.addEventListener('click', handleScrollClick);
+    const href = link.getAttribute('href');
+    console.log(`[smooth-scroll] Bound nav link ${index + 1} -> ${href}`);
   });
 
   console.log('[smooth-scroll] Smooth scroll handler initialized');
