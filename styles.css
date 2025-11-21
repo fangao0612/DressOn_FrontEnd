@@ -378,12 +378,12 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 .showcase-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);display:flex;position:relative}
 .showcase-column{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--border);position:relative}
 .showcase-column:last-of-type{border-right:none}
-.separator-circle{width:34px;height:34px;border-radius:50%;background:#ff5e66;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;line-height:1;position:absolute;top:50%;right:-17px;transform:translateY(-50%);z-index:10;box-shadow:0 4px 12px rgba(255,94,102,.35),0 2px 6px rgba(0,0,0,.4)}
-.sep-plus{letter-spacing:-1px;padding-left:1px}
-.sep-equals{letter-spacing:-0.5px;padding-bottom:1px}
-@media (max-width:1920px){.separator-circle{width:26px;height:26px;right:-13px;font-size:17px;box-shadow:0 3px 9px rgba(255,94,102,.35),0 2px 5px rgba(0,0,0,.4)}
-.sep-plus{letter-spacing:-0.5px;padding-left:0}
-.sep-equals{letter-spacing:-0.5px;padding-bottom:1px}}
+.separator-circle{width:34px;height:34px;border-radius:50%;background:#ff5e66;display:grid;place-items:center;font-size:22px;font-weight:700;color:#fff;line-height:0.95;position:absolute;top:50%;right:-17px;transform:translateY(-50%);z-index:10;box-shadow:0 4px 12px rgba(255,94,102,.35),0 2px 6px rgba(0,0,0,.4);text-align:center}
+.sep-plus{margin-top:1.5px}
+.sep-equals{margin-top:0.5px}
+@media (max-width:1920px){.separator-circle{width:26px;height:26px;right:-13px;font-size:17px;line-height:0.95;box-shadow:0 3px 9px rgba(255,94,102,.35),0 2px 5px rgba(0,0,0,.4)}
+.sep-plus{margin-top:1px}
+.sep-equals{margin-top:0.5px}}
 .showcase-img{aspect-ratio:263/350;background-size:cover;background-position:center;position:relative;width:100%}
 .showcase-img.img-1{background-image:linear-gradient(135deg,#4b5b8a,#1a2033)}
 .showcase-img.img-2{background-image:linear-gradient(135deg,#6b5b8a,#221a33)}
