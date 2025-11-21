@@ -1,10 +1,25 @@
 // Smooth Scroll Handler
 (function() {
-  // Precise scroll positions for different sections
+  // Precise scroll positions for different sections (responsive)
   const SCROLL_POSITIONS = {
-    'editor': 1337,  // Precise position for Image Editor section
-    'step1': 1337    // Same position for Launch Now button
+    'editor': {
+      desktop: 1337,    // >1920px
+      responsive: 963   // ≤1920px
+    },
+    'step1': {
+      desktop: 1337,    // >1920px
+      responsive: 963   // ≤1920px
+    }
   };
+
+  // Get appropriate scroll position based on screen width
+  function getScrollPosition(targetId) {
+    const positions = SCROLL_POSITIONS[targetId];
+    if (!positions) return undefined;
+
+    const isDesktop = window.innerWidth > 1920;
+    return isDesktop ? positions.desktop : positions.responsive;
+  }
 
   // Find all elements with data-scroll-to attribute
   const scrollButtons = document.querySelectorAll('[data-scroll-to]');
@@ -35,10 +50,11 @@
     }
 
     // Check if we have a precise position for this target
-    const precisePosition = SCROLL_POSITIONS[targetId];
+    const precisePosition = getScrollPosition(targetId);
 
     if (precisePosition !== undefined) {
-      console.log(`[smooth-scroll] Scrolling to precise position: ${precisePosition}px (target: #${targetId})`);
+      const screenType = window.innerWidth > 1920 ? 'desktop' : 'responsive';
+      console.log(`[smooth-scroll] Scrolling to precise position: ${precisePosition}px (target: #${targetId}, screen: ${screenType})`);
       window.scrollTo({
         top: precisePosition,
         behavior: 'smooth'
