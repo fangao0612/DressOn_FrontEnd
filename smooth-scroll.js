@@ -4,11 +4,11 @@
   const SCROLL_POSITIONS = {
     'editor': {
       desktop: 1337,    // >1920px
-      responsive: 963   // ≤1920px
+      responsive: 961   // ≤1920px
     },
     'step1': {
       desktop: 1337,    // >1920px
-      responsive: 963   // ≤1920px
+      responsive: 961   // ≤1920px
     }
   };
 
