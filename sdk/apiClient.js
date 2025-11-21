@@ -316,7 +316,7 @@ export const FluxKontext = {
     return await httpPost('/nano/process_async', form);
   },
 
-  async pollNanoResult(taskId, onProgress, { intervalMs = 3000, timeoutMs = 600000 } = {}) {
+  async pollNanoResult(taskId, onProgress, { intervalMs = 3000, timeoutMs = 300000 } = {}) {
     assert(taskId, 'taskId is required');
     const start = Date.now();
     while (true) {
