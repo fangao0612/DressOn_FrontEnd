@@ -52,10 +52,10 @@
         <button class="avatar profile-btn" aria-label="Profile" hidden>F</button>
         <button class="btn primary sign-in-btn" type="button" data-i18n="nav.signIn">Sign In</button>
         <div class="profile-popover" hidden>
-          <div class="me-line">Not signed in</div>
+          <div class="me-line" data-i18n="auth.notSignedIn">Not signed in</div>
           <div class="me-actions">
-            <button class="btn ghost btn-small login-btn">Sign in with Google</button>
-            <button class="btn ghost btn-small logout-btn" hidden>Logout</button>
+            <button class="btn ghost btn-small login-btn" data-i18n="auth.signInGoogle">Sign in with Google</button>
+            <button class="btn ghost btn-small logout-btn" hidden data-i18n="auth.logout">Logout</button>
           </div>
         </div>
       </div>
@@ -68,41 +68,41 @@
       <div class="auth-backdrop" id="auth-backdrop" onclick="document.getElementById('auth-modal').hidden=true"></div>
       <div class="auth-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
         <div class="auth-logo">🍌</div>
-        <h2 class="auth-title" id="auth-title">Welcome to Dress On</h2>
-        <p class="auth-sub">Sign in to continue to AI image editor</p>
+        <h2 class="auth-title" id="auth-title" data-i18n="auth.welcome">Welcome to Dress On</h2>
+        <p class="auth-sub" data-i18n="auth.subtitle">Sign in to continue to AI image editor</p>
         <div class="auth-tabs">
-          <button class="auth-tab active" data-tab="google">Google Sign In</button>
-          <button class="auth-tab" data-tab="email">Email Sign In</button>
+          <button class="auth-tab active" data-tab="google" data-i18n="auth.googleTab">Google Sign In</button>
+          <button class="auth-tab" data-tab="email" data-i18n="auth.emailTab">Email Sign In</button>
         </div>
         <div class="auth-pane auth-google active" data-pane="google">
           <button class="btn primary auth-google-btn" id="auth-google-btn">
             <img id="google-logo" src="./assets/Google_Logo.svg" alt="Google logo" style="width:18px;height:18px;margin-right:8px;" />
-            Continue with Google
+            <span data-i18n="auth.continueGoogle">Continue with Google</span>
           </button>
         </div>
         <div class="auth-pane auth-email" data-pane="email">
           <div id="auth-email-input-step">
-            <label class="auth-label">Email Address</label>
-            <input class="auth-input" id="auth-email" type="email" placeholder="your@email.com">
-            <button class="btn primary full" id="auth-email-send-btn">Send Verification Code</button>
-            <p class="auth-tip" id="auth-email-status">Enter your email to receive a verification code.</p>
+            <label class="auth-label" data-i18n="auth.emailLabel">Email Address</label>
+            <input class="auth-input" id="auth-email" type="email" placeholder="your@email.com" data-i18n="auth.emailPlaceholder" data-i18n-target="placeholder">
+            <button class="btn primary full" id="auth-email-send-btn" data-i18n="auth.sendCode">Send Verification Code</button>
+            <p class="auth-tip" id="auth-email-status" data-i18n="auth.emailTip">Enter your email to receive a verification code.</p>
           </div>
           <div id="auth-email-verify" style="display: none;">
             <button class="auth-back-btn" id="auth-email-back-btn">
-              <span class="back-arrow">←</span> Back
+              <span class="back-arrow">←</span> <span data-i18n="auth.back">Back</span>
             </button>
             <div class="auth-success-banner">
               <span class="success-icon">✓</span>
-              <p class="success-text">Verification code sent to <span id="sent-email"></span></p>
+              <p class="success-text"><span data-i18n="auth.codeSent">Verification code sent to</span> <span id="sent-email"></span></p>
             </div>
-            <label class="auth-label">Verification Code</label>
-            <input class="auth-input" id="auth-email-code" type="text" placeholder="Enter 6-digit code" maxlength="6">
-            <p class="auth-tip auth-expire-tip">Code expires in 10 minutes</p>
-            <button class="btn primary full" id="auth-email-verify-btn">Verify & Sign In</button>
-            <button class="btn ghost full" id="auth-email-resend-btn" style="margin-top: 8px;" disabled>Resend in 60s</button>
+            <label class="auth-label" data-i18n="auth.codeLabel">Verification Code</label>
+            <input class="auth-input" id="auth-email-code" type="text" placeholder="Enter 6-digit code" data-i18n="auth.codePlaceholder" data-i18n-target="placeholder" maxlength="6">
+            <p class="auth-tip auth-expire-tip" data-i18n="auth.codeExpire">Code expires in 10 minutes</p>
+            <button class="btn primary full" id="auth-email-verify-btn" data-i18n="auth.verify">Verify & Sign In</button>
+            <button class="btn ghost full" id="auth-email-resend-btn" style="margin-top: 8px;" disabled data-i18n="auth.resend">Resend in 60s</button>
           </div>
         </div>
-        <p class="auth-consent">By signing in, you agree to our <a href="#" target="_blank" rel="noopener">Terms of Service</a> and <a href="#" target="_blank" rel="noopener">Privacy Policy</a></p>
+        <p class="auth-consent"><span data-i18n="auth.consent">By signing in, you agree to our</span> <a href="#" target="_blank" rel="noopener" data-i18n="auth.termsService">Terms of Service</a> <span data-i18n="auth.and">and</span> <a href="#" target="_blank" rel="noopener" data-i18n="auth.privacyPolicy">Privacy Policy</a></p>
         <button class="auth-close" id="auth-close" type="button" aria-label="Close" onclick="document.getElementById('auth-modal').hidden=true">✕</button>
       </div>
     </div>
@@ -123,23 +123,23 @@
         <!-- Right: Content -->
         <div class="hero-right">
           <div class="hero-copy">
-            <div class="badge">Fashion · Consistency · One‑click Dressing</div>
-            <h1 class="hero-title">EASY outfit swap<br>with ANY two photos.</h1>
-            <p class="hero-sub">DressOn AI delivers stable character identity, refined fabric detail, and natural scene blending. Re‑style any photo with simple text and references.</p>
+            <div class="badge" data-i18n="hero.badge">Fashion · Consistency · One‑click Dressing</div>
+            <h1 class="hero-title"><span data-i18n="hero.title">EASY outfit swap</span><br><span data-i18n="hero.titleLine2">with ANY two photos.</span></h1>
+            <p class="hero-sub" data-i18n="hero.subtitle">DressOn AI delivers stable character identity, refined fabric detail, and natural scene blending. Re‑style any photo with simple text and references.</p>
             <div class="hero-actions">
-              <button class="btn primary" type="button" data-scroll-to="editor">Start Editing</button>
-              <a class="btn ghost" href="#showcase">View Examples</a>
+              <button class="btn primary" type="button" data-scroll-to="editor" data-i18n="hero.startEditing">Start Editing</button>
+              <a class="btn ghost" href="#showcase" data-i18n="hero.viewExamples">View Examples</a>
             </div>
             <ul class="hero-features">
-              <li>⚡ One‑shot dressing</li>
-              <li>🖼️ Multi‑image support</li>
-              <li>💬 Natural language</li>
+              <li data-i18n="hero.feature1">⚡ One‑shot dressing</li>
+              <li data-i18n="hero.feature2">🖼️ Multi‑image support</li>
+              <li data-i18n="hero.feature3">💬 Natural language</li>
             </ul>
 
             <!-- CTA at bottom of content -->
             <button class="hero-cta" type="button" data-scroll-to="editor">
               <div class="hero-cta-inner">
-                <span class="hero-cta-text">Get Started</span>
+                <span class="hero-cta-text" data-i18n="hero.getStarted">Get Started</span>
                 <div class="scroll-indicator">
                   <div class="arrow-down">⌄</div>
                 </div>
@@ -154,52 +154,52 @@
     <section class="editor" id="editor">
       <div class="container">
         <div class="section-header">
-          <h2 class="section-title">Step 1: Mix Character with Garment</h2>
-          <p class="section-subtitle">Experience the power of DressOn's natural language image editing. Transform any photo with simple text commands.</p>
+          <h2 class="section-title" data-i18n="step1.title">Step 1: Mix Character with Garment</h2>
+          <p class="section-subtitle" data-i18n="step1.subtitle">Experience the power of DressOn's natural language image editing. Transform any photo with simple text commands.</p>
         </div>
         <div class="editor-grid" id="step1">
           <div class="left-wrap">
           <div class="panel left">
-            <div class="panel-bar"><div class="bar-title">Prompt Engine</div></div>
+            <div class="panel-bar"><div class="bar-title" data-i18n="step1.promptEngine">Prompt Engine</div></div>
             <div class="panel-inner">
 
             <div class="field two-col">
-              <label class="label">Character Reference</label>
+              <label class="label" data-i18n="step1.characterRef">Character Reference</label>
               <div class="uploader square" data-role="person">
                 <input class="file-input" type="file" accept="image/*" aria-label="Upload character reference">
                 <div class="drop-area">
                   <div class="plus">+</div>
-                  <div class="hint">Add Image · Max 50MB</div>
+                  <div class="hint" data-i18n="step1.addImage">Add Image · Max 50MB</div>
                 </div>
                 <img class="preview" alt="Character preview" hidden>
               </div>
             </div>
 
             <div class="field two-col">
-              <label class="label">Garment Reference</label>
+              <label class="label" data-i18n="step1.garmentRef">Garment Reference</label>
               <div class="uploader square" data-role="clothes">
                 <input class="file-input" type="file" accept="image/*" aria-label="Upload garment reference">
                 <div class="drop-area">
                   <div class="plus">+</div>
-                  <div class="hint">Add Image · Max 50MB</div>
+                  <div class="hint" data-i18n="step1.addImage">Add Image · Max 50MB</div>
                 </div>
                 <img class="preview" alt="Garment preview" hidden>
               </div>
             </div>
             </div>
           </div>
-          <div class="step1-cta"><button class="btn primary full generate-btn" data-target="#canvas1">Generate Look</button></div>
+          <div class="step1-cta"><button class="btn primary full generate-btn" data-target="#canvas1" data-i18n="step1.generateLook">Generate Look</button></div>
           </div>
 
           <div class="panel right">
-            <div class="panel-bar"><div class="bar-title">Output Gallery</div></div>
+            <div class="panel-bar"><div class="bar-title" data-i18n="step1.outputGallery">Output Gallery</div></div>
             <div class="panel-inner">
               <div class="canvas" id="canvas1" data-role="output">
                 <input class="canvas-file-input" type="file" accept="image/*" aria-label="Upload test image" style="position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2">
                 <div class="placeholder">
                   <div class="icon">🪄</div>
-                  <div class="title">Ready for instant generation</div>
-                  <div class="desc">Upload references and hit Generate (or click to test)</div>
+                  <div class="title" data-i18n="step1.readyTitle">Ready for instant generation</div>
+                  <div class="desc" data-i18n="step1.readyDesc">Upload references and hit Generate (or click to test)</div>
                 </div>
               </div>
             </div>
@@ -212,45 +212,45 @@
     <section class="refine" id="step2">
       <div class="container">
         <div class="section-header">
-          <h2 class="section-title">Step 2: Refine with Prompt</h2>
-          <p class="section-subtitle">Fine-tune your creations with precise prompts. Control background, lighting, pose and style with natural language.</p>
+          <h2 class="section-title" data-i18n="step2.title">Step 2: Refine with Prompt</h2>
+          <p class="section-subtitle" data-i18n="step2.subtitle">Fine-tune your creations with precise prompts. Control background, lighting, pose and style with natural language.</p>
         </div>
         <div class="refine-grid">
           <div class="left-wrap">
           <div class="panel left">
-            <div class="panel-bar"><div class="bar-title">Refine with Prompts</div></div>
+            <div class="panel-bar"><div class="bar-title" data-i18n="step2.refinePrompts">Refine with Prompts</div></div>
             <div class="panel-inner">
               <div class="field two-col">
-                <label class="label">Refine Reference</label>
+                <label class="label" data-i18n="step2.refineRef">Refine Reference</label>
                 <div class="uploader square" data-role="refine">
                   <input class="file-input" type="file" accept="image/*" aria-label="Upload refine reference">
                   <div class="drop-area">
                     <div class="plus">+</div>
-                    <div class="hint">Add Image · Max 50MB</div>
+                    <div class="hint" data-i18n="step1.addImage">Add Image · Max 50MB</div>
                   </div>
                   <img class="preview" alt="Refine preview" hidden>
                 </div>
               </div>
               <div class="refine-form">
-                <label class="label" for="prompt">Main Prompt</label>
-                <textarea id="prompt" class="prompt" rows="5" placeholder="Golden‑hour rooftop, editorial street style, shallow depth of field, soft backlight"></textarea>
+                <label class="label" for="prompt" data-i18n="step2.mainPrompt">Main Prompt</label>
+                <textarea id="prompt" class="prompt" rows="5" placeholder="Golden‑hour rooftop, editorial street style, shallow depth of field, soft backlight" data-i18n="step2.promptPlaceholder" data-i18n-target="placeholder"></textarea>
                 <div class="prompt-actions">
-                  <button class="btn ghost btn-small" id="paste-prompt">Paste</button>
-                  <button class="btn ghost btn-small" id="copy-prompt">Copy</button>
+                  <button class="btn ghost btn-small" id="paste-prompt" data-i18n="step2.paste">Paste</button>
+                  <button class="btn ghost btn-small" id="copy-prompt" data-i18n="step2.copy">Copy</button>
                 </div>
               </div>
             </div>
           </div>
-          <div class="step2-cta"><button class="btn primary full refine-btn" id="refine-generate" data-target="#canvas2">Apply & Generate</button></div>
+          <div class="step2-cta"><button class="btn primary full refine-btn" id="refine-generate" data-target="#canvas2" data-i18n="step2.applyGenerate">Apply & Generate</button></div>
           </div>
           <div class="panel right">
-            <div class="panel-bar"><div class="bar-title">Live Preview</div></div>
+            <div class="panel-bar"><div class="bar-title" data-i18n="step2.livePreview">Live Preview</div></div>
             <div class="panel-inner">
               <div class="canvas" id="canvas2">
                 <div class="placeholder">
                   <div class="icon">🎨</div>
-                  <div class="title">Waiting for your prompt</div>
-                  <div class="desc">Describe style and scene, then generate</div>
+                  <div class="title" data-i18n="step2.waitingTitle">Waiting for your prompt</div>
+                  <div class="desc" data-i18n="step2.waitingDesc">Describe style and scene, then generate</div>
                 </div>
               </div>
             </div>
@@ -263,27 +263,27 @@
     <section class="upscale" id="step3">
       <div class="container">
         <div class="section-header">
-          <h2 class="section-title">Step 3: Upscale to High Resolution</h2>
-          <p class="section-subtitle">Elevate the final image with AI upscaling. Transform your creation into stunning high-resolution artwork.</p>
+          <h2 class="section-title" data-i18n="step3.title">Step 3: Upscale to High Resolution</h2>
+          <p class="section-subtitle" data-i18n="step3.subtitle">Elevate the final image with AI upscaling. Transform your creation into stunning high-resolution artwork.</p>
         </div>
         <div class="upscale-grid">
           <div class="left-wrap">
           <div class="panel left">
-            <div class="panel-bar"><div class="bar-title">Upscale Settings</div></div>
+            <div class="panel-bar"><div class="bar-title" data-i18n="step3.upscaleSettings">Upscale Settings</div></div>
             <div class="panel-inner">
               <div class="field two-col">
-                <label class="label">Upscale Reference</label>
+                <label class="label" data-i18n="step3.upscaleRef">Upscale Reference</label>
                 <div class="uploader square" data-role="upscale">
                   <input class="file-input" type="file" accept="image/*" aria-label="Upload upscale reference">
                   <div class="drop-area">
                     <div class="plus">+</div>
-                    <div class="hint">Add Image · Max 50MB</div>
+                    <div class="hint" data-i18n="step1.addImage">Add Image · Max 50MB</div>
                   </div>
                   <img class="preview" alt="Upscale preview" hidden>
                 </div>
                 <div class="get-image-actions">
-                  <button class="btn ghost btn-small" id="get-step1-image" disabled>Get Image from Step 1</button>
-                  <button class="btn ghost btn-small" id="get-step2-image" disabled>Get Image from Step 2</button>
+                  <button class="btn ghost btn-small" id="get-step1-image" disabled data-i18n="step3.getStep1">Get Image from Step 1</button>
+                  <button class="btn ghost btn-small" id="get-step2-image" disabled data-i18n="step3.getStep2">Get Image from Step 2</button>
                 </div>
                 <div class="resolution-selector">
                   <button class="btn ghost btn-small resolution-btn" data-resolution="2K">2K</button>
@@ -292,16 +292,16 @@
               </div>
             </div>
           </div>
-          <div class="step3-cta"><button class="btn primary full upscale-btn" id="upscale-generate" data-target="#canvas3">Upscale Image</button></div>
+          <div class="step3-cta"><button class="btn primary full upscale-btn" id="upscale-generate" data-target="#canvas3" data-i18n="step3.upscaleImage">Upscale Image</button></div>
           </div>
           <div class="panel right">
-            <div class="panel-bar"><div class="bar-title">High-Res Output</div></div>
+            <div class="panel-bar"><div class="bar-title" data-i18n="step3.highResOutput">High-Res Output</div></div>
             <div class="panel-inner">
               <div class="canvas" id="canvas3">
                 <div class="placeholder">
                   <div class="icon">✨</div>
-                  <div class="title">Ready for upscaling</div>
-                  <div class="desc">Upload image and enhance to high resolution</div>
+                  <div class="title" data-i18n="step3.readyTitle">Ready for upscaling</div>
+                  <div class="desc" data-i18n="step3.readyDesc">Upload image and enhance to high resolution</div>
                 </div>
               </div>
             </div>
@@ -313,7 +313,7 @@
     <!-- SHOWCASE -->
     <section class="showcase" id="showcase">
       <div class="container">
-        <h3 class="section-title">Lightning‑Fast Fashion Creations</h3>
+        <h3 class="section-title" data-i18n="showcase.title">Lightning‑Fast Fashion Creations</h3>
         <div class="showcase-grid">
           <article class="showcase-card" data-showcase-id="editorial-skyline">
             <div class="showcase-column">
@@ -321,34 +321,34 @@
                 <input type="file" class="showcase-file-input" accept="image/*" hidden>
                 <div class="upload-overlay">
                   <span class="upload-icon">+</span>
-                  <span class="upload-text">Drop or Click</span>
+                  <span class="upload-text" data-i18n="showcase.dropClick">Drop or Click</span>
                 </div>
                 <div class="separator-circle sep-plus">+</div>
               </div>
-              <div class="showcase-label">👤 Character & Pose</div>
+              <div class="showcase-label" data-i18n="showcase.character">👤 Character & Pose</div>
             </div>
             <div class="showcase-column">
               <div class="showcase-img img-2 editable-img" data-img-index="1">
                 <input type="file" class="showcase-file-input" accept="image/*" hidden>
                 <div class="upload-overlay">
                   <span class="upload-icon">+</span>
-                  <span class="upload-text">Drop or Click</span>
+                  <span class="upload-text" data-i18n="showcase.dropClick">Drop or Click</span>
                 </div>
                 <div class="separator-circle sep-equals">=</div>
               </div>
-              <div class="showcase-label">👔 Outfit Reference</div>
+              <div class="showcase-label" data-i18n="showcase.outfit">👔 Outfit Reference</div>
             </div>
             <div class="showcase-column">
               <div class="showcase-img img-3 editable-img" data-img-index="2">
                 <input type="file" class="showcase-file-input" accept="image/*" hidden>
                 <div class="upload-overlay">
                   <span class="upload-icon">+</span>
-                  <span class="upload-text">Drop or Click</span>
+                  <span class="upload-text" data-i18n="showcase.dropClick">Drop or Click</span>
                 </div>
               </div>
-              <div class="showcase-label label-final">✨ Final Result</div>
+              <div class="showcase-label label-final" data-i18n="showcase.result">✨ Final Result</div>
             </div>
-            <button class="btn primary btn-small showcase-save-btn" data-showcase-id="editorial-skyline">Save</button>
+            <button class="btn primary btn-small showcase-save-btn" data-showcase-id="editorial-skyline" data-i18n="showcase.save">Save</button>
           </article>
           <article class="showcase-card" data-showcase-id="garden-harmony">
             <div class="showcase-column">
@@ -356,34 +356,34 @@
                 <input type="file" class="showcase-file-input" accept="image/*" hidden>
                 <div class="upload-overlay">
                   <span class="upload-icon">+</span>
-                  <span class="upload-text">Drop or Click</span>
+                  <span class="upload-text" data-i18n="showcase.dropClick">Drop or Click</span>
                 </div>
                 <div class="separator-circle sep-plus">+</div>
               </div>
-              <div class="showcase-label">👤 Character & Pose</div>
+              <div class="showcase-label" data-i18n="showcase.character">👤 Character & Pose</div>
             </div>
             <div class="showcase-column">
               <div class="showcase-img img-2 editable-img" data-img-index="1">
                 <input type="file" class="showcase-file-input" accept="image/*" hidden>
                 <div class="upload-overlay">
                   <span class="upload-icon">+</span>
-                  <span class="upload-text">Drop or Click</span>
+                  <span class="upload-text" data-i18n="showcase.dropClick">Drop or Click</span>
                 </div>
                 <div class="separator-circle sep-equals">=</div>
               </div>
-              <div class="showcase-label">👔 Outfit Reference</div>
+              <div class="showcase-label" data-i18n="showcase.outfit">👔 Outfit Reference</div>
             </div>
             <div class="showcase-column">
               <div class="showcase-img img-3 editable-img" data-img-index="2">
                 <input type="file" class="showcase-file-input" accept="image/*" hidden>
                 <div class="upload-overlay">
                   <span class="upload-icon">+</span>
-                  <span class="upload-text">Drop or Click</span>
+                  <span class="upload-text" data-i18n="showcase.dropClick">Drop or Click</span>
                 </div>
               </div>
-              <div class="showcase-label label-final">✨ Final Result</div>
+              <div class="showcase-label label-final" data-i18n="showcase.result">✨ Final Result</div>
             </div>
-            <button class="btn primary btn-small showcase-save-btn" data-showcase-id="garden-harmony">Save</button>
+            <button class="btn primary btn-small showcase-save-btn" data-showcase-id="garden-harmony" data-i18n="showcase.save">Save</button>
           </article>
           <article class="showcase-card" data-showcase-id="island-breeze">
             <div class="showcase-column">
@@ -391,34 +391,34 @@
                 <input type="file" class="showcase-file-input" accept="image/*" hidden>
                 <div class="upload-overlay">
                   <span class="upload-icon">+</span>
-                  <span class="upload-text">Drop or Click</span>
+                  <span class="upload-text" data-i18n="showcase.dropClick">Drop or Click</span>
                 </div>
                 <div class="separator-circle sep-plus">+</div>
               </div>
-              <div class="showcase-label">👤 Character & Pose</div>
+              <div class="showcase-label" data-i18n="showcase.character">👤 Character & Pose</div>
             </div>
             <div class="showcase-column">
               <div class="showcase-img img-2 editable-img" data-img-index="1">
                 <input type="file" class="showcase-file-input" accept="image/*" hidden>
                 <div class="upload-overlay">
                   <span class="upload-icon">+</span>
-                  <span class="upload-text">Drop or Click</span>
+                  <span class="upload-text" data-i18n="showcase.dropClick">Drop or Click</span>
                 </div>
                 <div class="separator-circle sep-equals">=</div>
               </div>
-              <div class="showcase-label">👔 Outfit Reference</div>
+              <div class="showcase-label" data-i18n="showcase.outfit">👔 Outfit Reference</div>
             </div>
             <div class="showcase-column">
               <div class="showcase-img img-3 editable-img" data-img-index="2">
                 <input type="file" class="showcase-file-input" accept="image/*" hidden>
                 <div class="upload-overlay">
                   <span class="upload-icon">+</span>
-                  <span class="upload-text">Drop or Click</span>
+                  <span class="upload-text" data-i18n="showcase.dropClick">Drop or Click</span>
                 </div>
               </div>
-              <div class="showcase-label label-final">✨ Final Result</div>
+              <div class="showcase-label label-final" data-i18n="showcase.result">✨ Final Result</div>
             </div>
-            <button class="btn primary btn-small showcase-save-btn" data-showcase-id="island-breeze">Save</button>
+            <button class="btn primary btn-small showcase-save-btn" data-showcase-id="island-breeze" data-i18n="showcase.save">Save</button>
           </article>
           <article class="showcase-card" data-showcase-id="arctic-aura">
             <div class="showcase-column">
@@ -426,34 +426,34 @@
                 <input type="file" class="showcase-file-input" accept="image/*" hidden>
                 <div class="upload-overlay">
                   <span class="upload-icon">+</span>
-                  <span class="upload-text">Drop or Click</span>
+                  <span class="upload-text" data-i18n="showcase.dropClick">Drop or Click</span>
                 </div>
                 <div class="separator-circle sep-plus">+</div>
               </div>
-              <div class="showcase-label">👤 Character & Pose</div>
+              <div class="showcase-label" data-i18n="showcase.character">👤 Character & Pose</div>
             </div>
             <div class="showcase-column">
               <div class="showcase-img img-2 editable-img" data-img-index="1">
                 <input type="file" class="showcase-file-input" accept="image/*" hidden>
                 <div class="upload-overlay">
                   <span class="upload-icon">+</span>
-                  <span class="upload-text">Drop or Click</span>
+                  <span class="upload-text" data-i18n="showcase.dropClick">Drop or Click</span>
                 </div>
                 <div class="separator-circle sep-equals">=</div>
               </div>
-              <div class="showcase-label">👔 Outfit Reference</div>
+              <div class="showcase-label" data-i18n="showcase.outfit">👔 Outfit Reference</div>
             </div>
             <div class="showcase-column">
               <div class="showcase-img img-3 editable-img" data-img-index="2">
                 <input type="file" class="showcase-file-input" accept="image/*" hidden>
                 <div class="upload-overlay">
                   <span class="upload-icon">+</span>
-                  <span class="upload-text">Drop or Click</span>
+                  <span class="upload-text" data-i18n="showcase.dropClick">Drop or Click</span>
                 </div>
               </div>
-              <div class="showcase-label label-final">✨ Final Result</div>
+              <div class="showcase-label label-final" data-i18n="showcase.result">✨ Final Result</div>
             </div>
-            <button class="btn primary btn-small showcase-save-btn" data-showcase-id="arctic-aura">Save</button>
+            <button class="btn primary btn-small showcase-save-btn" data-showcase-id="arctic-aura" data-i18n="showcase.save">Save</button>
           </article>
         </div>
       </div>
@@ -462,27 +462,27 @@
     <!-- REVIEWS -->
     <section class="reviews" id="reviews">
       <div class="container">
-        <h3 class="section-title">What creators are saying</h3>
+        <h3 class="section-title" data-i18n="reviews.title">What creators are saying</h3>
         <div class="reviews-grid">
           <div class="review">
             <div class="avatar" aria-hidden="true"></div>
             <div>
-              <div class="author">UGC Creator</div>
-              <p>"Consistent characters made series content much easier. Details stay intact."</p>
+              <div class="author" data-i18n="reviews.author1">UGC Creator</div>
+              <p data-i18n="reviews.quote1">"Consistent characters made series content much easier. Details stay intact."</p>
             </div>
           </div>
           <div class="review">
             <div class="avatar" aria-hidden="true"></div>
             <div>
-              <div class="author">Fashion E‑commerce</div>
-              <p>"Batch dressing shortens launch cycles. Visual style stays unified."</p>
+              <div class="author" data-i18n="reviews.author2">Fashion E‑commerce</div>
+              <p data-i18n="reviews.quote2">"Batch dressing shortens launch cycles. Visual style stays unified."</p>
             </div>
           </div>
           <div class="review">
             <div class="avatar" aria-hidden="true"></div>
             <div>
-              <div class="author">Retoucher</div>
-              <p>"One‑click base renders + fine touches doubled our throughput."</p>
+              <div class="author" data-i18n="reviews.author3">Retoucher</div>
+              <p data-i18n="reviews.quote3">"One‑click base renders + fine touches doubled our throughput."</p>
             </div>
           </div>
         </div>
@@ -492,51 +492,51 @@
     <!-- FAQ -->
     <section class="faq" id="faq">
       <div class="container">
-        <h3 class="section-title">Frequently Asked Questions</h3>
+        <h3 class="section-title" data-i18n="faq.title">Frequently Asked Questions</h3>
         <div class="accordion" role="tablist">
           <div class="acc-item">
             <button class="acc-head" aria-expanded="false">
-              <span>What is DressOn AI?</span>
+              <span data-i18n="faq.q1">What is DressOn AI?</span>
               <span class="chev" aria-hidden>▾</span>
             </button>
             <div class="acc-panel" hidden>
-              <p>An AI fashion editor for creators. It supports identity consistency, garment references and scene refinement.</p>
+              <p data-i18n="faq.a1">An AI fashion editor for creators. It supports identity consistency, garment references and scene refinement.</p>
             </div>
           </div>
           <div class="acc-item">
             <button class="acc-head" aria-expanded="false">
-              <span>How does it work?</span>
+              <span data-i18n="faq.q2">How does it work?</span>
               <span class="chev" aria-hidden>▾</span>
             </button>
             <div class="acc-panel" hidden>
-              <p>Upload one character and one garment, optionally add notes, then generate. Refine with prompts in Step 2.</p>
+              <p data-i18n="faq.a2">Upload one character and one garment, optionally add notes, then generate. Refine with prompts in Step 2.</p>
             </div>
           </div>
           <div class="acc-item">
             <button class="acc-head" aria-expanded="false">
-              <span>Can I use it commercially?</span>
+              <span data-i18n="faq.q3">Can I use it commercially?</span>
               <span class="chev" aria-hidden>▾</span>
             </button>
             <div class="acc-panel" hidden>
-              <p>Yes, under applicable laws and platform policies. Please review your brand and portrait rights.</p>
+              <p data-i18n="faq.a3">Yes, under applicable laws and platform policies. Please review your brand and portrait rights.</p>
             </div>
           </div>
           <div class="acc-item">
             <button class="acc-head" aria-expanded="false">
-              <span>What types of edits are supported?</span>
+              <span data-i18n="faq.q4">What types of edits are supported?</span>
               <span class="chev" aria-hidden>▾</span>
             </button>
             <div class="acc-panel" hidden>
-              <p>Dressing, background replacement, camera and pose control, lighting and style adjustments.</p>
+              <p data-i18n="faq.a4">Dressing, background replacement, camera and pose control, lighting and style adjustments.</p>
             </div>
           </div>
           <div class="acc-item">
             <button class="acc-head" aria-expanded="false">
-              <span>Where can I try it?</span>
+              <span data-i18n="faq.q5">Where can I try it?</span>
               <span class="chev" aria-hidden>▾</span>
             </button>
             <div class="acc-panel" hidden>
-              <p>Use the “Start Editing” button on this page or contact us for enterprise access.</p>
+              <p data-i18n="faq.a5">Use the "Start Editing" button on this page or contact us for enterprise access.</p>
             </div>
           </div>
         </div>
