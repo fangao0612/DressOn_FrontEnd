@@ -1,7 +1,15 @@
 // Step 3: Upscale to High Resolution
 import { FluxKontext } from './sdk/apiClient.js';
+import { translations } from './translations.js';
+import { getCurrentLanguage } from './language-switcher.js';
 
 const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
+
+// Helper function to get translated text
+function t(key) {
+  const lang = getCurrentLanguage();
+  return translations[lang]?.[key] || translations['en']?.[key] || key;
+}
 
 (function initUpscale() {
   const $ = (s, ctx = document) => ctx.querySelector(s);
@@ -57,12 +65,14 @@ const DOWNLOAD_ICON = new URL('./assets/download.svg', import.meta.url).href;
   }
 
   // 显示placeholder
-  function showPlaceholder(message = 'Ready for upscaling') {
+  function showPlaceholder(message) {
+    const title = message || t('step3.readyTitle');
+    const desc = t('step3.readyDesc');
     canvas3.innerHTML = `
       <div class="placeholder">
         <div class="icon">✨</div>
-        <div class="title">${message}</div>
-        <div class="desc">Upload image and enhance to high resolution</div>
+        <div class="title">${title}</div>
+        <div class="desc">${desc}</div>
       </div>
     `;
   }
