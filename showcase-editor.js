@@ -1,16 +1,76 @@
 // Showcase Image Editor
 // This module handles drag-and-drop image uploads and saving for showcase images
+// Uses IndexedDB for storage to bypass LocalStorage 5MB limit
 
 import { SHOWCASE_CONFIG } from './showcase-config.js';
+
+// Simple IndexedDB wrapper
+const DB_NAME = 'DressOnShowcaseDB';
+const STORE_NAME = 'images';
+const DB_VERSION = 1;
+
+class ImageDB {
+  constructor() {
+    this.db = null;
+  }
+
+  async init() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+      request.onerror = (event) => {
+        console.error("IndexedDB error:", event.target.error);
+        reject(event.target.error);
+      };
+
+      request.onsuccess = (event) => {
+        this.db = event.target.result;
+        resolve(this.db);
+      };
+
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME);
+        }
+      };
+    });
+  }
+
+  async get(key) {
+    return new Promise((resolve, reject) => {
+      if (!this.db) return reject("DB not initialized");
+      const transaction = this.db.transaction([STORE_NAME], 'readonly');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.get(key);
+      
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async set(key, value) {
+    return new Promise((resolve, reject) => {
+      if (!this.db) return reject("DB not initialized");
+      const transaction = this.db.transaction([STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.put(value, key);
+      
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+}
 
 class ShowcaseEditor {
   constructor() {
     this.uploadedImages = new Map(); // Track uploaded images per card
-    this.STORAGE_KEY = 'showcase_images'; // localStorage key
+    this.STORAGE_KEY = 'showcase_images'; // Key for DB
+    this.db = new ImageDB();
     this.init();
   }
 
-  init() {
+  async init() {
     // Set edit mode on body element
     document.body.setAttribute('data-edit-mode', SHOWCASE_CONFIG.EDIT_MODE);
 
@@ -19,7 +79,15 @@ class ShowcaseEditor {
       return;
     }
 
-    this.restoreImagesFromStorage(); // Restore saved images on page load
+    try {
+      await this.db.init();
+      console.log('IndexedDB initialized');
+      await this.restoreImagesFromStorage(); // Restore saved images on page load
+    } catch (e) {
+      console.error('Failed to init DB:', e);
+      this.showNotification('数据库初始化失败', 'error');
+    }
+
     this.setupImageUploaders();
 
     // Only setup save buttons if enabled in config
@@ -41,20 +109,21 @@ class ShowcaseEditor {
     console.log('Save buttons hidden (SHOW_SAVE_BUTTON = false)');
   }
 
-  // Restore images from localStorage
-  restoreImagesFromStorage() {
+  // Restore images from IndexedDB
+  async restoreImagesFromStorage() {
     try {
-      const savedData = localStorage.getItem(this.STORAGE_KEY);
-      console.log('[Restore] Checking localStorage...', savedData ? 'Found data' : 'No data');
+      const savedData = await this.db.get(this.STORAGE_KEY);
+      console.log('[Restore] Checking DB...', savedData ? 'Found data' : 'No data');
 
       if (!savedData) {
         console.log('[Restore] No saved images found');
         return;
       }
 
-      const parsedData = JSON.parse(savedData);
-      console.log('[Restore] Parsed data:', parsedData);
-
+      // savedData is already an object, no need to JSON.parse if we stored it directly
+      // But to keep compatibility if we switch logic, let's assume it matches our structure
+      const parsedData = savedData; 
+      
       let restoredCount = 0;
 
       Object.entries(parsedData).forEach(([showcaseId, images]) => {
@@ -67,9 +136,30 @@ class ShowcaseEditor {
           );
 
           if (imgElement && imageData && imageData.data) {
-            // Restore the background image
+            // Restore the background image (fallback)
             imgElement.style.backgroundImage = `url(${imageData.data})`;
             imgElement.classList.add('has-image');
+
+            // 1. REMOVE OVERLAY COMPLETELY (Physical Removal)
+            const overlay = imgElement.querySelector('.upload-overlay');
+            if (overlay) {
+              overlay.remove(); // Delete it from DOM
+            }
+
+            // 2. Insert Real <img> tag for right-click support
+            let realImg = imgElement.querySelector('.real-showcase-img');
+            if (!realImg) {
+              realImg = document.createElement('img');
+              realImg.className = 'real-showcase-img';
+              // Append as LAST child
+              imgElement.appendChild(realImg);
+            }
+            realImg.src = imageData.data;
+            realImg.alt = `${showcaseId}-img-${imgIndex}`;
+            
+            // Remove any legacy mini buttons
+            const miniBtn = imgElement.querySelector('.mini-dl-btn');
+            if(miniBtn) miniBtn.remove();
 
             // Store in memory
             this.uploadedImages.get(showcaseId)[imgIndex] = imageData;
@@ -91,8 +181,8 @@ class ShowcaseEditor {
     }
   }
 
-  // Save images to localStorage
-  saveToLocalStorage() {
+  // Save images to IndexedDB
+  async saveToLocalStorage() {
     try {
       const dataToSave = {};
       let totalImages = 0;
@@ -102,15 +192,14 @@ class ShowcaseEditor {
         totalImages += Object.keys(images).length;
       });
 
-      const jsonData = JSON.stringify(dataToSave);
-      localStorage.setItem(this.STORAGE_KEY, jsonData);
+      // Store the object directly
+      await this.db.set(this.STORAGE_KEY, dataToSave);
 
-      console.log(`[Save] Saved ${totalImages} images to localStorage`);
-      console.log(`[Save] Data size: ${(jsonData.length / 1024).toFixed(2)} KB`);
+      console.log(`[Save] Saved ${totalImages} images to IndexedDB`);
       console.log('[Save] Saved showcases:', Object.keys(dataToSave));
     } catch (error) {
-      console.error('[Save] Failed to save to localStorage:', error);
-      this.showNotification('保存失败：存储空间可能不足', 'error');
+      console.error('[Save] Failed to save to DB:', error);
+      this.showNotification('保存失败：数据库错误', 'error');
     }
   }
 
@@ -169,7 +258,58 @@ class ShowcaseEditor {
     });
   }
 
-  handleFileUpload(file, imgElement, showcaseId, imgIndex) {
+  async resizeImage(file, targetPixels = 1024 * 1024) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const width = img.width;
+          const height = img.height;
+          const currentPixels = width * height;
+          
+          let newWidth = width;
+          let newHeight = height;
+
+          // Calculate new dimensions if larger than target
+          if (currentPixels > targetPixels) {
+            const ratio = Math.sqrt(targetPixels / currentPixels);
+            newWidth = Math.floor(width * ratio);
+            newHeight = Math.floor(height * ratio);
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = newWidth;
+          canvas.height = newHeight;
+          
+          const ctx = canvas.getContext('2d');
+          // High quality scaling
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, newWidth, newHeight);
+          
+          // Compress to jpeg with 0.75 quality to save space
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+          
+          // Also create blob for potential upload
+          canvas.toBlob((blob) => {
+            resolve({
+              dataUrl,
+              blob,
+              width: newWidth,
+              height: newHeight
+            });
+          }, 'image/jpeg', 0.75);
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async handleFileUpload(file, imgElement, showcaseId, imgIndex) {
     // Validate file type
     if (!SHOWCASE_CONFIG.ALLOWED_TYPES.includes(file.type)) {
       this.showNotification('Invalid file type. Please use JPEG, PNG, or WebP', 'error');
@@ -182,27 +322,55 @@ class ShowcaseEditor {
       return;
     }
 
-    // Read and display the image
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const imageData = e.target.result;
-
-      // Update the background image
-      imgElement.style.backgroundImage = `url(${imageData})`;
+    try {
+      this.showNotification('正在压缩图片...', 'info');
+      
+      // Resize image to match 1024x1024 pixel count
+      const processed = await this.resizeImage(file);
+      
+      // Update the background image (keep for fallback)
+      imgElement.style.backgroundImage = `url(${processed.dataUrl})`;
       imgElement.classList.add('has-image');
+      
+      // 1. REMOVE OVERLAY COMPLETELY (Physical Removal)
+      const overlay = imgElement.querySelector('.upload-overlay');
+      if (overlay) {
+        overlay.remove(); // Delete it from DOM
+      }
+
+      // 2. Insert Real <img> tag for right-click support
+      let realImg = imgElement.querySelector('.real-showcase-img');
+      if (!realImg) {
+        realImg = document.createElement('img');
+        realImg.className = 'real-showcase-img';
+        // Append as LAST child
+        imgElement.appendChild(realImg);
+      }
+      realImg.src = processed.dataUrl;
+      realImg.alt = `${showcaseId}-img-${imgIndex}`;
+      realImg.title = `Right click > Save Image As...`;
+
+      // Remove mini download button if it exists
+      const miniBtn = imgElement.querySelector('.mini-dl-btn');
+      if(miniBtn) miniBtn.remove();
 
       // Store the uploaded image data
       const showcaseImages = this.uploadedImages.get(showcaseId);
+      // Standardized naming convention: {showcaseId}-img-{index}.jpg
+      const standardizedName = `${showcaseId}-img-${imgIndex}.jpg`;
+      
       showcaseImages[imgIndex] = {
-        file: file,
-        data: imageData,
-        name: file.name
+        file: processed.blob, // Store processed blob instead of original file
+        data: processed.dataUrl,
+        name: standardizedName, // Force standardized name
+        width: processed.width,
+        height: processed.height
       };
 
-      this.showNotification(`图片已上传: ${file.name}`, 'success');
+      this.showNotification(`图片已处理 (${processed.width}x${processed.height})`, 'success');
 
-      // Auto-save to localStorage
-      this.saveToLocalStorage();
+      // Auto-save to IndexedDB
+      await this.saveToLocalStorage();
 
       // Enable the save button only if enabled in config
       if (SHOWCASE_CONFIG.SHOW_SAVE_BUTTON) {
@@ -212,9 +380,10 @@ class ShowcaseEditor {
           saveBtn.disabled = false;
         }
       }
-    };
-
-    reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Image processing failed:', error);
+      this.showNotification('图片处理失败', 'error');
+    }
   }
 
   setupSaveButtons() {
@@ -247,14 +416,15 @@ class ShowcaseEditor {
       setTimeout(() => {
         const link = document.createElement('a');
         link.href = imageData.data;
-        link.download = `${showcaseId}-img-${parseInt(index) + 1}.${this.getFileExtension(imageData.name)}`;
+        // Use the standardized name we set during upload
+        link.download = imageData.name;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
 
         downloadedCount++;
         if (downloadedCount === imageCount) {
-          this.showNotification(`已导出 ${imageCount} 张图片`, 'success');
+          this.showNotification(`已导出 ${imageCount} 张标准化命名图片`, 'success');
           this.showSaveInstructions(showcaseId, showcaseImages);
         }
       }, i * 300); // 300ms delay between downloads
@@ -279,7 +449,7 @@ class ShowcaseEditor {
 📦 已导出的文件：
 ${fileList}
 
-💡 提示：刷新页面后图片会自动恢复（保存在浏览器 localStorage）
+💡 提示：刷新页面后图片会自动恢复（保存在浏览器 IndexedDB）
     `;
 
     console.log(instructions);

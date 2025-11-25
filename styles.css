@@ -381,9 +381,9 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 .separator-circle{width:32px;height:32px;border-radius:50%;background:#ff5e66;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;line-height:1;position:absolute;top:50%;right:-16px;transform:translateY(-50%);z-index:10;box-shadow:0 4px 12px rgba(255,94,102,.35),0 2px 6px rgba(0,0,0,.4);box-sizing:border-box;padding-top:0;padding-bottom:1px}
 @media (max-width:1920px){.separator-circle{width:24px;height:24px;right:-12px;font-size:15px;line-height:1;box-shadow:0 3px 9px rgba(255,94,102,.35),0 2px 5px rgba(0,0,0,.4);padding-top:0;padding-bottom:2px}}
 .showcase-img{aspect-ratio:263/350;background-size:cover;background-position:center;position:relative;width:100%}
-.showcase-img.img-1{background-image:linear-gradient(135deg,#4b5b8a,#1a2033)}
-.showcase-img.img-2{background-image:linear-gradient(135deg,#6b5b8a,#221a33)}
-.showcase-img.img-3{background-image:linear-gradient(135deg,#4b8a7c,#1a332d)}
+.showcase-img.img-1{background-image:url('./assets/showcase/editorial-skyline-img-1.jpg'), linear-gradient(135deg,#4b5b8a,#1a2033)}
+.showcase-img.img-2{background-image:url('./assets/showcase/editorial-skyline-img-2.jpg'), linear-gradient(135deg,#6b5b8a,#221a33)}
+.showcase-img.img-3{background-image:url('./assets/showcase/editorial-skyline-img-3.jpg'), linear-gradient(135deg,#4b8a7c,#1a332d)}
 .showcase-label{padding:16px 12px;text-align:center;font-size:13px;font-weight:600;color:rgba(255,255,255,.65)}
 .label-final{color:#E4C07A;font-weight:700}
 .showcase-save-btn{position:absolute;bottom:16px;right:16px;z-index:10}
@@ -865,11 +865,65 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   margin-top: 3px;
 }
 
+/* Hide Save buttons permanently */
+.showcase-save-btn {
+  display: none !important;
+}
+
 /* Showcase Editor Styles */
 .editable-img {
   position: relative;
   cursor: pointer;
   transition: all 0.3s ease;
+}
+
+/* Real image overlay for right-click save support */
+.real-showcase-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* CRITICAL: High Z-Index to be clickable */
+  z-index: 100 !important; 
+  display: none;
+  pointer-events: auto !important;
+}
+.editable-img.has-image .real-showcase-img {
+  display: block;
+}
+
+/* KILL THE OVERLAY - NUCLEAR OPTION */
+.editable-img.has-image .upload-overlay {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  z-index: -999 !important;
+  opacity: 0 !important;
+}
+
+/* Only dragover brings it back */
+.editable-img.has-image.dragover .upload-overlay {
+  display: flex !important;
+  visibility: visible !important;
+  z-index: 110 !important; /* Higher than image during drag */
+  opacity: 1 !important;
+}
+
+.editable-img:not(.has-image) .upload-overlay {
+  display: flex;
+  opacity: 0;
+}
+.editable-img:not(.has-image):hover .upload-overlay {
+  opacity: 1;
+}
+
+/* Dragover state - always show overlay to indicate drop zone */
+.editable-img.dragover .upload-overlay {
+  display: flex !important;
+  opacity: 1 !important;
+  background: rgba(59, 130, 246, 0.3) !important;
+  border: 2px dashed #3b82f6;
 }
 
 .editable-img .upload-overlay {
@@ -882,37 +936,42 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   justify-content: center;
   opacity: 0;
   transition: opacity 0.3s ease;
-  pointer-events: none;
+  pointer-events: none; /* Let clicks pass through to file input if needed, but we handle click on parent */
 }
 
-.editable-img:hover .upload-overlay {
-  opacity: 1;
-}
-
-.editable-img .upload-icon {
-  font-size: 32px;
-  color: var(--primary);
-  margin-bottom: 8px;
-}
-
-.editable-img .upload-text {
-  font-size: 13px;
-  font-weight: 500;
+/* Micro Download Button - Only appears on hover for images */
+.mini-dl-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: all 0.2s ease;
+  z-index: 20;
   color: #fff;
 }
-
-.editable-img.dragover {
-  outline: 2px dashed var(--primary);
-  outline-offset: -4px;
+.mini-dl-btn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
 }
-
-.editable-img.dragover .upload-overlay {
+.editable-img:hover .mini-dl-btn {
   opacity: 1;
-  background: rgba(59, 130, 246, 0.15);
+  transform: translateY(0);
 }
 
-.editable-img.has-image .upload-overlay {
-  background: rgba(0, 0, 0, 0.5);
+/* SVG icon for mini download */
+.mini-dl-icon {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
 }
 
 .showcase-meta {
