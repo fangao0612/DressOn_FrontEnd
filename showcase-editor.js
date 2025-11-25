@@ -427,10 +427,6 @@ class ShowcaseEditor {
       // Remove standalone img if exists (cleanup old logic)
       const oldImg = imgElement.querySelector(':scope > .real-showcase-img');
       if(oldImg) oldImg.remove();
-      
-      // Force remove overlay
-      const overlay = imgElement.querySelector('.upload-overlay');
-      if (overlay) overlay.style.display = 'none';
 
       // Remove mini download button if it exists
       const miniBtn = imgElement.querySelector('.mini-dl-btn');
