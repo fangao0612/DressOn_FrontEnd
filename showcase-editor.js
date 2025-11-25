@@ -146,16 +146,53 @@ class ShowcaseEditor {
               overlay.remove(); // Delete it from DOM
             }
 
-            // 2. Insert Real <img> tag for right-click support
-            let realImg = imgElement.querySelector('.real-showcase-img');
+            // Semantic naming reconstruction for restore
+            const CARD_INDEX = {
+              'editorial-skyline': 1,
+              'garden-harmony': 2,
+              'island-breeze': 3,
+              'arctic-aura': 4
+            };
+            const ROLE_NAMES = ['Character & Pose', 'Outfit Reference', 'Final Result'];
+            const cardIndex = CARD_INDEX[showcaseId] || 0;
+            const roleName = ROLE_NAMES[Number(imgIndex)] || 'Image';
+            const standardizedName = `${roleName}-${cardIndex}.jpg`;
+
+            // 2. Insert Real <img> tag wrapped in <a> for download
+            let imgLink = imgElement.querySelector('.download-link');
+            if (!imgLink) {
+              imgLink = document.createElement('a');
+              imgLink.className = 'download-link';
+              // Append as LAST child
+              imgElement.appendChild(imgLink);
+            }
+            
+            // Update link properties
+            imgLink.href = imageData.data;
+            imgLink.download = standardizedName;
+            imgLink.title = `Click to download: ${standardizedName}`;
+            imgLink.style.cssText = 'position:absolute;inset:0;z-index:100;cursor:pointer;display:block;';
+            
+            // Update inner image
+            let realImg = imgLink.querySelector('.real-showcase-img');
             if (!realImg) {
               realImg = document.createElement('img');
               realImg.className = 'real-showcase-img';
-              // Append as LAST child
-              imgElement.appendChild(realImg);
+              realImg.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+              imgLink.appendChild(realImg);
             }
             realImg.src = imageData.data;
-            realImg.alt = `${showcaseId}-img-${imgIndex}`;
+            realImg.alt = standardizedName;
+
+            // Stop propagation
+            imgLink.addEventListener('click', (e) => {
+              e.stopPropagation(); 
+              // Let default action happen (download)
+            });
+
+            // Cleanup legacy standalone img
+            const oldImg = imgElement.querySelector(':scope > .real-showcase-img');
+            if(oldImg) oldImg.remove();
             
             // Remove any legacy mini buttons
             const miniBtn = imgElement.querySelector('.mini-dl-btn');
@@ -338,22 +375,6 @@ class ShowcaseEditor {
         overlay.remove(); // Delete it from DOM
       }
 
-      // 2. Insert Real <img> tag for right-click support
-      let realImg = imgElement.querySelector('.real-showcase-img');
-      if (!realImg) {
-        realImg = document.createElement('img');
-        realImg.className = 'real-showcase-img';
-        // Append as LAST child
-        imgElement.appendChild(realImg);
-      }
-      realImg.src = processed.dataUrl;
-      realImg.alt = `${showcaseId}-img-${imgIndex}`;
-      realImg.title = `Right click > Save Image As...`;
-
-      // Remove mini download button if it exists
-      const miniBtn = imgElement.querySelector('.mini-dl-btn');
-      if(miniBtn) miniBtn.remove();
-
       // Store the uploaded image data
       const showcaseImages = this.uploadedImages.get(showcaseId);
 
@@ -368,6 +389,50 @@ class ShowcaseEditor {
       const cardIndex = CARD_INDEX[showcaseId] || 0;
       const roleName = ROLE_NAMES[Number(imgIndex)] || 'Image';
       const standardizedName = `${roleName}-${cardIndex}.jpg`;
+
+      // 2. Insert Real <img> tag wrapped in <a> for download
+      let imgLink = imgElement.querySelector('.download-link');
+      if (!imgLink) {
+        imgLink = document.createElement('a');
+        imgLink.className = 'download-link';
+        // Append as LAST child
+        imgElement.appendChild(imgLink);
+      }
+      
+      // Update link properties
+      imgLink.href = processed.dataUrl;
+      imgLink.download = standardizedName; // This forces the filename
+      imgLink.title = `Click to download: ${standardizedName}`;
+      imgLink.style.cssText = 'position:absolute;inset:0;z-index:100;cursor:pointer;display:block;';
+      
+      // Update inner image
+      let realImg = imgLink.querySelector('.real-showcase-img');
+      if (!realImg) {
+        realImg = document.createElement('img');
+        realImg.className = 'real-showcase-img';
+        realImg.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+        imgLink.appendChild(realImg);
+      }
+      realImg.src = processed.dataUrl;
+      realImg.alt = standardizedName;
+
+      // Stop propagation so clicking image doesn't trigger upload again
+      imgLink.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        this.showNotification(`下载中: ${standardizedName}`, 'success');
+      });
+
+      // Remove standalone img if exists (cleanup old logic)
+      const oldImg = imgElement.querySelector(':scope > .real-showcase-img');
+      if(oldImg) oldImg.remove();
+      
+      // Force remove overlay
+      const overlay = imgElement.querySelector('.upload-overlay');
+      if (overlay) overlay.style.display = 'none';
+
+      // Remove mini download button if it exists
+      const miniBtn = imgElement.querySelector('.mini-dl-btn');
+      if(miniBtn) miniBtn.remove();
       
       showcaseImages[imgIndex] = {
         file: processed.blob, // Store processed blob instead of original file
