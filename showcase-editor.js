@@ -171,7 +171,8 @@ class ShowcaseEditor {
             imgLink.href = imageData.data;
             imgLink.download = standardizedName;
             imgLink.title = `Click to download: ${standardizedName}`;
-            imgLink.style.cssText = 'position:absolute;inset:0;z-index:100;cursor:pointer;display:block;';
+            // LOW z-index (5) is enough to be clickable but stay below circles (50)
+            imgLink.style.cssText = 'position:absolute;inset:0;z-index:5;cursor:pointer;display:block;';
             
             // Update inner image
             let realImg = imgLink.querySelector('.real-showcase-img');
@@ -403,7 +404,8 @@ class ShowcaseEditor {
       imgLink.href = processed.dataUrl;
       imgLink.download = standardizedName; // This forces the filename
       imgLink.title = `Click to download: ${standardizedName}`;
-      imgLink.style.cssText = 'position:absolute;inset:0;z-index:100;cursor:pointer;display:block;';
+      // LOW z-index (5) is enough to be clickable but stay below circles (50)
+      imgLink.style.cssText = 'position:absolute;inset:0;z-index:5;cursor:pointer;display:block;';
       
       // Update inner image
       let realImg = imgLink.querySelector('.real-showcase-img');
