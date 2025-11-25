@@ -356,8 +356,18 @@ class ShowcaseEditor {
 
       // Store the uploaded image data
       const showcaseImages = this.uploadedImages.get(showcaseId);
-      // Standardized naming convention: {showcaseId}-img-{index}.jpg
-      const standardizedName = `${showcaseId}-img-${imgIndex}.jpg`;
+
+      // Semantic naming: Character & Pose-N, Outfit Reference-N, Final Result-N
+      const CARD_INDEX = {
+        'editorial-skyline': 1,
+        'garden-harmony': 2,
+        'island-breeze': 3,
+        'arctic-aura': 4
+      };
+      const ROLE_NAMES = ['Character & Pose', 'Outfit Reference', 'Final Result'];
+      const cardIndex = CARD_INDEX[showcaseId] || 0;
+      const roleName = ROLE_NAMES[Number(imgIndex)] || 'Image';
+      const standardizedName = `${roleName}-${cardIndex}.jpg`;
       
       showcaseImages[imgIndex] = {
         file: processed.blob, // Store processed blob instead of original file
@@ -432,8 +442,8 @@ class ShowcaseEditor {
   }
 
   showSaveInstructions(showcaseId, showcaseImages) {
-    const fileList = Object.entries(showcaseImages).map(([index, img]) =>
-      `  - ${showcaseId}-img-${parseInt(index) + 1}.${this.getFileExtension(img.name)}`
+    const fileList = Object.entries(showcaseImages).map(([, img]) =>
+      `  - ${img.name}`
     ).join('\n');
 
     const instructions = `
