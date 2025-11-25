@@ -62,6 +62,171 @@ class ImageDB {
   }
 }
 
+// Lightbox for image preview
+class Lightbox {
+  constructor() {
+    this.overlay = null;
+    this.imgContainer = null;
+    this.currentImg = null;
+    this.originalRect = null;
+    this.isOpen = false;
+    this.init();
+  }
+
+  init() {
+    // Create overlay
+    this.overlay = document.createElement('div');
+    this.overlay.className = 'lightbox-overlay';
+    this.overlay.style.cssText = `
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    `;
+
+    // Create image container
+    this.imgContainer = document.createElement('div');
+    this.imgContainer.className = 'lightbox-img-container';
+    this.imgContainer.style.cssText = `
+      position: absolute;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: default;
+    `;
+
+    // Create image element
+    this.currentImg = document.createElement('img');
+    this.currentImg.className = 'lightbox-img';
+    this.currentImg.style.cssText = `
+      max-height: 90vh;
+      max-width: 90vw;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    `;
+
+    this.imgContainer.appendChild(this.currentImg);
+    this.overlay.appendChild(this.imgContainer);
+    document.body.appendChild(this.overlay);
+
+    // Close on overlay click
+    this.overlay.addEventListener('click', (e) => {
+      if (e.target === this.overlay) {
+        this.close();
+      }
+    });
+
+    // Close on ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.isOpen) {
+        this.close();
+      }
+    });
+
+    // Prevent image click from closing
+    this.imgContainer.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+  }
+
+  open(imgSrc, sourceElement) {
+    if (this.isOpen) return;
+    this.isOpen = true;
+
+    // Get source element position
+    this.originalRect = sourceElement.getBoundingClientRect();
+
+    // Set image source
+    this.currentImg.src = imgSrc;
+
+    // Position container at source location initially
+    this.imgContainer.style.transition = 'none';
+    this.imgContainer.style.left = `${this.originalRect.left}px`;
+    this.imgContainer.style.top = `${this.originalRect.top}px`;
+    this.imgContainer.style.width = `${this.originalRect.width}px`;
+    this.imgContainer.style.height = `${this.originalRect.height}px`;
+
+    // Show overlay
+    this.overlay.style.opacity = '1';
+    this.overlay.style.visibility = 'visible';
+
+    // Force reflow
+    this.imgContainer.offsetHeight;
+
+    // Animate to center
+    requestAnimationFrame(() => {
+      this.imgContainer.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+      
+      // Calculate final size (90vh height, maintain aspect ratio)
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      const targetHeight = viewportHeight * 0.9;
+      
+      // Wait for image to load to get natural dimensions
+      if (this.currentImg.naturalWidth && this.currentImg.naturalHeight) {
+        this.animateToCenter(targetHeight, viewportWidth, viewportHeight);
+      } else {
+        this.currentImg.onload = () => {
+          this.animateToCenter(targetHeight, viewportWidth, viewportHeight);
+        };
+      }
+    });
+  }
+
+  animateToCenter(targetHeight, viewportWidth, viewportHeight) {
+    const aspectRatio = this.currentImg.naturalWidth / this.currentImg.naturalHeight;
+    let finalHeight = targetHeight;
+    let finalWidth = finalHeight * aspectRatio;
+
+    // If too wide, constrain by width instead
+    if (finalWidth > viewportWidth * 0.9) {
+      finalWidth = viewportWidth * 0.9;
+      finalHeight = finalWidth / aspectRatio;
+    }
+
+    const finalLeft = (viewportWidth - finalWidth) / 2;
+    const finalTop = (viewportHeight - finalHeight) / 2;
+
+    this.imgContainer.style.left = `${finalLeft}px`;
+    this.imgContainer.style.top = `${finalTop}px`;
+    this.imgContainer.style.width = `${finalWidth}px`;
+    this.imgContainer.style.height = `${finalHeight}px`;
+  }
+
+  close() {
+    if (!this.isOpen) return;
+    this.isOpen = false;
+
+    // Animate back to original position
+    if (this.originalRect) {
+      this.imgContainer.style.left = `${this.originalRect.left}px`;
+      this.imgContainer.style.top = `${this.originalRect.top}px`;
+      this.imgContainer.style.width = `${this.originalRect.width}px`;
+      this.imgContainer.style.height = `${this.originalRect.height}px`;
+    }
+
+    // Fade out overlay
+    this.overlay.style.opacity = '0';
+
+    // Hide after animation
+    setTimeout(() => {
+      this.overlay.style.visibility = 'hidden';
+    }, 400);
+  }
+}
+
+// Global lightbox instance
+const lightbox = new Lightbox();
+
 class ShowcaseEditor {
   constructor() {
     this.uploadedImages = new Map(); // Track uploaded images per card
@@ -120,17 +285,13 @@ class ShowcaseEditor {
         return;
       }
 
-      // savedData is already an object, no need to JSON.parse if we stored it directly
-      // But to keep compatibility if we switch logic, let's assume it matches our structure
       const parsedData = savedData; 
-      
       let restoredCount = 0;
 
       Object.entries(parsedData).forEach(([showcaseId, images]) => {
         this.uploadedImages.set(showcaseId, {});
 
         Object.entries(images).forEach(([imgIndex, imageData]) => {
-          // Find the corresponding image element
           const imgElement = document.querySelector(
             `.showcase-card[data-showcase-id="${showcaseId}"] .editable-img[data-img-index="${imgIndex}"]`
           );
@@ -140,62 +301,34 @@ class ShowcaseEditor {
             imgElement.style.backgroundImage = `url(${imageData.data})`;
             imgElement.classList.add('has-image');
 
-            // 1. REMOVE OVERLAY COMPLETELY (Physical Removal)
+            // Remove overlay
             const overlay = imgElement.querySelector('.upload-overlay');
             if (overlay) {
-              overlay.remove(); // Delete it from DOM
+              overlay.remove();
             }
 
-            // Semantic naming reconstruction for restore
-            const CARD_INDEX = {
-              'editorial-skyline': 1,
-              'garden-harmony': 2,
-              'island-breeze': 3,
-              'arctic-aura': 4
-            };
-            const ROLE_NAMES = ['Character & Pose', 'Outfit Reference', 'Final Result'];
-            const cardIndex = CARD_INDEX[showcaseId] || 0;
-            const roleName = ROLE_NAMES[Number(imgIndex)] || 'Image';
-            const standardizedName = `${roleName}-${cardIndex}.jpg`;
-
-            // 2. Insert Real <img> tag wrapped in <a> for download
-            let imgLink = imgElement.querySelector('.download-link');
-            if (!imgLink) {
-              imgLink = document.createElement('a');
-              imgLink.className = 'download-link';
-              // Append as LAST child
-              imgElement.appendChild(imgLink);
-            }
-            
-            // Update link properties
-            imgLink.href = imageData.data;
-            imgLink.download = standardizedName;
-            imgLink.title = `Click to download: ${standardizedName}`;
-            // LOW z-index (5) is enough to be clickable but stay below circles (50)
-            imgLink.style.cssText = 'position:absolute;inset:0;z-index:5;cursor:pointer;display:block;';
-            
-            // Update inner image
-            let realImg = imgLink.querySelector('.real-showcase-img');
+            // Insert clickable image (no download link, just img for lightbox)
+            let realImg = imgElement.querySelector('.real-showcase-img');
             if (!realImg) {
               realImg = document.createElement('img');
               realImg.className = 'real-showcase-img';
-              realImg.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
-              imgLink.appendChild(realImg);
+              realImg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;cursor:pointer;';
+              imgElement.appendChild(realImg);
             }
             realImg.src = imageData.data;
-            realImg.alt = standardizedName;
+            realImg.alt = imageData.name || `${showcaseId}-img-${imgIndex}`;
 
-            // Stop propagation
-            imgLink.addEventListener('click', (e) => {
-              e.stopPropagation(); 
-              // Let default action happen (download)
+            // Remove old download link if exists
+            const oldLink = imgElement.querySelector('.download-link');
+            if (oldLink) oldLink.remove();
+
+            // Click to open lightbox
+            realImg.addEventListener('click', (e) => {
+              e.stopPropagation();
+              lightbox.open(imageData.data, realImg);
             });
 
-            // Cleanup legacy standalone img
-            const oldImg = imgElement.querySelector(':scope > .real-showcase-img');
-            if(oldImg) oldImg.remove();
-            
-            // Remove any legacy mini buttons
+            // Remove legacy buttons
             const miniBtn = imgElement.querySelector('.mini-dl-btn');
             if(miniBtn) miniBtn.remove();
 
@@ -203,8 +336,6 @@ class ShowcaseEditor {
             this.uploadedImages.get(showcaseId)[imgIndex] = imageData;
             restoredCount++;
             console.log(`[Restore] Restored ${showcaseId} img-${imgIndex}`);
-          } else {
-            console.warn(`[Restore] Failed to restore ${showcaseId} img-${imgIndex}`, imgElement ? 'Element found' : 'Element not found');
           }
         });
       });
@@ -230,7 +361,6 @@ class ShowcaseEditor {
         totalImages += Object.keys(images).length;
       });
 
-      // Store the object directly
       await this.db.set(this.STORAGE_KEY, dataToSave);
 
       console.log(`[Save] Saved ${totalImages} images to IndexedDB`);
@@ -255,10 +385,10 @@ class ShowcaseEditor {
         this.uploadedImages.set(showcaseId, {});
       }
 
-      // Click to upload
+      // Click to upload (only if no image yet)
       imgElement.addEventListener('click', (e) => {
-        if (e.target === imgElement || e.target.classList.contains('upload-overlay') ||
-            e.target.classList.contains('upload-icon') || e.target.classList.contains('upload-text')) {
+        // Only trigger upload if clicking on empty area (not on the real image)
+        if (!imgElement.classList.contains('has-image')) {
           fileInput.click();
         }
       });
@@ -309,7 +439,6 @@ class ShowcaseEditor {
           let newWidth = width;
           let newHeight = height;
 
-          // Calculate new dimensions if larger than target
           if (currentPixels > targetPixels) {
             const ratio = Math.sqrt(targetPixels / currentPixels);
             newWidth = Math.floor(width * ratio);
@@ -321,15 +450,12 @@ class ShowcaseEditor {
           canvas.height = newHeight;
           
           const ctx = canvas.getContext('2d');
-          // High quality scaling
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, newWidth, newHeight);
           
-          // Compress to jpeg with 0.75 quality to save space
           const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
           
-          // Also create blob for potential upload
           canvas.toBlob((blob) => {
             resolve({
               dataUrl,
@@ -348,13 +474,11 @@ class ShowcaseEditor {
   }
 
   async handleFileUpload(file, imgElement, showcaseId, imgIndex) {
-    // Validate file type
     if (!SHOWCASE_CONFIG.ALLOWED_TYPES.includes(file.type)) {
       this.showNotification('Invalid file type. Please use JPEG, PNG, or WebP', 'error');
       return;
     }
 
-    // Validate file size
     if (file.size > SHOWCASE_CONFIG.MAX_FILE_SIZE) {
       this.showNotification(`File too large. Max size is ${SHOWCASE_CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB`, 'error');
       return;
@@ -363,23 +487,18 @@ class ShowcaseEditor {
     try {
       this.showNotification('正在压缩图片...', 'info');
       
-      // Resize image to match 1024x1024 pixel count
       const processed = await this.resizeImage(file);
       
-      // Update the background image (keep for fallback)
       imgElement.style.backgroundImage = `url(${processed.dataUrl})`;
       imgElement.classList.add('has-image');
       
-      // 1. REMOVE OVERLAY COMPLETELY (Physical Removal)
+      // Remove overlay
       const overlay = imgElement.querySelector('.upload-overlay');
       if (overlay) {
-        overlay.remove(); // Delete it from DOM
+        overlay.remove();
       }
 
-      // Store the uploaded image data
-      const showcaseImages = this.uploadedImages.get(showcaseId);
-
-      // Semantic naming: Character & Pose-N, Outfit Reference-N, Final Result-N
+      // Semantic naming
       const CARD_INDEX = {
         'editorial-skyline': 1,
         'garden-harmony': 2,
@@ -391,61 +510,47 @@ class ShowcaseEditor {
       const roleName = ROLE_NAMES[Number(imgIndex)] || 'Image';
       const standardizedName = `${roleName}-${cardIndex}.jpg`;
 
-      // 2. Insert Real <img> tag wrapped in <a> for download
-      let imgLink = imgElement.querySelector('.download-link');
-      if (!imgLink) {
-        imgLink = document.createElement('a');
-        imgLink.className = 'download-link';
-        // Append as LAST child
-        imgElement.appendChild(imgLink);
-      }
-      
-      // Update link properties
-      imgLink.href = processed.dataUrl;
-      imgLink.download = standardizedName; // This forces the filename
-      imgLink.title = `Click to download: ${standardizedName}`;
-      // LOW z-index (5) is enough to be clickable but stay below circles (50)
-      imgLink.style.cssText = 'position:absolute;inset:0;z-index:5;cursor:pointer;display:block;';
-      
-      // Update inner image
-      let realImg = imgLink.querySelector('.real-showcase-img');
+      // Remove old download link if exists
+      const oldLink = imgElement.querySelector('.download-link');
+      if (oldLink) oldLink.remove();
+
+      // Insert clickable image for lightbox
+      let realImg = imgElement.querySelector('.real-showcase-img');
       if (!realImg) {
         realImg = document.createElement('img');
         realImg.className = 'real-showcase-img';
-        realImg.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
-        imgLink.appendChild(realImg);
+        realImg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;cursor:pointer;';
+        imgElement.appendChild(realImg);
       }
       realImg.src = processed.dataUrl;
       realImg.alt = standardizedName;
 
-      // Stop propagation so clicking image doesn't trigger upload again
-      imgLink.addEventListener('click', (e) => {
-        e.stopPropagation(); 
-        this.showNotification(`下载中: ${standardizedName}`, 'success');
+      // Click to open lightbox
+      realImg.addEventListener('click', (e) => {
+        e.stopPropagation();
+        lightbox.open(processed.dataUrl, realImg);
       });
 
-      // Remove standalone img if exists (cleanup old logic)
-      const oldImg = imgElement.querySelector(':scope > .real-showcase-img');
+      // Remove legacy elements
+      const oldImg = imgElement.querySelector(':scope > .real-showcase-img:not(:last-child)');
       if(oldImg) oldImg.remove();
-
-      // Remove mini download button if it exists
       const miniBtn = imgElement.querySelector('.mini-dl-btn');
       if(miniBtn) miniBtn.remove();
-      
+
+      // Store the uploaded image data
+      const showcaseImages = this.uploadedImages.get(showcaseId);
       showcaseImages[imgIndex] = {
-        file: processed.blob, // Store processed blob instead of original file
+        file: processed.blob,
         data: processed.dataUrl,
-        name: standardizedName, // Force standardized name
+        name: standardizedName,
         width: processed.width,
         height: processed.height
       };
 
       this.showNotification(`图片已处理 (${processed.width}x${processed.height})`, 'success');
 
-      // Auto-save to IndexedDB
       await this.saveToLocalStorage();
 
-      // Enable the save button only if enabled in config
       if (SHOWCASE_CONFIG.SHOW_SAVE_BUTTON) {
         const saveBtn = document.querySelector(`.showcase-save-btn[data-showcase-id="${showcaseId}"]`);
         if (saveBtn) {
@@ -478,18 +583,15 @@ class ShowcaseEditor {
       return;
     }
 
-    // Download all images with proper naming
     console.log(`导出图片 ${showcaseId}:`, showcaseImages);
 
     const imageCount = Object.keys(showcaseImages).length;
     let downloadedCount = 0;
 
-    // Download each image with a small delay to prevent browser blocking
     Object.entries(showcaseImages).forEach(([index, imageData], i) => {
       setTimeout(() => {
         const link = document.createElement('a');
         link.href = imageData.data;
-        // Use the standardized name we set during upload
         link.download = imageData.name;
         document.body.appendChild(link);
         link.click();
@@ -500,7 +602,7 @@ class ShowcaseEditor {
           this.showNotification(`已导出 ${imageCount} 张标准化命名图片`, 'success');
           this.showSaveInstructions(showcaseId, showcaseImages);
         }
-      }, i * 300); // 300ms delay between downloads
+      }, i * 300);
     });
   }
 
@@ -534,7 +636,6 @@ ${fileList}
   }
 
   showNotification(message, type = 'info') {
-    // Create a simple toast notification
     const toast = document.createElement('div');
     toast.className = `showcase-toast showcase-toast-${type}`;
     toast.textContent = message;
