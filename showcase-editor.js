@@ -62,14 +62,15 @@ class ImageDB {
   }
 }
 
-// Lightbox for image preview
+// Lightbox for image preview - using cloned thumbnail approach
 class Lightbox {
   constructor() {
     this.overlay = null;
-    this.imgContainer = null;
-    this.currentImg = null;
-    this.originalRect = null;
+    this.clonedImg = null;
     this.isOpen = false;
+    this.isAnimating = false;
+    this.originalRect = null;
+    this.originalSrc = null;
     this.init();
   }
 
@@ -80,49 +81,19 @@ class Lightbox {
     this.overlay.style.cssText = `
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
-      z-index: 9999;
+      background: rgba(0, 0, 0, 0);
+      backdrop-filter: blur(0px);
+      z-index: 9998;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      transition: background 0.35s ease, backdrop-filter 0.35s ease, opacity 0.35s ease;
       cursor: pointer;
     `;
-
-    // Create image container
-    this.imgContainer = document.createElement('div');
-    this.imgContainer.className = 'lightbox-img-container';
-    this.imgContainer.style.cssText = `
-      position: absolute;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      cursor: default;
-    `;
-
-    // Create image element
-    this.currentImg = document.createElement('img');
-    this.currentImg.className = 'lightbox-img';
-    this.currentImg.style.cssText = `
-      max-height: 90vh;
-      max-width: 90vw;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-      border-radius: 8px;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-    `;
-
-    this.imgContainer.appendChild(this.currentImg);
-    this.overlay.appendChild(this.imgContainer);
     document.body.appendChild(this.overlay);
 
     // Close on overlay click
-    this.overlay.addEventListener('click', (e) => {
-      if (e.target === this.overlay) {
-        this.close();
-      }
+    this.overlay.addEventListener('click', () => {
+      this.close();
     });
 
     // Close on ESC
@@ -131,96 +102,135 @@ class Lightbox {
         this.close();
       }
     });
-
-    // Prevent image click from closing
-    this.imgContainer.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
   }
 
   open(imgSrc, sourceElement) {
-    if (this.isOpen) return;
+    if (this.isOpen || this.isAnimating) return;
+    this.isAnimating = true;
     this.isOpen = true;
 
-    // Get source element position
+    // Get source element's exact position
     this.originalRect = sourceElement.getBoundingClientRect();
+    this.originalSrc = imgSrc;
 
-    // Set image source
-    this.currentImg.src = imgSrc;
-
-    // Position container at source location initially
-    this.imgContainer.style.transition = 'none';
-    this.imgContainer.style.left = `${this.originalRect.left}px`;
-    this.imgContainer.style.top = `${this.originalRect.top}px`;
-    this.imgContainer.style.width = `${this.originalRect.width}px`;
-    this.imgContainer.style.height = `${this.originalRect.height}px`;
-
-    // Show overlay
-    this.overlay.style.opacity = '1';
+    // Show overlay with fade
     this.overlay.style.visibility = 'visible';
+    this.overlay.style.opacity = '1';
+    
+    // Create a clone of the image at exact position
+    this.clonedImg = document.createElement('img');
+    this.clonedImg.src = imgSrc;
+    this.clonedImg.style.cssText = `
+      position: fixed;
+      left: ${this.originalRect.left}px;
+      top: ${this.originalRect.top}px;
+      width: ${this.originalRect.width}px;
+      height: ${this.originalRect.height}px;
+      object-fit: cover;
+      z-index: 9999;
+      border-radius: 4px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: none;
+      pointer-events: auto;
+    `;
+    document.body.appendChild(this.clonedImg);
+
+    // Click on cloned image to close
+    this.clonedImg.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.close();
+    });
 
     // Force reflow
-    this.imgContainer.offsetHeight;
+    this.clonedImg.offsetHeight;
 
-    // Animate to center
+    // Animate overlay background
     requestAnimationFrame(() => {
-      this.imgContainer.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-      
-      // Calculate final size (90vh height, maintain aspect ratio)
-      const viewportHeight = window.innerHeight;
-      const viewportWidth = window.innerWidth;
-      const targetHeight = viewportHeight * 0.9;
-      
-      // Wait for image to load to get natural dimensions
-      if (this.currentImg.naturalWidth && this.currentImg.naturalHeight) {
-        this.animateToCenter(targetHeight, viewportWidth, viewportHeight);
-      } else {
-        this.currentImg.onload = () => {
-          this.animateToCenter(targetHeight, viewportWidth, viewportHeight);
-        };
-      }
+      this.overlay.style.background = 'rgba(0, 0, 0, 0.88)';
+      this.overlay.style.backdropFilter = 'blur(12px)';
     });
-  }
 
-  animateToCenter(targetHeight, viewportWidth, viewportHeight) {
-    const aspectRatio = this.currentImg.naturalWidth / this.currentImg.naturalHeight;
-    let finalHeight = targetHeight;
-    let finalWidth = finalHeight * aspectRatio;
+    // Calculate final centered position
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Wait for image natural dimensions
+    const doAnimate = () => {
+      const naturalWidth = this.clonedImg.naturalWidth || this.originalRect.width;
+      const naturalHeight = this.clonedImg.naturalHeight || this.originalRect.height;
+      const aspectRatio = naturalWidth / naturalHeight;
 
-    // If too wide, constrain by width instead
-    if (finalWidth > viewportWidth * 0.9) {
-      finalWidth = viewportWidth * 0.9;
-      finalHeight = finalWidth / aspectRatio;
+      // Target: 90vh height, maintain aspect ratio
+      let finalHeight = viewportHeight * 0.9;
+      let finalWidth = finalHeight * aspectRatio;
+
+      // If too wide, constrain by width
+      if (finalWidth > viewportWidth * 0.9) {
+        finalWidth = viewportWidth * 0.9;
+        finalHeight = finalWidth / aspectRatio;
+      }
+
+      const finalLeft = (viewportWidth - finalWidth) / 2;
+      const finalTop = (viewportHeight - finalHeight) / 2;
+
+      // Enable transition and animate
+      this.clonedImg.style.transition = 'all 0.4s cubic-bezier(0.32, 0.72, 0, 1)';
+      this.clonedImg.style.left = `${finalLeft}px`;
+      this.clonedImg.style.top = `${finalTop}px`;
+      this.clonedImg.style.width = `${finalWidth}px`;
+      this.clonedImg.style.height = `${finalHeight}px`;
+      this.clonedImg.style.objectFit = 'contain';
+      this.clonedImg.style.borderRadius = '8px';
+      this.clonedImg.style.boxShadow = '0 25px 80px rgba(0,0,0,0.6)';
+
+      setTimeout(() => {
+        this.isAnimating = false;
+      }, 400);
+    };
+
+    if (this.clonedImg.complete && this.clonedImg.naturalWidth) {
+      requestAnimationFrame(doAnimate);
+    } else {
+      this.clonedImg.onload = () => requestAnimationFrame(doAnimate);
+      // Fallback if already cached
+      setTimeout(() => {
+        if (this.isAnimating) requestAnimationFrame(doAnimate);
+      }, 50);
     }
-
-    const finalLeft = (viewportWidth - finalWidth) / 2;
-    const finalTop = (viewportHeight - finalHeight) / 2;
-
-    this.imgContainer.style.left = `${finalLeft}px`;
-    this.imgContainer.style.top = `${finalTop}px`;
-    this.imgContainer.style.width = `${finalWidth}px`;
-    this.imgContainer.style.height = `${finalHeight}px`;
   }
 
   close() {
-    if (!this.isOpen) return;
+    if (!this.isOpen || this.isAnimating) return;
+    this.isAnimating = true;
     this.isOpen = false;
 
-    // Animate back to original position
-    if (this.originalRect) {
-      this.imgContainer.style.left = `${this.originalRect.left}px`;
-      this.imgContainer.style.top = `${this.originalRect.top}px`;
-      this.imgContainer.style.width = `${this.originalRect.width}px`;
-      this.imgContainer.style.height = `${this.originalRect.height}px`;
+    // Fade overlay
+    this.overlay.style.background = 'rgba(0, 0, 0, 0)';
+    this.overlay.style.backdropFilter = 'blur(0px)';
+
+    // Animate image back to original position
+    if (this.clonedImg && this.originalRect) {
+      this.clonedImg.style.transition = 'all 0.35s cubic-bezier(0.32, 0.72, 0, 1)';
+      this.clonedImg.style.left = `${this.originalRect.left}px`;
+      this.clonedImg.style.top = `${this.originalRect.top}px`;
+      this.clonedImg.style.width = `${this.originalRect.width}px`;
+      this.clonedImg.style.height = `${this.originalRect.height}px`;
+      this.clonedImg.style.objectFit = 'cover';
+      this.clonedImg.style.borderRadius = '4px';
+      this.clonedImg.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
     }
 
-    // Fade out overlay
-    this.overlay.style.opacity = '0';
-
-    // Hide after animation
+    // Cleanup after animation
     setTimeout(() => {
       this.overlay.style.visibility = 'hidden';
-    }, 400);
+      this.overlay.style.opacity = '0';
+      if (this.clonedImg) {
+        this.clonedImg.remove();
+        this.clonedImg = null;
+      }
+      this.isAnimating = false;
+    }, 350);
   }
 }
 
@@ -229,14 +239,13 @@ const lightbox = new Lightbox();
 
 class ShowcaseEditor {
   constructor() {
-    this.uploadedImages = new Map(); // Track uploaded images per card
-    this.STORAGE_KEY = 'showcase_images'; // Key for DB
+    this.uploadedImages = new Map();
+    this.STORAGE_KEY = 'showcase_images';
     this.db = new ImageDB();
     this.init();
   }
 
   async init() {
-    // Set edit mode on body element
     document.body.setAttribute('data-edit-mode', SHOWCASE_CONFIG.EDIT_MODE);
 
     if (!SHOWCASE_CONFIG.EDIT_MODE) {
@@ -247,15 +256,15 @@ class ShowcaseEditor {
     try {
       await this.db.init();
       console.log('IndexedDB initialized');
-      await this.restoreImagesFromStorage(); // Restore saved images on page load
+      await this.restoreImagesFromStorage();
     } catch (e) {
       console.error('Failed to init DB:', e);
       this.showNotification('数据库初始化失败', 'error');
     }
 
     this.setupImageUploaders();
+    this.setupGlobalClickHandler(); // Use event delegation
 
-    // Only setup save buttons if enabled in config
     if (SHOWCASE_CONFIG.SHOW_SAVE_BUTTON) {
       this.setupSaveButtons();
     } else {
@@ -265,7 +274,18 @@ class ShowcaseEditor {
     console.log('Showcase editor initialized');
   }
 
-  // Hide all save buttons
+  // Event delegation for image clicks - more reliable than individual listeners
+  setupGlobalClickHandler() {
+    document.addEventListener('click', (e) => {
+      const img = e.target.closest('.real-showcase-img');
+      if (img && img.dataset.imgSrc) {
+        e.preventDefault();
+        e.stopPropagation();
+        lightbox.open(img.dataset.imgSrc, img);
+      }
+    });
+  }
+
   hideSaveButtons() {
     const saveButtons = document.querySelectorAll('.showcase-save-btn');
     saveButtons.forEach(btn => {
@@ -274,7 +294,6 @@ class ShowcaseEditor {
     console.log('Save buttons hidden (SHOW_SAVE_BUTTON = false)');
   }
 
-  // Restore images from IndexedDB
   async restoreImagesFromStorage() {
     try {
       const savedData = await this.db.get(this.STORAGE_KEY);
@@ -297,42 +316,7 @@ class ShowcaseEditor {
           );
 
           if (imgElement && imageData && imageData.data) {
-            // Restore the background image (fallback)
-            imgElement.style.backgroundImage = `url(${imageData.data})`;
-            imgElement.classList.add('has-image');
-
-            // Remove overlay
-            const overlay = imgElement.querySelector('.upload-overlay');
-            if (overlay) {
-              overlay.remove();
-            }
-
-            // Insert clickable image (no download link, just img for lightbox)
-            let realImg = imgElement.querySelector('.real-showcase-img');
-            if (!realImg) {
-              realImg = document.createElement('img');
-              realImg.className = 'real-showcase-img';
-              realImg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;cursor:pointer;';
-              imgElement.appendChild(realImg);
-            }
-            realImg.src = imageData.data;
-            realImg.alt = imageData.name || `${showcaseId}-img-${imgIndex}`;
-
-            // Remove old download link if exists
-            const oldLink = imgElement.querySelector('.download-link');
-            if (oldLink) oldLink.remove();
-
-            // Click to open lightbox
-            realImg.addEventListener('click', (e) => {
-              e.stopPropagation();
-              lightbox.open(imageData.data, realImg);
-            });
-
-            // Remove legacy buttons
-            const miniBtn = imgElement.querySelector('.mini-dl-btn');
-            if(miniBtn) miniBtn.remove();
-
-            // Store in memory
+            this.applyImageToElement(imgElement, imageData.data, imageData.name);
             this.uploadedImages.get(showcaseId)[imgIndex] = imageData;
             restoredCount++;
             console.log(`[Restore] Restored ${showcaseId} img-${imgIndex}`);
@@ -350,7 +334,33 @@ class ShowcaseEditor {
     }
   }
 
-  // Save images to IndexedDB
+  // Centralized method to apply image to element
+  applyImageToElement(imgElement, imgSrc, imgName) {
+    imgElement.style.backgroundImage = `url(${imgSrc})`;
+    imgElement.classList.add('has-image');
+
+    // Remove overlay
+    const overlay = imgElement.querySelector('.upload-overlay');
+    if (overlay) overlay.remove();
+
+    // Remove old elements
+    const oldLink = imgElement.querySelector('.download-link');
+    if (oldLink) oldLink.remove();
+    const oldImg = imgElement.querySelector('.real-showcase-img');
+    if (oldImg) oldImg.remove();
+    const miniBtn = imgElement.querySelector('.mini-dl-btn');
+    if (miniBtn) miniBtn.remove();
+
+    // Create new image element
+    const realImg = document.createElement('img');
+    realImg.className = 'real-showcase-img';
+    realImg.src = imgSrc;
+    realImg.alt = imgName || 'Showcase image';
+    realImg.dataset.imgSrc = imgSrc; // Store src in data attribute for event delegation
+    realImg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;cursor:pointer;';
+    imgElement.appendChild(realImg);
+  }
+
   async saveToLocalStorage() {
     try {
       const dataToSave = {};
@@ -380,20 +390,21 @@ class ShowcaseEditor {
       const showcaseId = showcaseCard.getAttribute('data-showcase-id');
       const imgIndex = imgElement.getAttribute('data-img-index');
 
-      // Initialize map for this showcase if needed
       if (!this.uploadedImages.has(showcaseId)) {
         this.uploadedImages.set(showcaseId, {});
       }
 
-      // Click to upload (only if no image yet)
+      // Click to upload only if no image
       imgElement.addEventListener('click', (e) => {
-        // Only trigger upload if clicking on empty area (not on the real image)
+        // Don't trigger upload if clicking on the real image (it opens lightbox)
+        if (e.target.classList.contains('real-showcase-img')) {
+          return;
+        }
         if (!imgElement.classList.contains('has-image')) {
           fileInput.click();
         }
       });
 
-      // File input change
       fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -488,15 +499,6 @@ class ShowcaseEditor {
       this.showNotification('正在压缩图片...', 'info');
       
       const processed = await this.resizeImage(file);
-      
-      imgElement.style.backgroundImage = `url(${processed.dataUrl})`;
-      imgElement.classList.add('has-image');
-      
-      // Remove overlay
-      const overlay = imgElement.querySelector('.upload-overlay');
-      if (overlay) {
-        overlay.remove();
-      }
 
       // Semantic naming
       const CARD_INDEX = {
@@ -510,32 +512,8 @@ class ShowcaseEditor {
       const roleName = ROLE_NAMES[Number(imgIndex)] || 'Image';
       const standardizedName = `${roleName}-${cardIndex}.jpg`;
 
-      // Remove old download link if exists
-      const oldLink = imgElement.querySelector('.download-link');
-      if (oldLink) oldLink.remove();
-
-      // Insert clickable image for lightbox
-      let realImg = imgElement.querySelector('.real-showcase-img');
-      if (!realImg) {
-        realImg = document.createElement('img');
-        realImg.className = 'real-showcase-img';
-        realImg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;cursor:pointer;';
-        imgElement.appendChild(realImg);
-      }
-      realImg.src = processed.dataUrl;
-      realImg.alt = standardizedName;
-
-      // Click to open lightbox
-      realImg.addEventListener('click', (e) => {
-        e.stopPropagation();
-        lightbox.open(processed.dataUrl, realImg);
-      });
-
-      // Remove legacy elements
-      const oldImg = imgElement.querySelector(':scope > .real-showcase-img:not(:last-child)');
-      if(oldImg) oldImg.remove();
-      const miniBtn = imgElement.querySelector('.mini-dl-btn');
-      if(miniBtn) miniBtn.remove();
+      // Apply image to element
+      this.applyImageToElement(imgElement, processed.dataUrl, standardizedName);
 
       // Store the uploaded image data
       const showcaseImages = this.uploadedImages.get(showcaseId);
