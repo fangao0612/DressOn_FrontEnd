@@ -54,8 +54,8 @@ export const translations = {
     'step1.subtitle': 'Experience the power of DressOn\'s natural language image editing. Transform any photo with simple text commands.',
     'step1.promptEngine': 'Prompt Engine',
     'step1.characterRef': 'Character Reference',
-    'step1.garmentRef': 'Garment Reference',
-    'step1.addImage': 'Add Image · Max 50MB',
+    'step1.garmentRef': 'Outfit Reference',
+    'step1.addImage': 'Add Image · Max 10MB',
     'step1.generateLook': 'Generate Look',
     'step1.outputGallery': 'Output Gallery',
     'step1.readyTitle': 'Ready for instant generation',
@@ -89,7 +89,7 @@ export const translations = {
 
     // Showcase
     'showcase.title': 'Lightning‑Fast Fashion Creations',
-    'showcase.character': '🧑 Character & Pose',
+    'showcase.character': '👤 Character & Pose',
     'showcase.outfit': '👔 Outfit Reference',
     'showcase.result': '✨ Final Result',
     'showcase.dropClick': 'Drop or Click',
@@ -179,7 +179,7 @@ export const translations = {
     'step1.promptEngine': '提示引擎',
     'step1.characterRef': '人物参考',
     'step1.garmentRef': '服装参考',
-    'step1.addImage': '添加图片 · 最大 50MB',
+    'step1.addImage': '添加图片 · 最大 10MB',
     'step1.generateLook': '生成造型',
     'step1.outputGallery': '输出画廊',
     'step1.readyTitle': '准备即时生成',
@@ -213,7 +213,7 @@ export const translations = {
 
     // Showcase
     'showcase.title': '闪电般快速的时尚创作',
-    'showcase.character': '🧑 人物与姿势',
+    'showcase.character': '👤 人物与姿势',
     'showcase.outfit': '👔 服装参考',
     'showcase.result': '✨ 最终结果',
     'showcase.dropClick': '拖放或点击',

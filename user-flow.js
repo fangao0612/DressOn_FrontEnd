@@ -448,7 +448,7 @@ async function handleGenerate() {
   const mainFile = personInput?.files?.[0];
   const garmentFile = clothesInput?.files?.[0] || __garmentOriginal; // 支持先上传 garment
   if (!mainFile) { setCanvasError(targetSel, 'Please upload Character Reference.'); return; }
-  if (!garmentFile) { setCanvasError(targetSel, 'Please upload Garment Reference.'); return; }
+  if (!garmentFile) { setCanvasError(targetSel, 'Please upload Outfit Reference.'); return; }
 
   // 缓存 garment 原图（只在提供新文件时更新）
   if (clothesInput?.files?.[0]) {

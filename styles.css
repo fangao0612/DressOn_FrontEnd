@@ -695,7 +695,7 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
   .reviews-grid{grid-template-columns:1fr}
 }
 
-/* Reduce spacing between Character Reference and Garment Reference in Prompt Engine */
+/* Reduce spacing between Character Reference and Outfit Reference in Prompt Engine */
 .editor .panel.left .panel-inner .field.two-col:nth-of-type(2){
   margin-top: -1px;
 }
