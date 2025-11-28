@@ -111,8 +111,10 @@ body.no-scroll{overflow:hidden}
 /* Auth visibility guard (CSS-level, no闪烁) */
 html[data-auth="on"] .sign-in-btn{display:none !important}
 html[data-auth="on"] .profile-btn{display:inline-grid !important}
+html[data-auth="on"] .credits{display:inline-flex !important}
 html:not([data-auth="on"]) .sign-in-btn{display:inline-flex !important}
 html:not([data-auth="on"]) .profile-btn{display:none !important}
+html:not([data-auth="on"]) .credits{display:none !important}
 
 /* Auth modal */
 .auth-modal{position:fixed;inset:0;display:grid;place-items:center;z-index:999}
