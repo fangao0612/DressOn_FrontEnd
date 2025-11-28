@@ -299,39 +299,77 @@ class ShowcaseEditor {
       const savedData = await this.db.get(this.STORAGE_KEY);
       console.log('[Restore] Checking DB...', savedData ? 'Found data' : 'No data');
 
-      if (!savedData) {
-        console.log('[Restore] No saved images found');
-        return;
-      }
-
-      const parsedData = savedData; 
-      let restoredCount = 0;
-
-      Object.entries(parsedData).forEach(([showcaseId, images]) => {
-        this.uploadedImages.set(showcaseId, {});
-
-        Object.entries(images).forEach(([imgIndex, imageData]) => {
-          const imgElement = document.querySelector(
-            `.showcase-card[data-showcase-id="${showcaseId}"] .editable-img[data-img-index="${imgIndex}"]`
-          );
-
-          if (imgElement && imageData && imageData.data) {
-            this.applyImageToElement(imgElement, imageData.data, imageData.name);
-            this.uploadedImages.get(showcaseId)[imgIndex] = imageData;
-            restoredCount++;
-            console.log(`[Restore] Restored ${showcaseId} img-${imgIndex}`);
-          }
+      if (savedData) {
+        // 1. Restore from DB
+        let restoredCount = 0;
+        Object.entries(savedData).forEach(([showcaseId, images]) => {
+          this.uploadedImages.set(showcaseId, {});
+          Object.entries(images).forEach(([imgIndex, imageData]) => {
+            const imgElement = document.querySelector(
+              `.showcase-card[data-showcase-id="${showcaseId}"] .editable-img[data-img-index="${imgIndex}"]`
+            );
+            if (imgElement && imageData && imageData.data) {
+              this.applyImageToElement(imgElement, imageData.data, imageData.name);
+              this.uploadedImages.get(showcaseId)[imgIndex] = imageData;
+              restoredCount++;
+            }
+          });
         });
-      });
-
-      if (restoredCount > 0) {
-        console.log(`[Restore] Successfully restored ${restoredCount} images`);
-        this.showNotification(`已恢复 ${restoredCount} 张图片`, 'success');
+        if (restoredCount > 0) {
+          console.log(`[Restore] Successfully restored ${restoredCount} images from DB`);
+          this.showNotification(`已恢复 ${restoredCount} 张图片`, 'success');
+          return;
+        }
       }
+
+      // 2. If no data in DB, load default assets
+      console.log('[Restore] No saved data, loading defaults...');
+      await this.loadDefaultImages();
+
     } catch (error) {
       console.error('[Restore] Failed to restore images:', error);
       this.showNotification('恢复图片失败', 'error');
     }
+  }
+
+  async loadDefaultImages() {
+    const CARD_MAPPING = {
+      'editorial-skyline': 1,
+      'garden-harmony': 2,
+      'island-breeze': 3,
+      'arctic-aura': 4
+    };
+    const ROLE_NAMES = ['Character & Pose', 'Outfit Reference', 'Final Result'];
+    
+    let loadedCount = 0;
+
+    for (const [showcaseId, cardIndex] of Object.entries(CARD_MAPPING)) {
+      if (!this.uploadedImages.has(showcaseId)) {
+        this.uploadedImages.set(showcaseId, {});
+      }
+
+      for (let i = 0; i < 3; i++) {
+        const roleName = ROLE_NAMES[i];
+        const fileName = `${roleName}-${cardIndex}.jpg`;
+        const imgPath = `./assets/showcase/${fileName}`;
+        
+        const imgElement = document.querySelector(
+          `.showcase-card[data-showcase-id="${showcaseId}"] .editable-img[data-img-index="${i}"]`
+        );
+
+        if (imgElement) {
+          // Apply directly from asset path
+          this.applyImageToElement(imgElement, imgPath, fileName);
+          
+          // We don't save to DB yet to save space, unless user edits it.
+          // Or we could fetch and save:
+          // await this.fetchAndSaveDefault(imgPath, showcaseId, i, fileName);
+          
+          loadedCount++;
+        }
+      }
+    }
+    console.log(`[Restore] Loaded ${loadedCount} default images`);
   }
 
   // Centralized method to apply image to element
