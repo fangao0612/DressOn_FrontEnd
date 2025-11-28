@@ -18,25 +18,8 @@
     
     /* Pricing-specific styles */
     .pricing-hero {
-      padding: 120px 0 80px;
+      padding: 120px 0 40px;
       text-align: center;
-    }
-    .pricing-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, rgba(255,94,102,0.15), rgba(124,134,211,0.15));
-      border: 1px solid rgba(255,94,102,0.3);
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 24px;
-    }
-    .pricing-badge::before {
-      content: '⚡';
-      font-size: 16px;
     }
     .pricing-hero h1 {
       font-size: clamp(2.5rem, 5vw, 3.5rem);
@@ -49,30 +32,68 @@
     .pricing-hero p {
       font-size: 1.25rem;
       color: var(--muted);
-      margin: 0 auto 48px;
+      margin: 0 auto 32px;
       max-width: 600px;
       opacity: 0;
       animation: fadeInUp 0.6s ease-out 0.1s forwards;
     }
-    .pricing-badge {
+
+    /* Top Level Tabs */
+    .pricing-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 48px;
       opacity: 0;
-      animation: fadeInUp 0.5s ease-out forwards;
+      animation: fadeInUp 0.6s ease-out 0.15s forwards;
     }
-    .billing-toggle {
-      opacity: 0;
-      animation: fadeInUp 0.6s ease-out 0.2s forwards;
+    .tab-btn {
+      padding: 12px 32px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    
+    .tab-btn:hover {
+      border-color: var(--text);
+      color: var(--text);
+    }
+    .tab-btn.active {
+      background: #ffcc00; /* Yellow from screenshot */
+      color: #000;
+      border-color: #ffcc00;
+      box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+    }
+    .tab-icon { font-size: 1.1em; }
+
+    /* View Sections */
+    .view-section {
+      display: none;
+      animation: fadeInUp 0.4s ease-out forwards;
+    }
+    .view-section.active {
+      display: block;
+    }
+
     /* Billing toggle */
     .billing-toggle {
       display: inline-flex;
       align-items: center;
-      gap: 16px;
+      gap: 4px;
       padding: 6px;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 999px;
       margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeInUp 0.6s ease-out 0.2s forwards;
     }
     .billing-option {
       padding: 10px 28px;
@@ -86,16 +107,15 @@
       position: relative;
     }
     .billing-option.active {
-      background: linear-gradient(180deg, #ff5e66, #e24b55);
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(255,94,102,0.3);
+      background: #ffcc00;
+      color: #000;
     }
     .billing-option .save-badge {
       position: absolute;
-      top: -8px;
-      right: -8px;
-      background: #ffcc66;
-      color: #0a0d12;
+      top: -10px;
+      right: -10px;
+      background: #ff5e66;
+      color: white;
       font-size: 10px;
       font-weight: 900;
       padding: 2px 6px;
@@ -111,8 +131,12 @@
       max-width: 1200px;
       margin: 0 auto 80px;
       padding: 0 20px;
-      background: transparent;
     }
+    /* 4 columns for credit packs */
+    .pricing-cards.four-cols {
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
     /* Fade-in animation */
     @keyframes fadeInUp {
       from {
@@ -132,27 +156,16 @@
       padding: 32px 28px;
       position: relative;
       transition: transform 0.2s, border-color 0.2s;
-      
-      /* Animation */
-      opacity: 0;
-      animation: fadeInUp 0.6s ease-out forwards;
-    }
-    .pricing-card:nth-child(1) {
-      animation-delay: 0.1s;
-    }
-    .pricing-card:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-    .pricing-card:nth-child(3) {
-      animation-delay: 0.3s;
+      display: flex;
+      flex-direction: column;
     }
     .pricing-card:hover {
       transform: translateY(-4px);
       border-color: rgba(255,94,102,0.4);
     }
     .pricing-card.featured {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 1px var(--primary), 0 20px 40px rgba(255,94,102,0.15);
+      border-color: #ffcc00;
+      box-shadow: 0 0 0 1px #ffcc00, 0 20px 40px rgba(255, 204, 0, 0.1);
     }
     .pricing-card.featured::before {
       content: 'Most Popular';
@@ -160,8 +173,8 @@
       top: -12px;
       left: 50%;
       transform: translateX(-50%);
-      background: linear-gradient(135deg, #ff5e66, #e24b55);
-      color: #fff;
+      background: #ffcc00;
+      color: #000;
       font-size: 12px;
       font-weight: 900;
       padding: 6px 16px;
@@ -172,15 +185,16 @@
     .plan-icon {
       font-size: 32px;
       margin-bottom: 12px;
+      color: #ffcc00;
     }
     .plan-name {
-      font-size: 1.75rem;
+      font-size: 1.5rem;
       font-weight: 900;
       margin: 0 0 8px;
     }
     .plan-desc {
       color: var(--muted);
-      font-size: 14px;
+      font-size: 13px;
       margin: 0 0 24px;
       min-height: 40px;
     }
@@ -188,73 +202,78 @@
       display: flex;
       align-items: baseline;
       gap: 4px;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
     }
     .price-amount {
-      font-size: 3rem;
+      font-size: 2.5rem;
       font-weight: 900;
-      color: var(--text);
+      color: #ffcc00;
     }
     .price-period {
       color: var(--muted);
       font-size: 1rem;
     }
     .price-original {
-      font-size: 1.25rem;
+      font-size: 1rem;
       color: var(--muted);
       text-decoration: line-through;
       margin-left: 8px;
     }
     .save-percentage {
       display: inline-block;
-      background: linear-gradient(135deg, #ffcc66, #ff9966);
-      color: #0a0d12;
-      font-size: 12px;
+      background: #ff5e66;
+      color: white;
+      font-size: 11px;
       font-weight: 900;
-      padding: 4px 10px;
-      border-radius: 6px;
+      padding: 2px 8px;
+      border-radius: 4px;
       margin-left: 8px;
       text-transform: uppercase;
+      vertical-align: middle;
     }
     .plan-credits {
       font-size: 14px;
-      color: var(--muted);
+      color: var(--text);
       margin-bottom: 24px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      text-align: center;
     }
     .plan-credits strong {
-      color: var(--text);
-      font-weight: 700;
+      color: #ffcc00;
+      font-weight: 800;
     }
     .plan-cta {
       width: 100%;
       padding: 14px 24px;
       border-radius: 12px;
-      border: none;
-      background: linear-gradient(180deg, #ff5e66, #e24b55);
-      color: #fff;
+      border: 1px solid #ffcc00;
+      background: transparent;
+      color: #ffcc00;
       font-weight: 900;
       font-size: 16px;
       cursor: pointer;
       margin-bottom: 24px;
-      transition: transform 0.15s, box-shadow 0.15s;
+      transition: all 0.15s;
     }
     .plan-cta:hover {
+      background: #ffcc00;
+      color: #000;
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(255,94,102,0.35);
+      box-shadow: 0 8px 20px rgba(255, 204, 0, 0.2);
     }
+    /* Featured CTA */
     .pricing-card.featured .plan-cta {
-      background: linear-gradient(135deg, #ff5e66, #e24b55);
-      box-shadow: 0 6px 18px rgba(255,94,102,0.25);
+      background: #ffcc00;
+      color: #000;
     }
-    .plan-cta.secondary {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text);
+    .pricing-card.featured .plan-cta:hover {
+      background: #ffe066;
     }
-    .plan-cta.secondary:hover {
-      border-color: var(--primary);
-      box-shadow: 0 4px 12px rgba(255,94,102,0.2);
-    }
+
     .plan-features {
       list-style: none;
       padding: 0;
@@ -262,37 +281,21 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      flex-grow: 1;
     }
     .plan-features li {
       display: flex;
       align-items: flex-start;
       gap: 10px;
       color: var(--text);
-      font-size: 14px;
+      font-size: 13px;
       line-height: 1.5;
     }
     .plan-features li::before {
       content: '✓';
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: rgba(255,94,102,0.15);
-      color: var(--primary);
+      color: #ffcc00;
       font-weight: 900;
       flex-shrink: 0;
-      margin-top: 2px;
-    }
-    .plan-features li.dimmed {
-      color: var(--muted);
-      opacity: 0.6;
-    }
-    .plan-features li.dimmed::before {
-      content: '—';
-      background: rgba(255,255,255,0.05);
-      color: var(--muted);
     }
     
     /* FAQ Section */
@@ -306,10 +309,7 @@
       font-size: 2.5rem;
       font-weight: 900;
       margin-bottom: 48px;
-      background: linear-gradient(135deg, #ffcc66 0%, #ff9966 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--text);
     }
     .faq-item {
       background: var(--card);
@@ -335,9 +335,9 @@
       text-align: center;
       padding: 80px 20px;
       margin: 60px 0;
-      background: linear-gradient(135deg, rgba(255,94,102,0.08), rgba(124,134,211,0.08));
-      border-top: 1px solid rgba(255,94,102,0.2);
-      border-bottom: 1px solid rgba(255,94,102,0.2);
+      background: linear-gradient(135deg, rgba(255,204,0,0.05), rgba(255,94,102,0.05));
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
     }
     .cta-section h2 {
       font-size: 2.25rem;
@@ -348,10 +348,6 @@
       font-size: 1.125rem;
       color: var(--muted);
       margin: 0 0 32px;
-    }
-    .cta-section .btn {
-      padding: 16px 40px;
-      font-size: 18px;
     }
   </style>
 </head>
@@ -396,111 +392,234 @@
     <!-- Pricing Hero -->
     <section class="pricing-hero">
       <div class="container">
-        <div class="pricing-badge">Limited Time: Save 20% with Annual Billing</div>
         <h1>Choose Your Perfect Plan</h1>
         <p>Unlimited creativity starts here</p>
         
+        <!-- Mode Tabs -->
+        <div class="pricing-tabs">
+          <button class="tab-btn active" data-target="#subscriptions">
+            <span class="tab-icon">💳</span> Subscriptions
+          </button>
+          <button class="tab-btn" data-target="#credit-packs">
+            <span class="tab-icon">📦</span> Credit Packs
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Subscriptions View -->
+    <div id="subscriptions" class="view-section active">
+      <div class="container" style="text-align:center">
         <!-- Billing Toggle -->
         <div class="billing-toggle">
           <button class="billing-option active" data-period="monthly">Monthly</button>
           <button class="billing-option" data-period="yearly">
             Yearly
-            <span class="save-badge">Save 20%</span>
+            <span class="save-badge">LIMITED TIME: Save 50%</span>
           </button>
         </div>
       </div>
-    </section>
 
-    <!-- Pricing Cards -->
-    <section class="pricing-cards">
-      <!-- Basic Plan -->
-      <div class="pricing-card">
-        <div class="plan-icon">🌱</div>
-        <h2 class="plan-name">Basic</h2>
-        <p class="plan-desc">Perfect for individuals and light users</p>
-        
-        <div class="plan-price">
-          <span class="price-amount monthly-price">$12.00</span>
-          <span class="price-amount yearly-price" style="display:none">$9.60</span>
-          <span class="price-period">/mo</span>
-          <span class="save-percentage yearly-price" style="display:none">Save 20%</span>
-        </div>
-        <p class="price-original yearly-price" style="display:none">$144.00/year</p>
-        
-        <p class="plan-credits"><strong>1600 credits</strong>/year</p>
-        
-        <button class="plan-cta secondary">Subscribe Now</button>
-        
-        <ul class="plan-features">
-          <li>75 high-quality images/month</li>
-          <li>All style templates included</li>
-          <li>Standard generation speed</li>
-          <li>Basic customer support</li>
-          <li>JPG/PNG format downloads</li>
-          <li class="dimmed">Commercial Use License</li>
-        </ul>
-      </div>
+      <section class="pricing-cards">
+        <!-- Basic Plan -->
+        <div class="pricing-card">
+          <div class="plan-icon">⚡</div>
+          <h2 class="plan-name">Basic</h2>
+          <p class="plan-desc">Perfect for individuals and light users</p>
+          
+          <div class="plan-price">
+            <span class="price-amount monthly-price">$15.00</span>
+            <span class="price-amount yearly-price" style="display:none">$12.00</span>
+            <span class="price-period">/mo</span>
+          </div>
+          
+          <div class="yearly-price" style="display:none; margin-bottom: 12px;">
+             <span class="price-original">$180.00</span>
+             <span style="color:#2ecc71; font-weight:bold; font-size:14px; margin-left:4px;">$144.00/year</span>
+          </div>
 
-      <!-- Pro Plan (Featured) -->
-      <div class="pricing-card featured">
-        <div class="plan-icon">🚀</div>
-        <h2 class="plan-name">Pro</h2>
-        <p class="plan-desc">For professional creators and teams</p>
-        
-        <div class="plan-price">
-          <span class="price-amount monthly-price">$19.50</span>
-          <span class="price-amount yearly-price" style="display:none">$15.60</span>
-          <span class="price-period">/mo</span>
-          <span class="save-percentage yearly-price" style="display:none">Save 20%</span>
-        </div>
-        <p class="price-original yearly-price" style="display:none">$234.00/year</p>
-        
-        <p class="plan-credits"><strong>9600 credits</strong>/year</p>
-        
-        <button class="plan-cta">Subscribe Now</button>
-        
-        <ul class="plan-features">
-          <li>400 high-quality images/month</li>
-          <li>All style templates included</li>
-          <li>Priority generation queue</li>
-          <li>Priority customer support</li>
-          <li>JPG/PNG/WebP format downloads</li>
-          <li>Batch generation feature</li>
-          <li>Image editing tools (coming in October)</li>
-          <li><strong>Commercial Use License</strong></li>
-        </ul>
-      </div>
+          <div class="plan-credits">
+            <span class="monthly-price"><strong>150 credits</strong>/month</span>
+            <span class="yearly-price" style="display:none"><strong>1800 credits</strong>/year</span>
+          </div>
+          
+          <ul class="plan-features">
+            <li>75 high-quality images/month</li>
+            <li>All style templates included</li>
+            <li>Standard generation speed</li>
+            <li>Basic customer support</li>
+            <li>JPG/PNG format downloads</li>
+            <li class="yearly-price" style="display:none; color:#ffcc00;"><strong>Commercial Use License</strong></li>
+          </ul>
 
-      <!-- Max Plan -->
-      <div class="pricing-card">
-        <div class="plan-icon">👑</div>
-        <h2 class="plan-name">Max</h2>
-        <p class="plan-desc">Designed for large enterprises and professional studios</p>
-        
-        <div class="plan-price">
-          <span class="price-amount monthly-price">$40.00</span>
-          <span class="price-amount yearly-price" style="display:none">$32.00</span>
-          <span class="price-period">/mo</span>
-          <span class="save-percentage yearly-price" style="display:none">Save 20%</span>
+          <button class="plan-cta" style="margin-top:auto;">Sign In to Get Started</button>
         </div>
-        <p class="price-original yearly-price" style="display:none">$480.00/year</p>
-        
-        <p class="plan-credits"><strong>19200 credits</strong>/year</p>
-        
-        <button class="plan-cta">Subscribe Now</button>
-        
-        <ul class="plan-features">
-          <li>800 high-quality images/month</li>
-          <li>All style templates included</li>
-          <li>Fastest generation speed</li>
-          <li>Dedicated account manager</li>
-          <li>All format downloads</li>
-          <li>Batch generation feature</li>
-          <li>Professional editing suite (coming in October)</li>
-          <li><strong>Commercial Use License</strong></li>
-        </ul>
-      </div>
-    </section>
+
+        <!-- Pro Plan (Featured) -->
+        <div class="pricing-card featured">
+          <div class="plan-icon">🚀</div>
+          <h2 class="plan-name">Pro</h2>
+          <p class="plan-desc">For professional creators and teams</p>
+          
+          <div class="plan-price">
+            <span class="price-amount monthly-price">$39.00</span>
+            <span class="price-amount yearly-price" style="display:none">$19.50</span>
+            <span class="price-period">/mo</span>
+            <span class="save-percentage yearly-price" style="display:none">SAVE 50%</span>
+          </div>
+
+          <div class="yearly-price" style="display:none; margin-bottom: 12px;">
+             <span class="price-original">$468.00</span>
+             <span style="color:#2ecc71; font-weight:bold; font-size:14px; margin-left:4px;">$234.00/year</span>
+          </div>
+          
+          <div class="plan-credits">
+            <span class="monthly-price"><strong>800 credits</strong>/month</span>
+            <span class="yearly-price" style="display:none"><strong>9600 credits</strong>/year</span>
+          </div>
+          
+          <ul class="plan-features">
+            <li>400 high-quality images/month</li>
+            <li>Support Seedream-4 Model</li>
+            <li>Support Nanobanana-Pro Model</li>
+            <li>All style templates included</li>
+            <li>Priority generation queue</li>
+            <li>Priority customer support</li>
+            <li>JPG/PNG/WebP format downloads</li>
+            <li>Batch generation feature</li>
+            <li>Image editing tools (Coming in October)</li>
+            <li class="yearly-price" style="display:none; color:#ffcc00;"><strong>Commercial Use License</strong></li>
+          </ul>
+
+          <button class="plan-cta" style="margin-top:auto;">Sign In to Get Started</button>
+        </div>
+
+        <!-- Max Plan -->
+        <div class="pricing-card">
+          <div class="plan-icon">👑</div>
+          <h2 class="plan-name">Max</h2>
+          <p class="plan-desc">Designed for large enterprises and professional studios</p>
+          
+          <div class="plan-price">
+            <span class="price-amount monthly-price">$160.00</span>
+            <span class="price-amount yearly-price" style="display:none">$80.00</span>
+            <span class="price-period">/mo</span>
+            <span class="save-percentage yearly-price" style="display:none">SAVE 50%</span>
+          </div>
+
+          <div class="yearly-price" style="display:none; margin-bottom: 12px;">
+             <span class="price-original">$1,920.00</span>
+             <span style="color:#2ecc71; font-weight:bold; font-size:14px; margin-left:4px;">$960.00/year</span>
+          </div>
+          
+          <div class="plan-credits">
+            <span class="monthly-price"><strong>4600 credits</strong>/month</span>
+            <span class="yearly-price" style="display:none"><strong>55200 credits</strong>/year</span>
+          </div>
+          
+          <ul class="plan-features">
+            <li>2300 high-quality images/month</li>
+            <li>Support Seedream-4 Model</li>
+            <li>Support Nanobanana-Pro Model</li>
+            <li>All style templates included</li>
+            <li>Fastest generation speed</li>
+            <li>Dedicated account manager</li>
+            <li>All format downloads</li>
+            <li>Batch generation feature</li>
+            <li>Professional editing suite (Coming in October)</li>
+            <li class="yearly-price" style="display:none; color:#ffcc00;"><strong>Commercial Use License</strong></li>
+          </ul>
+
+          <button class="plan-cta" style="margin-top:auto;">Sign In to Get Started</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Credit Packs View -->
+    <div id="credit-packs" class="view-section">
+      <section class="pricing-cards four-cols">
+        <!-- Starter Pack -->
+        <div class="pricing-card">
+          <h2 class="plan-name">Starter Pack</h2>
+          <p class="plan-desc">Try out our AI capabilities</p>
+          <div class="plan-price">
+            <span class="price-amount">$30.00</span>
+          </div>
+          <div class="plan-credits">
+            <strong>200 credits</strong>
+          </div>
+          <div style="color:#2ecc71; font-size:12px; font-weight:bold; margin-bottom:12px;">One-time purchase • No expiry</div>
+          
+          <ul class="plan-features">
+            <li>200 credits included</li>
+            <li>Never expires</li>
+            <li>All features unlocked</li>
+          </ul>
+          <button class="plan-cta" style="margin-top:auto;">Sign In to Get Started</button>
+        </div>
+
+        <!-- Growth Pack -->
+        <div class="pricing-card featured">
+          <h2 class="plan-name">Growth Pack</h2>
+          <p class="plan-desc">Perfect for regular creators</p>
+          <div class="plan-price">
+            <span class="price-amount">$80.00</span>
+          </div>
+          <div class="plan-credits">
+            <strong>533 credits</strong>
+          </div>
+          <div style="color:#2ecc71; font-size:12px; font-weight:bold; margin-bottom:12px;">One-time purchase • No expiry</div>
+          
+          <ul class="plan-features">
+            <li>533 credits included</li>
+            <li>Never expires</li>
+            <li>Priority support included</li>
+          </ul>
+          <button class="plan-cta" style="margin-top:auto;">Sign In to Get Started</button>
+        </div>
+
+        <!-- Professional Pack -->
+        <div class="pricing-card">
+          <h2 class="plan-name">Professional Pack</h2>
+          <p class="plan-desc">For serious content creators</p>
+          <div class="plan-price">
+            <span class="price-amount">$200.00</span>
+          </div>
+          <div class="plan-credits">
+            <strong>1333 credits</strong>
+          </div>
+          <div style="color:#2ecc71; font-size:12px; font-weight:bold; margin-bottom:12px;">One-time purchase • No expiry</div>
+          
+          <ul class="plan-features">
+            <li>1333 credits included</li>
+            <li>Never expires</li>
+            <li>Priority support & batch processing</li>
+          </ul>
+          <button class="plan-cta" style="margin-top:auto;">Sign In to Get Started</button>
+        </div>
+
+        <!-- Enterprise Pack -->
+        <div class="pricing-card">
+          <h2 class="plan-name">Enterprise Pack</h2>
+          <p class="plan-desc">Maximum value for teams</p>
+          <div class="plan-price">
+            <span class="price-amount">$800.00</span>
+          </div>
+          <div class="plan-credits">
+            <strong>5333 credits</strong>
+          </div>
+          <div style="color:#2ecc71; font-size:12px; font-weight:bold; margin-bottom:12px;">One-time purchase • No expiry</div>
+          
+          <ul class="plan-features">
+            <li>5333 credits included</li>
+            <li>Never expires</li>
+            <li>Dedicated support & API access</li>
+          </ul>
+          <button class="plan-cta" style="margin-top:auto;">Sign In to Get Started</button>
+        </div>
+      </section>
+    </div>
 
     <!-- FAQ Section -->
     <section class="faq-section">
@@ -512,18 +631,13 @@
       </div>
       
       <div class="faq-item">
-        <h3 class="faq-question">Can I change my plan anytime?</h3>
-        <p class="faq-answer">Yes, you can upgrade or downgrade your plan at any time. Upgrades take effect immediately, while downgrades take effect at the next billing cycle.</p>
-      </div>
-      
-      <div class="faq-item">
         <h3 class="faq-question">Do unused credits roll over?</h3>
-        <p class="faq-answer">Monthly plan credits do not roll over to the next month. Yearly plan credits are valid for the entire subscription period. We recommend choosing a plan based on your actual usage needs.</p>
+        <p class="faq-answer">Monthly plan credits do not roll over to the next month. Yearly plan credits are valid for the entire subscription period. Credit packs never expire.</p>
       </div>
       
       <div class="faq-item">
         <h3 class="faq-question">What payment methods are supported?</h3>
-        <p class="faq-answer">We support credit cards, debit cards, Alipay, WeChat Pay, and various other payment methods. All payments are processed through secure third-party payment platforms.</p>
+        <p class="faq-answer">We support credit cards, debit cards, Alipay, WeChat Pay, and various other payment methods.</p>
       </div>
     </section>
 
@@ -538,10 +652,27 @@
   </main>
 
   <script type="module">
-    // Billing toggle
+    // Tab Switching
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const viewSections = document.querySelectorAll('.view-section');
+    
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Deactivate all
+        tabBtns.forEach(b => b.classList.remove('active'));
+        viewSections.forEach(v => v.classList.remove('active'));
+        
+        // Activate clicked
+        btn.classList.add('active');
+        const targetId = btn.dataset.target;
+        document.querySelector(targetId).classList.add('active');
+      });
+    });
+
+    // Billing toggle (Monthly / Yearly)
     const billingOptions = document.querySelectorAll('.billing-option');
-    const monthlyPrices = document.querySelectorAll('.monthly-price');
-    const yearlyPrices = document.querySelectorAll('.yearly-price');
+    const monthlyElements = document.querySelectorAll('.monthly-price');
+    const yearlyElements = document.querySelectorAll('.yearly-price');
     
     billingOptions.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -551,41 +682,29 @@
         billingOptions.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         
-        // Toggle prices
+        // Toggle visibility
         if (period === 'monthly') {
-          monthlyPrices.forEach(el => el.style.display = '');
-          yearlyPrices.forEach(el => el.style.display = 'none');
+          monthlyElements.forEach(el => el.style.display = '');
+          yearlyElements.forEach(el => el.style.display = 'none');
         } else {
-          monthlyPrices.forEach(el => el.style.display = 'none');
-          yearlyPrices.forEach(el => el.style.display = '');
+          monthlyElements.forEach(el => el.style.display = 'none');
+          yearlyElements.forEach(el => el.style.display = '');
         }
-      });
-    });
-    
-    // Subscribe button handlers
-    const ctaButtons = document.querySelectorAll('.plan-cta');
-    ctaButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const planName = btn.closest('.pricing-card').querySelector('.plan-name').textContent;
-        alert(`Subscribing to ${planName} plan. Payment integration coming soon!`);
       });
     });
     
     // Auth integration (reuse from main site)
     const signInBtn = document.querySelector('.sign-in-btn');
     const loginBtn = document.querySelector('.login-btn');
+    const ctaButtons = document.querySelectorAll('.plan-cta');
     
-    if (signInBtn) {
-      signInBtn.addEventListener('click', () => {
-        window.location.href = 'https://dresson-backend.onrender.com/auth/login';
-      });
-    }
-    
-    if (loginBtn) {
-      loginBtn.addEventListener('click', () => {
-        window.location.href = 'https://dresson-backend.onrender.com/auth/login';
-      });
-    }
+    const goToLogin = () => {
+      window.location.href = 'https://dresson-backend.onrender.com/auth/login';
+    };
+
+    if (signInBtn) signInBtn.addEventListener('click', goToLogin);
+    if (loginBtn) loginBtn.addEventListener('click', goToLogin);
+    ctaButtons.forEach(btn => btn.addEventListener('click', goToLogin));
     
     // Check auth status
     fetch('https://dresson-backend.onrender.com/me', { credentials: 'include' })
@@ -607,4 +726,3 @@
   </script>
 </body>
 </html>
-
