@@ -11,11 +11,6 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>👗</text></svg>">
   <link rel="stylesheet" href="./styles.css">
   <style>
-    /* Override body background: remove gradients, use solid color */
-    body {
-      background: var(--bg) !important;
-    }
-    
     /* Pricing-specific styles */
     .pricing-hero {
       padding: 120px 0 40px;
@@ -66,10 +61,10 @@
       color: var(--text);
     }
     .tab-btn.active {
-      background: #ffcc00; /* Yellow from screenshot */
-      color: #000;
-      border-color: #ffcc00;
-      box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(255, 94, 102, 0.3);
     }
     .tab-icon { font-size: 1.1em; }
 
@@ -107,15 +102,16 @@
       position: relative;
     }
     .billing-option.active {
-      background: #ffcc00;
-      color: #000;
+      background: linear-gradient(180deg, #ff5e66, #e24b55);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(255,94,102,0.3);
     }
     .billing-option .save-badge {
       position: absolute;
       top: -10px;
       right: -10px;
-      background: #ff5e66;
-      color: white;
+      background: #ffcc66;
+      color: #0a0d12;
       font-size: 10px;
       font-weight: 900;
       padding: 2px 6px;
@@ -164,8 +160,8 @@
       border-color: rgba(255,94,102,0.4);
     }
     .pricing-card.featured {
-      border-color: #ffcc00;
-      box-shadow: 0 0 0 1px #ffcc00, 0 20px 40px rgba(255, 204, 0, 0.1);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px var(--primary), 0 20px 40px rgba(255,94,102,0.15);
     }
     .pricing-card.featured::before {
       content: 'Most Popular';
@@ -173,8 +169,8 @@
       top: -12px;
       left: 50%;
       transform: translateX(-50%);
-      background: #ffcc00;
-      color: #000;
+      background: linear-gradient(135deg, #ff5e66, #e24b55);
+      color: #fff;
       font-size: 12px;
       font-weight: 900;
       padding: 6px 16px;
@@ -185,7 +181,6 @@
     .plan-icon {
       font-size: 32px;
       margin-bottom: 12px;
-      color: #ffcc00;
     }
     .plan-name {
       font-size: 1.5rem;
@@ -208,7 +203,7 @@
     .price-amount {
       font-size: 2.5rem;
       font-weight: 900;
-      color: #ffcc00;
+      color: var(--text);
     }
     .price-period {
       color: var(--muted);
@@ -222,8 +217,8 @@
     }
     .save-percentage {
       display: inline-block;
-      background: #ff5e66;
-      color: white;
+      background: linear-gradient(135deg, #ffcc66, #ff9966);
+      color: #0a0d12;
       font-size: 11px;
       font-weight: 900;
       padding: 2px 8px;
@@ -234,44 +229,51 @@
     }
     .plan-credits {
       font-size: 14px;
-      color: var(--text);
+      color: var(--muted);
       margin-bottom: 24px;
       padding: 8px 12px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      text-align: center;
+      text-align: left;
+      background: transparent;
+      border: none;
     }
     .plan-credits strong {
-      color: #ffcc00;
+      color: var(--text);
       font-weight: 800;
     }
     .plan-cta {
       width: 100%;
       padding: 14px 24px;
       border-radius: 12px;
-      border: 1px solid #ffcc00;
-      background: transparent;
-      color: #ffcc00;
+      border: none;
+      background: linear-gradient(180deg, #ff5e66, #e24b55);
+      color: #fff;
       font-weight: 900;
       font-size: 16px;
       cursor: pointer;
       margin-bottom: 24px;
-      transition: all 0.15s;
+      transition: transform 0.15s, box-shadow 0.15s;
     }
     .plan-cta:hover {
-      background: #ffcc00;
-      color: #000;
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(255, 204, 0, 0.2);
+      box-shadow: 0 8px 20px rgba(255,94,102,0.35);
+      background: linear-gradient(180deg, #ff5e66, #e24b55);
+      color: #fff;
     }
     /* Featured CTA */
     .pricing-card.featured .plan-cta {
-      background: #ffcc00;
-      color: #000;
+      background: linear-gradient(135deg, #ff5e66, #e24b55);
+      box-shadow: 0 6px 18px rgba(255,94,102,0.25);
     }
-    .pricing-card.featured .plan-cta:hover {
-      background: #ffe066;
+    .plan-cta.secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .plan-cta.secondary:hover {
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(255,94,102,0.2);
+      background: transparent;
+      color: var(--text);
     }
 
     .plan-features {
@@ -293,9 +295,17 @@
     }
     .plan-features li::before {
       content: '✓';
-      color: #ffcc00;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(255,94,102,0.15);
+      color: var(--primary);
       font-weight: 900;
       flex-shrink: 0;
+      margin-top: 0;
     }
     
     /* FAQ Section */
@@ -309,7 +319,11 @@
       font-size: 2.5rem;
       font-weight: 900;
       margin-bottom: 48px;
-      color: var(--text);
+      background: linear-gradient(135deg, #ffcc66 0%, #ff9966 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
     }
     .faq-item {
       background: var(--card);
@@ -335,9 +349,9 @@
       text-align: center;
       padding: 80px 20px;
       margin: 60px 0;
-      background: linear-gradient(135deg, rgba(255,204,0,0.05), rgba(255,94,102,0.05));
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(255,94,102,0.08), rgba(124,134,211,0.08));
+      border-top: 1px solid rgba(255,94,102,0.2);
+      border-bottom: 1px solid rgba(255,94,102,0.2);
     }
     .cta-section h2 {
       font-size: 2.25rem;
@@ -453,7 +467,7 @@
             <li class="yearly-price" style="display:none; color:#ffcc00;"><strong>Commercial Use License</strong></li>
           </ul>
 
-          <button class="plan-cta" style="margin-top:auto;">Sign In to Get Started</button>
+          <button class="plan-cta secondary" style="margin-top:auto;">Sign In to Get Started</button>
         </div>
 
         <!-- Pro Plan (Featured) -->
@@ -556,7 +570,7 @@
             <li>Never expires</li>
             <li>All features unlocked</li>
           </ul>
-          <button class="plan-cta" style="margin-top:auto;">Sign In to Get Started</button>
+          <button class="plan-cta secondary" style="margin-top:auto;">Sign In to Get Started</button>
         </div>
 
         <!-- Growth Pack -->
