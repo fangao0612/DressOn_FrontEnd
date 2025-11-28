@@ -108,15 +108,19 @@
     }
     .billing-option .save-badge {
       position: absolute;
-      top: -10px;
-      right: -10px;
+      top: -18px; /* Move up */
+      right: -12px; /* Move right */
       background: #ffcc66;
       color: #0a0d12;
-      font-size: 10px;
+      font-size: 9px; /* Slightly smaller font */
       font-weight: 900;
-      padding: 2px 6px;
+      padding: 4px 6px;
       border-radius: 4px;
       text-transform: uppercase;
+      white-space: nowrap; /* Keep in one line if possible, or control width */
+      line-height: 1.1;
+      z-index: 10;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
     
     /* Pricing cards */
