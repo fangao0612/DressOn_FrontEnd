@@ -89,7 +89,7 @@ export const translations = {
 
     // Showcase
     'showcase.title': 'Lightning‑Fast Fashion Creations',
-    'showcase.character': '👤 Character & Pose',
+    'showcase.character': '🧑 Character & Pose',
     'showcase.outfit': '👔 Outfit Reference',
     'showcase.result': '✨ Final Result',
     'showcase.dropClick': 'Drop or Click',
@@ -213,7 +213,7 @@ export const translations = {
 
     // Showcase
     'showcase.title': '闪电般快速的时尚创作',
-    'showcase.character': '👤 人物与姿势',
+    'showcase.character': '🧑 人物与姿势',
     'showcase.outfit': '👔 服装参考',
     'showcase.result': '✨ 最终结果',
     'showcase.dropClick': '拖放或点击',

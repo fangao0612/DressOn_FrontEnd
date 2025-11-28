@@ -386,7 +386,7 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 .showcase-img.img-1{background-image:url('./assets/showcase/editorial-skyline-img-1.jpg'), linear-gradient(135deg,#4b5b8a,#1a2033)}
 .showcase-img.img-2{background-image:url('./assets/showcase/editorial-skyline-img-2.jpg'), linear-gradient(135deg,#6b5b8a,#221a33)}
 .showcase-img.img-3{background-image:url('./assets/showcase/editorial-skyline-img-3.jpg'), linear-gradient(135deg,#4b8a7c,#1a332d)}
-.showcase-label{padding:16px 12px;text-align:center;font-size:13px;font-weight:600;color:rgba(255,255,255,.65)}
+.showcase-label{padding:16px 12px;text-align:center;font-size:13px;font-weight:600;color:rgba(255,255,255,.92)}
 .label-final{color:#E4C07A;font-weight:700}
 .showcase-save-btn{position:absolute;bottom:16px;right:16px;z-index:10}
 
@@ -831,6 +831,10 @@ button.hero-cta:hover .hero-cta-text{opacity:0.8}
 
 [data-theme="light"] .credits .unit{
   color:#64748b;  /* muted dark color for "credits" text */
+}
+
+[data-theme="light"] .showcase-label{
+  color:rgba(0,0,0,.85);  /* dark text on light background */
 }
 
 /* Fix button shadow clipping in prompt-actions */
