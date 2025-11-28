@@ -39,9 +39,23 @@
       .policy-content { padding: 24px; }
       h1 { font-size: 2rem; }
     }
+    
+    /* Top gradient only */
+    .page-gradient-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 600px;
+      background: radial-gradient(800px 360px at 20% 10%, rgba(255,94,102,.08), transparent 60%),
+                  radial-gradient(900px 420px at 80% -5%, rgba(124,134,211,.08), transparent 60%);
+      z-index: -1;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
+  <div class="page-gradient-bg"></div>
   <header class="site-header">
     <div class="container header-inner nb-header">
       <div class="nb-left">
