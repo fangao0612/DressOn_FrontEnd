@@ -351,7 +351,9 @@ class ShowcaseEditor {
       for (let i = 0; i < 3; i++) {
         const roleName = ROLE_NAMES[i];
         const fileName = `${roleName}-${cardIndex}.jpg`;
-        const imgPath = `./assets/showcase/${fileName}`;
+        // Encode special characters in filename for URL
+        const encodedFileName = encodeURIComponent(fileName);
+        const imgPath = `./assets/showcase/${encodedFileName}`;
         
         const imgElement = document.querySelector(
           `.showcase-card[data-showcase-id="${showcaseId}"] .editable-img[data-img-index="${i}"]`
