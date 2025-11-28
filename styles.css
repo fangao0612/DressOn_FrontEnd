@@ -106,7 +106,7 @@ body.no-scroll{overflow:hidden}
 
 /* Sign In button: same footprint as Launch Now, without stroke */
 .sign-in-btn{padding:0 1.05rem;height:40px;border-radius:999px;border:0;white-space:nowrap;line-height:1;}
-button.sign-in-btn{line-height:36px;padding:0 1.05rem;}
+button.sign-in-btn{line-height:32px;padding:0 1.05rem;}
 .btn.primary.sign-in-btn{border:0 !important}
 
 /* Auth visibility guard (CSS-level, no闪烁) */
