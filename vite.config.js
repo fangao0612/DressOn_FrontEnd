@@ -17,6 +17,7 @@ export default defineConfig({
         pricing: resolve(__dirname, 'pricing.html'),
         privacy: resolve(__dirname, 'privacy.html'),
         terms: resolve(__dirname, 'terms.html'),
+        refund: resolve(__dirname, 'refund.html'),
       },
     },
   },

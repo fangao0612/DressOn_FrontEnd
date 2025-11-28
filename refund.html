@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Refund Policy — DressOn AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>👗</text></svg>">
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    body {
+      background: var(--bg) !important;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Top gradient */
+    .page-gradient-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 600px;
+      background: radial-gradient(800px 360px at 20% 10%, rgba(255,94,102,.08), transparent 60%),
+                  radial-gradient(900px 420px at 80% -5%, rgba(124,134,211,.08), transparent 60%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .refund-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px 32px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,.15);
+    }
+
+    .refund-icon {
+      font-size: 48px;
+      margin-bottom: 24px;
+      display: inline-block;
+      background: linear-gradient(135deg, #ffcc66, #ff9966);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 12px rgba(255,153,102,0.3));
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 900;
+      margin: 0 0 8px;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0 0 16px;
+      color: var(--text);
+    }
+
+    p {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .email-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #b388ff; /* A distinct purple color */
+      text-decoration: none;
+      background: rgba(179, 136, 255, 0.1);
+      padding: 8px 16px;
+      border-radius: 8px;
+      margin-bottom: 32px;
+      transition: background 0.2s;
+    }
+    .email-link:hover {
+      background: rgba(179, 136, 255, 0.2);
+    }
+
+    .btn-back {
+      display: inline-flex;
+      padding: 12px 32px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-back:hover {
+      border-color: var(--text);
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-gradient-bg"></div>
+  <header class="site-header">
+    <div class="container header-inner nb-header">
+      <div class="nb-left">
+        <div class="brand">
+          <img class="logo-img" src="./assets/dresson_logo.svg" alt="Dress On logo" />
+          <span class="name">Dress On</span>
+        </div>
+      </div>
+      <div class="nb-center">
+        <a class="nav-link" href="/">Image Editor</a>
+        <a class="nav-link" href="/#showcase">Showcase</a>
+        <a class="nav-link" href="/pricing.html">Pricing</a>
+        <a class="nav-link" href="/#api">API</a>
+        <a class="nav-link" href="/calculator.html" target="_blank">Calculator</a>
+      </div>
+      <div class="nb-right">
+        <button class="icon-btn theme-toggle" aria-label="Toggle theme">🌙</button>
+        <a class="btn primary sign-in-btn" href="/pricing.html">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="refund-card">
+      <h1 style="font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 20px;">Refund Application</h1>
+      
+      <div class="refund-icon">
+        <span class="material-symbols-outlined" style="font-family: 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif;">✉️</span>
+      </div>
+
+      <h2>Contact Us for Refund</h2>
+      
+      <p>To request a refund, please send us an email with your order details and reason for the refund. Our support team will review your request and respond within 2-3 business days.</p>
+      
+      <a href="mailto:support@dresson.ai" class="email-link">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        support@dresson.ai
+      </a>
+
+      <div>
+        <a href="/" class="btn-back">Go Back</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>&copy; 2025 DressOn AI. All rights reserved.</p>
+      <nav class="footer-nav">
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/refund.html">Refund</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script type="module">
+    // Reuse theme logic
+    const themeToggle = document.querySelector('.theme-toggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        const root = document.documentElement;
+        const newTheme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', newTheme);
+        themeToggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+        localStorage.setItem('theme', newTheme);
+      });
+      
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      themeToggle.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+    }
+  </script>
+</body>
+</html>
+
