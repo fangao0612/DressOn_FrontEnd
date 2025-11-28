@@ -353,7 +353,7 @@ class ShowcaseEditor {
         const fileName = `${roleName}-${cardIndex}.jpg`;
         // Encode special characters in filename for URL
         const encodedFileName = encodeURIComponent(fileName);
-        const imgPath = `./assets/showcase/${encodedFileName}`;
+        const imgPath = `/showcase/${encodedFileName}`;
         
         const imgElement = document.querySelector(
           `.showcase-card[data-showcase-id="${showcaseId}"] .editable-img[data-img-index="${i}"]`
@@ -376,9 +376,6 @@ class ShowcaseEditor {
 
   // Centralized method to apply image to element
   applyImageToElement(imgElement, imgSrc, imgName) {
-    imgElement.style.backgroundImage = `url(${imgSrc})`;
-    imgElement.classList.add('has-image');
-
     // Remove overlay
     const overlay = imgElement.querySelector('.upload-overlay');
     if (overlay) overlay.remove();
@@ -398,7 +395,16 @@ class ShowcaseEditor {
     realImg.alt = imgName || 'Showcase image';
     realImg.dataset.imgSrc = imgSrc; // Store src in data attribute for event delegation
     realImg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;cursor:pointer;';
+    
+    // Error handling: if image fails, remove it to show background
+    realImg.onerror = () => {
+      console.warn(`[Showcase] Failed to load image: ${imgSrc}`);
+      realImg.remove();
+      // Restore overlay if needed, or just leave background
+    };
+
     imgElement.appendChild(realImg);
+    imgElement.classList.add('has-image');
   }
 
   async saveToLocalStorage() {
